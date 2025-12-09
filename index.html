@@ -1,1 +1,61 @@
-<img src="assets/banner.png" alt="TokenHatch Banner" class="banner">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokenHatch Mini App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Banner -->
+    <div class="banner">
+        <h1>🐣 TokenHatch</h1>
+        <p>Tap eggs, unlock creatures, earn rewards!</p>
+    </div>
+
+    <!-- Start App button -->
+    <div class="start-container">
+        <button id="start-btn">Start</button>
+    </div>
+
+    <!-- App content (hidden initially) -->
+    <div id="app" class="hidden">
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" data-tab="home">🏠</button>
+            <button class="nav-btn" data-tab="tasks">📝</button>
+            <button class="nav-btn" data-tab="hatch">🥚</button>
+            <button class="nav-btn" data-tab="airdrop">🎁</button>
+        </div>
+
+        <!-- Screens -->
+        <div id="screens">
+
+            <div class="screen" id="home-screen">
+                <h2>Home</h2>
+                <p>Egg tap game will be here.</p>
+            </div>
+
+            <div class="screen hidden" id="tasks-screen">
+                <h2>Tasks</h2>
+                <p>Affiliate earning tasks will show here.</p>
+            </div>
+
+            <div class="screen hidden" id="hatch-screen">
+                <h2>Hatch</h2>
+                <p>Your unlocked creatures will appear here.</p>
+            </div>
+
+            <div class="screen hidden" id="airdrop-screen">
+                <h2>Airdrop</h2>
+                <p>Upcoming airdrop info and rewards.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
