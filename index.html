@@ -19,40 +19,34 @@
         <button id="start-btn">Start</button>
     </div>
 
-    <!-- App content (hidden initially) -->
-    <div id="app" class="hidden">
+    <!-- Tab buttons (hidden initially) -->
+    <div class="tabs hidden">
+        <button class="tab-btn active" data-tab="home">🏠 Home</button>
+        <button class="tab-btn" data-tab="tasks">📝 Tasks</button>
+        <button class="tab-btn" data-tab="hatch">🥚 Hatch</button>
+        <button class="tab-btn" data-tab="airdrop">🎁 Airdrop</button>
+    </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <button class="nav-btn active" data-tab="home">🏠</button>
-            <button class="nav-btn" data-tab="tasks">📝</button>
-            <button class="nav-btn" data-tab="hatch">🥚</button>
-            <button class="nav-btn" data-tab="airdrop">🎁</button>
+    <!-- Screens -->
+    <div class="screens">
+        <div class="screen" id="home">
+            <h2>Home</h2>
+            <p>Egg tap game will be here.</p>
         </div>
 
-        <!-- Screens -->
-        <div id="screens">
+        <div class="screen hidden" id="tasks">
+            <h2>Tasks</h2>
+            <p>Affiliate tasks appear here.</p>
+        </div>
 
-            <div class="screen" id="home-screen">
-                <h2>Home</h2>
-                <p>Egg tap game will be here.</p>
-            </div>
+        <div class="screen hidden" id="hatch">
+            <h2>Hatch</h2>
+            <p>Your unlocked creatures appear here.</p>
+        </div>
 
-            <div class="screen hidden" id="tasks-screen">
-                <h2>Tasks</h2>
-                <p>Affiliate earning tasks will show here.</p>
-            </div>
-
-            <div class="screen hidden" id="hatch-screen">
-                <h2>Hatch</h2>
-                <p>Your unlocked creatures will appear here.</p>
-            </div>
-
-            <div class="screen hidden" id="airdrop-screen">
-                <h2>Airdrop</h2>
-                <p>Upcoming airdrop info and rewards.</p>
-            </div>
-
+        <div class="screen hidden" id="airdrop">
+            <h2>Airdrop</h2>
+            <p>Upcoming airdrop info will appear here.</p>
         </div>
     </div>
 
