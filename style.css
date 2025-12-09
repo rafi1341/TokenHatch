@@ -6,28 +6,11 @@ body {
     color: white;
 }
 
-.banner {
-    margin-top: 20px;
-}
-
-.start-container {
-    margin: 20px 0;
-}
-
-#start-btn {
-    padding: 12px 30px;
-    font-size: 20px;
-    border-radius: 10px;
-    border: none;
-    background: #ffbf00;
-    cursor: pointer;
-}
-
-/* Tabs/buttons below start */
+/* Tabs/buttons at top */
 .tabs {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
 .tab-btn {
