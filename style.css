@@ -7,12 +7,18 @@ body {
     justify-content: flex-end;
 }
 
-/* Tabs/buttons at top */
+/* Tabs/buttons at bottom */
 .tabs {
     display: flex;
-    justify-content: flex-end;
-    margin: 20px 0;
+    justify-content: center;  /* centers buttons horizontally */
+    gap: 10px;                /* space between buttons */
+    position: fixed;          /* fix at viewport bottom */
+    bottom: 20px;             /* distance from bottom */
+    left: 50%;                /* center horizontally */
+    transform: translateX(-50%);
+    margin: 0;                /* remove top/bottom margin */
 }
+
 
 .tab-btn {
     flex: 1;
