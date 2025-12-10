@@ -40,9 +40,9 @@ tabBtns.forEach(btn => {
 // ------------------- Egg Hatching Game -------------------
 document.addEventListener('DOMContentLoaded', () => {
     const eggs = [
-        { hp: 3, creature: 'creature1.png' },
-        { hp: 4, creature: 'creature2.png' },
-        { hp: 5, creature: 'creature3.png' }
+        { hp: 3, creature: 'assets/creature1.png' },
+        { hp: 4, creature: 'assets/creature2.png' },
+        { hp: 5, creature: 'assets/creature3.png' }
     ];
     let currentLevel = 0;
 
