@@ -43,3 +43,45 @@ body {
 .hidden {
     display: none;
 }
+
+/* ---------- Egg Game Styles ---------- */
+.egg-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+
+.egg {
+    width: 150px;
+    height: 200px;
+    cursor: pointer;
+    position: relative;
+}
+
+.egg img {
+    width: 100%;
+    transition: transform 0.2s;
+}
+
+/* Small "hit" effect when egg is tapped */
+.egg.hit {
+    transform: scale(0.95);
+}
+
+/* Creature unlocked display */
+#creature-unlocked {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#creature-unlocked img {
+    width: 150px;
+    height: auto;
+}
+
+.hidden {
+    display: none;
+}
+
