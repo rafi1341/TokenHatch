@@ -3,50 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TokenHatch Mini App</title>
+    <title>TokenHatch</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Tab buttons below top -->
+    <!-- NAV BAR -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="home"> Home</button>
-        <button class="tab-btn" data-tab="tasks"> Tasks</button>
-        <button class="tab-btn" data-tab="hatch"> creatures1</button>
-        <button class="tab-btn" data-tab="airdrop"> Airdrop</button> 
+        <button class="tab-btn active" data-tab="home">🏠 Home</button>
+        <button class="tab-btn" data-tab="tasks">📝 Tasks</button>
+        <button class="tab-btn" data-tab="hatch">🥚 Hatch</button>
+        <button class="tab-btn" data-tab="airdrop">🎁 Airdrop</button>
     </div>
 
-    <!-- Screens -->
-    <div class="screens">
-        <div class="screen" id="home">
-            <h2>Home</h2>
-            <p>Egg tap game will be here.</p>
-        </div>
-
-        <div class="screen hidden" id="tasks">
-            <h2>Tasks</h2>
-            <p>Affiliate tasks appear here.</p>
-        </div>
-
-        <div class="screen hidden" id="hatch">
-            <h2>Hatch</h2>
-            <p>Your unlocked creatures appear here.</p>
-        </div>
-
-        <div class="screen hidden" id="airdrop">
-            <h2>Airdrop</h2>
-            <p>Upcoming airdrop info will appear here.</p>
-        </div>
+    <!-- SCREENS -->
+    <div id="home" class="screen">
+        <h2>Welcome to TokenHatch</h2>
+        <p>Your mini app base is ready.</p>
     </div>
 
-    <div id="egg-screen" class="screen hidden"> <!-- this matches your tabs -->
-    <div class="egg-container"></div>
-    <div id="creature-unlocked" class="hidden">
-        <img id="creature-image" src="" alt="Creature">
-        <p>Creature Unlocked!</p>
+    <div id="tasks" class="screen hidden">
+        <h2>Tasks</h2>
+        <p>Task system coming soon.</p>
     </div>
-</div>
 
+    <div id="hatch" class="screen hidden">
+        <h2>Hatch</h2>
+        <p>Egg game will be added later.</p>
+    </div>
+
+    <div id="airdrop" class="screen hidden">
+        <h2>Airdrop Info</h2>
+        <p>Airdrop features coming soon.</p>
+    </div>
 
     <script src="script.js"></script>
 </body>
