@@ -4,13 +4,20 @@ body {
     padding: 20px;
     background: #f8f8f8;
     text-align: center;
+    padding-bottom: 70px; /* space for bottom tabs so content isn't hidden */
 }
 
 /* Tabs */
 .tabs {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f0f0f0;
+    padding: 10px 0;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
 
 .tab-btn {
