@@ -1,87 +1,38 @@
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f8f8f8;
     text-align: center;
-    background: #111;
-    color: white;
-    justify-content: flex-end;
 }
 
-/* Tabs/buttons at bottom */
+/* Tabs */
 .tabs {
     display: flex;
-    justify-content: center;  /* centers buttons horizontally */
-    position: fixed;          /* fix at viewport bottom */
-    bottom: 10px;             /* distance from bottom */
-    left: 50%;                /* center horizontally */
-    transform: translateX(-50%);
-    margin: 0;                /* remove top/bottom margin */
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
-
 
 .tab-btn {
     flex: 1;
-    margin: 0 5px;
     padding: 12px;
-    font-size: 18px;
-    background: #222;
-    border: 2px solid #333;
-    border-radius: 10px;
-    cursor: pointer;
+    margin: 0 5px;
+    border: none;
+    background: #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
 }
 
 .tab-btn.active {
-    background: #ffbf00;
-    color: #111;
+    background: #6c5ce7;
+    color: white;
 }
 
 /* Screens */
 .screen {
-    padding: 20px;
+    margin-top: 20px;
 }
 
 .hidden {
     display: none;
 }
-
-/* ---------- Egg Game Styles ---------- */
-.egg-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 50px;
-    flex-wrap: wrap;
-}
-
-.egg {
-    width: 150px;
-    height: 200px;
-    cursor: pointer;
-    position: relative;
-}
-
-.egg img {
-    width: 100%;
-    transition: transform 0.2s;
-}
-
-/* Small "hit" effect when egg is tapped */
-.egg.hit {
-    transform: scale(0.95);
-}
-
-/* Creature unlocked display */
-#creature-unlocked {
-    text-align: center;
-    margin-top: 30px;
-}
-
-#creature-unlocked img {
-    width: 150px;
-    height: auto;
-}
-
-.hidden {
-    display: none;
-}
-
