@@ -17,13 +17,32 @@ tabBtns.forEach(btn => {
     });
 });
 
+// ------------------- Tabs Code -------------------
+const tabBtns = document.querySelectorAll(".tab-btn");
+const screens = document.querySelectorAll(".screen");
+
+// Tab switching
+tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+
+        // Hide all screens
+        screens.forEach(screen => screen.classList.add("hidden"));
+        // Show clicked screen
+        document.getElementById(target).classList.remove("hidden");
+
+        // Active button styling
+        tabBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    });
+});
+
+// ------------------- Egg Hatching Game -------------------
 document.addEventListener('DOMContentLoaded', () => {
-    // Egg data
     const eggs = [
         { hp: 3, creature: 'creature1.png' },
         { hp: 4, creature: 'creature2.png' },
-        { hp: 5, creature: 'creature3.png' },
-        // ... up to 20
+        { hp: 5, creature: 'creature3.png' }
     ];
     let currentLevel = 0;
 
@@ -33,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showEgg(level) {
         eggContainer.innerHTML = '';
-        if (level >= eggs.length) {
+        if(level >= eggs.length){
             eggContainer.innerHTML = '<p>All eggs hatched!</p>';
             return;
         }
@@ -43,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         egg.dataset.hp = eggs[level].hp;
 
         const img = document.createElement('img');
-        img.src = 'egg.png'; // your egg image
+        img.src = 'assets/egg.png'; // egg image path
         egg.appendChild(img);
 
         eggContainer.appendChild(egg);
@@ -54,16 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
             egg.classList.add('hit');
             setTimeout(() => egg.classList.remove('hit'), 100);
 
-            if (hp <= 0) {
+            if(hp <= 0){
                 hatchEgg(level);
             }
         });
     }
 
-    function hatchEgg(level) {
+    function hatchEgg(level){
         const egg = document.querySelector('.egg');
         egg.style.display = 'none';
-        creatureImage.src = eggs[level].creature;
+        creatureImage.src = `assets/${eggs[level].creature}`; // creature image path
         creatureDiv.classList.remove('hidden');
 
         setTimeout(() => {
@@ -76,4 +95,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start first egg
     showEgg(currentLevel);
 });
-
