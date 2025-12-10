@@ -1,26 +1,25 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: #f8f8f8;
-    text-align: center;
-}
-
-/* Tabs */
+/* Tabs fixed at bottom */
 .tabs {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f0f0f0;
+    padding: 10px 0;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
 
+/* Buttons inside tabs */
 .tab-btn {
     flex: 1;
-    padding: 12px;
     margin: 0 5px;
+    padding: 12px 0;
     border: none;
-    background: #e0e0e0;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 16px;
+    background: #e0e0e0;
 }
 
 .tab-btn.active {
@@ -28,11 +27,7 @@ body {
     color: white;
 }
 
-/* Screens */
-.screen {
-    margin-top: 20px;
-}
-
-.hidden {
-    display: none;
+/* Add bottom padding to body so content is not hidden behind tabs */
+body {
+    padding-bottom: 70px; /* height of tabs + some space */
 }
