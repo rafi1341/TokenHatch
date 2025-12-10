@@ -4,12 +4,13 @@ body {
     text-align: center;
     background: #111;
     color: white;
+    justify-content: flex-end;
 }
 
 /* Tabs/buttons at top */
 .tabs {
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-end;
     margin: 20px 0;
 }
 
