@@ -77,7 +77,13 @@ document.addEventListener("DOMContentLoaded", () => {
         plus.style.top = `${e.pageY}px`;
         document.body.appendChild(plus);
         setTimeout(() => plus.remove(), 800);
-
+        try {
+        supabase
+            .from('users_tokens')
+            .upsert({ id: userId, tokens: tokens });
+        } catch(err) {
+        console.error("Supabase save failed:", err);
+    }
         // Save asynchronously
         saveTokens();
     });
