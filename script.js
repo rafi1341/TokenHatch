@@ -1,5 +1,8 @@
+// script.js
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Tab switching ---
+    // ------------------------
+    // Tab switching
+    // ------------------------
     const tabBtns = document.querySelectorAll(".tab-btn");
     const screens = document.querySelectorAll(".screen");
 
@@ -13,38 +16,30 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- Egg tapping logic ---
+    // ------------------------
+    // Egg tapping
+    // ------------------------
     const egg = document.getElementById("egg");
     const tokenCountDisplay = document.getElementById("token-count");
-
-    // Load tokens from LocalStorage or start with 0
-    let tokens = parseInt(localStorage.getItem('eggTokens') || 0);
-    tokenCountDisplay.textContent = tokens;
+    let tokens = parseInt(tokenCountDisplay.textContent) || 0;
 
     if (!egg) {
         console.error("Egg element not found!");
         return;
     }
 
-    egg.addEventListener("click", (e) => {
-        // Increment token
+    egg.addEventListener("click", () => {
+        // Increment tokens locally
         tokens++;
         tokenCountDisplay.textContent = tokens;
 
-        // Save to LocalStorage
-        localStorage.setItem('eggTokens', tokens);
-
-        // Hit animation
-        egg.classList.add("hit");
-        setTimeout(() => egg.classList.remove("hit"), 100);
-
-        // Floating +1 animation
+        // Floating +1
         const plus = document.createElement("div");
         plus.classList.add("floating-plus");
         plus.textContent = "+1";
         plus.style.position = "absolute";
-        plus.style.left = `${e.pageX}px`;
-        plus.style.top = `${e.pageY}px`;
+        plus.style.left = `${egg.getBoundingClientRect().left + egg.offsetWidth / 2}px`;
+        plus.style.top = `${egg.getBoundingClientRect().top}px`;
         plus.style.color = "#fff";
         plus.style.fontWeight = "bold";
         plus.style.userSelect = "none";
@@ -52,13 +47,18 @@ document.addEventListener("DOMContentLoaded", () => {
         plus.style.transition = "all 0.8s ease-out";
         document.body.appendChild(plus);
 
-        // Animate upwards
         setTimeout(() => {
-            plus.style.top = `${e.pageY - 30}px`;
-            plus.style.opacity = '0';
-        }, 10);
+            plus.style.transform = "translateY(-30px)";
+            plus.style.opacity = "0";
+        }, 0);
 
-        // Remove element after animation
         setTimeout(() => plus.remove(), 800);
+
+        // ------------------------
+        // Send score to bot
+        // ------------------------
+        if (window.Telegram?.WebApp?.sendData) {
+            window.Telegram.WebApp.sendData(JSON.stringify({ score: tokens }));
+        }
     });
 });
