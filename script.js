@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- 1. Tab switching code ---
+
+    // --- Tab switching code ---
     const tabBtns = document.querySelectorAll(".tab-btn");
     const screens = document.querySelectorAll(".screen");
     tabBtns.forEach(btn => {
@@ -12,16 +13,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- 2. PocketBase setup ---
-    const pb = new PocketBase('http://127.0.0.1:8090'); // or your hosted URL
+    // --- PocketBase setup ---
+    const pb = new PocketBase('http://127.0.0.1:8090'); // replace with your hosted URL if needed
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456";
     let userRecord = null;
 
-    // --- 3. Load tokens ---
+    // --- Load tokens from PocketBase ---
     async function loadTokens() {
         try {
             userRecord = await pb.collection('users_tokens').getFirstListItem(`id="${userId}"`);
         } catch (err) {
+            // create record if not exists
             userRecord = await pb.collection('users_tokens').create({
                 id: userId,
                 tokens: 0,
@@ -32,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadTokens();
 
-    // --- 4. Egg tap handler ---
+    // --- Increment tokens on egg click ---
     async function incrementToken() {
         userRecord.tokens++;
         document.getElementById("token-count").textContent = userRecord.tokens;
@@ -43,13 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    document.getElementById("egg").addEventListener("click", async (e) => {
-        // animation
-        const egg = e.currentTarget;
+    const egg = document.getElementById("egg");
+    egg.addEventListener("click", async (e) => {
+        // Hit animation
         egg.classList.add("hit");
         setTimeout(() => egg.classList.remove("hit"), 100);
 
-        // floating +1
+        // Floating +1
         const plus = document.createElement("div");
         plus.classList.add("floating-plus");
         plus.textContent = "+1";
@@ -58,7 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(plus);
         setTimeout(() => plus.remove(), 800);
 
-        // increment tokens
+        // Increment tokens
         await incrementToken();
     });
+
 });
