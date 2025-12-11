@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tokenCountDisplay = document.getElementById("token-count");
     let tokens = 0;
 
-    egg.addEventListener("click", (e) => {
+    egg.addEventListener("click", () => {
         // Increment token
         tokens++;
         tokenCountDisplay.textContent = tokens;
