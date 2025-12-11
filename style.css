@@ -55,4 +55,6 @@ body {
 .egg {
     width: 250px; /* adjust size */
     height: auto;
+    position: relative;
+    top: 40px; 
 }
