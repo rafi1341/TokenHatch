@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabBtns = document.querySelectorAll(".tab-btn");
     const screens = document.querySelectorAll(".screen");
 
+    const tokenCountDisplay = document.getElementById("token-count");
+    let tokens = await loadTokens(); // get initial value from Supabase
+    tokenCountDisplay.textContent = tokens;
+
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             const target = btn.dataset.tab;
@@ -43,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(plus);
 
         setTimeout(() => plus.remove(), 800);
+        saveTokens(tokens); 
     });
 
 });
