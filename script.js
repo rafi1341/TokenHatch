@@ -18,11 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const tokenCountDisplay = document.getElementById("token-count");
     let tokens = parseInt(tokenCountDisplay.textContent) || 0;
 
-    // --- Initialize PocketBase ---
-    const pb = new PocketBase('http://127.0.0.1:8090');
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456";
-    let userRecord;
-
     async function loadUser() {
         try {
             userRecord = await pb.collection('users_tokens').getFirstListItem(`id="${userId}"`);
