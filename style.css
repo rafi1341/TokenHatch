@@ -67,16 +67,16 @@ body {
 
 /* Floating +1 */
 .floating-plus {
-    position: absolute;
     font-weight: bold;
-    color: #f39c12; /* gold/orange */
+    color: #f39c12;
     font-size: 20px;
-    pointer-events: none; /* so it doesn’t block clicks */
+    pointer-events: none;
+    transform: translate(-50%, -50%);
     animation: floatUp 0.8s ease-out forwards;
 }
 
 @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-50px); }
+    0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+    100% { opacity: 0; transform: translate(-50%, -50%) translateY(-50px); }
 }
 
