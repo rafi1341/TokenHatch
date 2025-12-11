@@ -32,3 +32,38 @@ egg.addEventListener("click", () => {
     hitCountDisplay.textContent = `Hits: ${hits}`;
 });
 
+const egg = document.getElementById("egg");
+const tokenCountDisplay = document.getElementById("token-count");
+
+let tokens = 0;
+
+egg.addEventListener("click", (e) => {
+    // Increment token
+    tokens++;
+    tokenCountDisplay.textContent = tokens;
+
+    // Hit animation
+    egg.classList.add("hit");
+    setTimeout(() => egg.classList.remove("hit"), 100);
+
+    // Create floating +1
+    const plus = document.createElement("div");
+    plus.classList.add("floating-plus");
+    plus.textContent = "+1";
+
+    // Position it where user clicked
+    const rect = egg.getBoundingClientRect();
+    plus.style.left = `${e.clientX - rect.left}px`;
+    plus.style.top = `${e.clientY - rect.top}px`;
+
+    // Add to egg-wrapper
+    const wrapper = document.querySelector(".egg-wrapper");
+    wrapper.appendChild(plus);
+
+    // Remove after animation
+    setTimeout(() => {
+        plus.remove();
+    }, 800);
+});
+
+
