@@ -65,7 +65,7 @@ body {
 /* Floating +1 */
 .floating-plus {
     font-weight: bold;
-    color: #f39c12;
+    color: white;
     font-size: 20px;
     pointer-events: none;
     position: absolute;
