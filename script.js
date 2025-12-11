@@ -12,3 +12,23 @@ tabBtns.forEach(btn => {
         btn.classList.add("active");
     });
 });
+
+// Egg tapping logic
+const egg = document.getElementById("egg");
+const hitCountDisplay = document.getElementById("hit-count");
+
+let hits = 0;
+
+egg.addEventListener("click", () => {
+    hits++;
+    
+    // Add hit animation
+    egg.classList.add("hit");
+    setTimeout(() => {
+        egg.classList.remove("hit");
+    }, 100);
+
+    // Update hit count
+    hitCountDisplay.textContent = `Hits: ${hits}`;
+});
+
