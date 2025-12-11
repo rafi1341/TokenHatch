@@ -1,13 +1,18 @@
+/* Body padding for bottom tabs */
 body {
+    padding-bottom: 70px;
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 22px;
-    background: #f8f8f8;
     text-align: center;
-    padding-bottom: 70px; /* space for bottom tabs so content isn't hidden */
+    margin: 0;
+    background: #f8f8f8;
 }
 
-/* Tabs */
+/* Screens hidden class */
+.hidden {
+    display: none;
+}
+
+/* Tabs fixed at bottom */
 .tabs {
     display: flex;
     justify-content: space-between;
@@ -22,12 +27,12 @@ body {
 
 .tab-btn {
     flex: 1;
-    padding: 12px;
     margin: 0 5px;
+    padding: 12px 0;
     border: none;
-    background: #e0e0e0;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 16px;
+    background: #e0e0e0;
 }
 
 .tab-btn.active {
@@ -35,34 +40,24 @@ body {
     color: white;
 }
 
-/* Screens */
-.screen {
-    margin-top: 20px;
-}
-
-.hidden {
-    display: none;
-}
-
-/* Egg wrapper to center the egg */
+/* Egg wrapper */
 .egg-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 50px; /* adjust vertical spacing */
+    margin-top: 50px;
 }
 
+/* Egg image */
 .egg {
-    width: 250px; /* adjust size */
+    width: 150px;
     height: auto;
-    position: relative;
-    top: 40px; 
+    cursor: pointer;
 }
 
-/* Hit animation */
 .hit {
-    transform: scale(0.7);
-    transition: transform 0.4s;
+    transform: scale(0.9);
+    transition: transform 0.1s;
 }
 
 /* Floating +1 */
@@ -71,6 +66,7 @@ body {
     color: #f39c12;
     font-size: 20px;
     pointer-events: none;
+    position: absolute;
     transform: translate(-50%, -50%);
     animation: floatUp 0.8s ease-out forwards;
 }
@@ -79,4 +75,3 @@ body {
     0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
     100% { opacity: 0; transform: translate(-50%, -50%) translateY(-50px); }
 }
-
