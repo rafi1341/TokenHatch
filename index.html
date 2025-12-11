@@ -3,88 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TokenHatch Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 100px;
-            background: #f8f8f8;
-        }
-
-        .egg-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
-        }
-
-        .egg {
-            width: 150px;
-            height: auto;
-            cursor: pointer;
-        }
-
-        .hit {
-            transform: scale(0.9);
-            transition: transform 0.1s;
-        }
-
-        .floating-plus {
-            font-weight: bold;
-            color: #f39c12;
-            font-size: 20px;
-            pointer-events: none;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            animation: floatUp 0.8s ease-out forwards;
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
-            100% { opacity: 0; transform: translate(-50%, -50%) translateY(-50px); }
-        }
-    </style>
+    <title>TokenHatch</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <h2>Welcome to TokenHatch</h2>
-    <p>Tokens: <span id="token-count">0</span></p>
-
-    <div class="egg-wrapper">
-        <img src="assets/egg1.png" alt="Egg" class="egg" id="egg">
+    <!-- Screens -->
+    <div id="home" class="screen">
+        <h2>Welcome to TokenHatch</h2>
+        <p>Tokens: <span id="token-count">0</span></p>
+        <div class="egg-wrapper">
+            <img src="assets/egg.png" alt="Egg" class="egg" id="egg">
+        </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const egg = document.getElementById("egg");
-            const tokenCountDisplay = document.getElementById("token-count");
+    <div id="tasks" class="screen hidden">
+        <h2>Tasks</h2>
+        <p>Task system coming soon.</p>
+    </div>
 
-            let tokens = 0;
+    <div id="hatch" class="screen hidden">
+        <h2>Hatch</h2>
+        <p>Egg game coming soon.</p>
+    </div>
 
-            egg.addEventListener("click", (e) => {
-                // Increment token
-                tokens++;
-                tokenCountDisplay.textContent = tokens;
+    <div id="airdrop" class="screen hidden">
+        <h2>Airdrop Info</h2>
+        <p>Airdrop features coming soon.</p>
+    </div>
 
-                // Hit animation
-                egg.classList.add("hit");
-                setTimeout(() => egg.classList.remove("hit"), 100);
+    <!-- Tabs fixed at bottom -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="home">🏠 Home</button>
+        <button class="tab-btn" data-tab="tasks">📝 Tasks</button>
+        <button class="tab-btn" data-tab="hatch">🥚 Hatch</button>
+        <button class="tab-btn" data-tab="airdrop">🎁 Airdrop</button>
+    </div>
 
-                // Floating +1
-                const plus = document.createElement("div");
-                plus.classList.add("floating-plus");
-                plus.textContent = "+1";
-                plus.style.left = `${e.pageX}px`;
-                plus.style.top = `${e.pageY}px`;
-                document.body.appendChild(plus);
-
-                setTimeout(() => plus.remove(), 800);
-            });
-        });
-    </script>
-
+    <script src="script.js"></script>
 </body>
-</html>
