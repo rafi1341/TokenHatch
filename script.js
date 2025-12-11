@@ -1,43 +1,61 @@
+// script.js
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- Tab switching ---
+    // --- Tabs ---
     const tabBtns = document.querySelectorAll(".tab-btn");
     const screens = document.querySelectorAll(".screen");
-
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             screens.forEach(s => s.classList.add("hidden"));
             document.getElementById(btn.dataset.tab).classList.remove("hidden");
-
             tabBtns.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
         });
     });
-    const pb = new PocketBase('http://127.0.0.1:8090');
-    const userId = "6648337638"; // Telegram user ID or test 
-    pb.collection('users_tokens').getOne(userId).then(record => console.log(record));
 
-
-    // --- Egg tapping logic ---
+    // --- Egg tapping ---
     const egg = document.getElementById("egg");
     const tokenCountDisplay = document.getElementById("token-count");
-    let tokens = 0;
+    let tokens = parseInt(tokenCountDisplay.textContent) || 0;
 
-    if(!egg) {
-        console.error("Egg element not found!");
-        return;
+    // --- Initialize PocketBase ---
+    const pb = new PocketBase('http://127.0.0.1:8090');
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456";
+    let userRecord;
+
+    async function loadUser() {
+        try {
+            userRecord = await pb.collection('users_tokens').getFirstListItem(`id="${userId}"`);
+        } catch {
+            userRecord = await pb.collection('users_tokens').create({
+                id: userId,
+                tokens: tokens,
+                updated_at: new Date().toISOString()
+            });
+        }
+        tokens = userRecord.tokens;
+        tokenCountDisplay.textContent = tokens;
     }
 
-    egg.addEventListener("click", (e) => {
-        // Increment tokens locally
+    loadUser();
+
+    async function updateTokens() {
+        if(!userRecord) return;
         tokens++;
         tokenCountDisplay.textContent = tokens;
+        try {
+            await pb.collection('users_tokens').update(userRecord.id, {
+                tokens: tokens,
+                updated_at: new Date().toISOString()
+            });
+        } catch(e) {
+            console.error("Failed to update tokens:", e);
+        }
+    }
 
-        // Hit animation
-        egg.classList.add("hit");
-        setTimeout(() => egg.classList.remove("hit"), 100);
-
-        // Floating +1 animation
+    // Click handler
+    egg.addEventListener("click", async (e) => {
+        // Animate +1
         const plus = document.createElement("div");
         plus.classList.add("floating-plus");
         plus.textContent = "+1";
@@ -48,8 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
         plus.style.fontWeight = "bold";
         plus.style.userSelect = "none";
         document.body.appendChild(plus);
-
         setTimeout(() => plus.remove(), 800);
-    });
 
+        // Hit animation
+        egg.classList.add("hit");
+        setTimeout(() => egg.classList.remove("hit"), 100);
+
+        // Update tokens
+        await updateTokens();
+    });
 });
