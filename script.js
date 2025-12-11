@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Supabase setup ---
     const SUPABASE_URL = "https://bvdaqngzsdsolfhphrlq.supabase.co"; // your project URL
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2ZGFxbmd6c2Rzb2xmaHBocmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTE5NTMsImV4cCI6MjA4MDk4Nzk1M30.-fDucAxLylPBnnsFuETB7hAF1VDHndGbdt47cyt_AyY"; // your anon key
+    const SUPABASE_KEY = "YOUR_ANON_KEY"; // replace with your anon key
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- Get Telegram user ID safely ---
@@ -61,28 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Egg click handler ---
     egg.addEventListener("click", (e) => {
-    // Hit animation
-    egg.classList.add("hit");
-    setTimeout(() => egg.classList.remove("hit"), 100);
-
-    // Floating +1
-    const plus = document.createElement("div");
-    plus.classList.add("floating-plus");
-    plus.textContent = "+1";
-    plus.style.left = `${e.pageX}px`;
-    plus.style.top = `${e.pageY}px`;
-    document.body.appendChild(plus);
-    setTimeout(() => plus.remove(), 800);
-
-    // Increment tokens locally
-    tokens++;
-    tokenCountDisplay.textContent = tokens;
-
-    // Save to Supabase asynchronously (does not block animation)
-    incrementToken();
-});
-
-
         // Hit animation
         egg.classList.add("hit");
         setTimeout(() => egg.classList.remove("hit"), 100);
@@ -94,8 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
         plus.style.left = `${e.pageX}px`;
         plus.style.top = `${e.pageY}px`;
         document.body.appendChild(plus);
-
         setTimeout(() => plus.remove(), 800);
+
+        // Increment tokens locally
+        tokens++;
+        tokenCountDisplay.textContent = tokens;
+
+        // Save to Supabase asynchronously (does not block animation)
+        incrementToken();
     });
 
 });
