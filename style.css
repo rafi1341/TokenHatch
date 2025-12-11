@@ -61,6 +61,22 @@ body {
 
 /* Hit animation */
 .hit {
-    transform: scale(0.9);
-    transition: transform 0.1s;
+    transform: scale(0.7);
+    transition: transform 0.4s;
 }
+
+/* Floating +1 */
+.floating-plus {
+    position: absolute;
+    font-weight: bold;
+    color: #f39c12; /* gold/orange */
+    font-size: 20px;
+    pointer-events: none; /* so it doesn’t block clicks */
+    animation: floatUp 0.8s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-50px); }
+}
+
