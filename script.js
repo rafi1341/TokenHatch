@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     const pb = new PocketBase('http://127.0.0.1:8090');
+    const userId = "6648337638"; // Telegram user ID or test 
+    pb.collection('users_tokens').getOne(userId).then(record => console.log(record));
+
 
     // --- Egg tapping logic ---
     const egg = document.getElementById("egg");
