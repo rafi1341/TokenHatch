@@ -58,3 +58,9 @@ body {
     position: relative;
     top: 40px; 
 }
+
+/* Hit animation */
+.hit {
+    transform: scale(0.9);
+    transition: transform 0.1s;
+}
