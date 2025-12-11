@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             const target = btn.dataset.tab;
-
             screens.forEach(s => s.classList.add("hidden"));
             document.getElementById(target).classList.remove("hidden");
 
@@ -16,55 +15,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- Egg tapping logic ---
+    // --- Egg and token setup ---
     const egg = document.getElementById("egg");
     const tokenCountDisplay = document.getElementById("token-count");
-
-    // --- Supabase setup ---
-    const SUPABASE_URL = "https://bvdaqngzsdsolfhphrlq.supabase.co"; // your project URL
-    const SUPABASE_KEY = "YOUR_ANON_KEY"; // replace with your anon key
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // --- Get Telegram user ID safely ---
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456";
-
     let tokens = 0;
 
-    // --- Load tokens from Supabase ---
+    // --- Supabase setup ---
+    const SUPABASE_URL = "https://bvdaqngzsdsolfhphrlq.supabase.co";
+    const SUPABASE_KEY = "YOUR_ANON_KEY";
+    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456";
+
+    // --- Load tokens safely ---
     async function loadTokens() {
-    try {
-        const { data, error } = await supabase
-            .from('users_tokens')
-            .select('tokens')
-            .eq('id', userId)
-            .single();
+        try {
+            const { data, error } = await supabase
+                .from('users_tokens')
+                .select('tokens')
+                .eq('id', userId)
+                .single();
 
-        if (data) {
-            tokens = data.tokens;
+            if (data) tokens = data.tokens;
+            else await supabase.from('users_tokens').insert({ id: userId, tokens: 0 });
+
+        } catch (err) {
+            console.error("Supabase loadTokens error:", err);
+        } finally {
             tokenCountDisplay.textContent = tokens;
-        } else {
-            await supabase.from('users_tokens').insert({ id: userId, tokens: 0 });
-            tokenCountDisplay.textContent = 0;
         }
-    } catch(err) {
-        console.error("Supabase loadTokens error:", err);
-        tokenCountDisplay.textContent = tokens; // still show local tokens
     }
-}
 
+    loadTokens();
 
-    // --- Increment tokens and update Supabase ---
-    async function incrementToken() {
-        tokens++;
-        tokenCountDisplay.textContent = tokens;
-
-        await supabase
-            .from('users_tokens')
-            .upsert({ id: userId, tokens: tokens });
+    // --- Increment tokens ---
+    async function saveTokens() {
+        try {
+            await supabase
+                .from('users_tokens')
+                .upsert({ id: userId, tokens: tokens });
+        } catch (err) {
+            console.error("Supabase saveTokens error:", err);
+        }
     }
 
     // --- Egg click handler ---
     egg.addEventListener("click", (e) => {
+        // Increment tokens locally
+        tokens++;
+        tokenCountDisplay.textContent = tokens;
+
         // Hit animation
         egg.classList.add("hit");
         setTimeout(() => egg.classList.remove("hit"), 100);
@@ -78,12 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(plus);
         setTimeout(() => plus.remove(), 800);
 
-        // Increment tokens locally
-        tokens++;
-        tokenCountDisplay.textContent = tokens;
-
-        // Save to Supabase asynchronously (does not block animation)
-        incrementToken();
+        // Save asynchronously
+        saveTokens();
     });
 
 });
