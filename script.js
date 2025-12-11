@@ -13,36 +13,36 @@ tabBtns.forEach(btn => {
     });
 });
 
-const egg = document.getElementById("egg");
-const tokenCountDisplay = document.getElementById("token-count");
+document.addEventListener("DOMContentLoaded", () => {
 
-let tokens = 0;
+    const egg = document.getElementById("egg");
+    const tokenCountDisplay = document.getElementById("token-count");
 
-egg.addEventListener("click", (e) => {
-    // Increment token
-    tokens++;
-    tokenCountDisplay.textContent = tokens;
+    let tokens = 0;
 
-    // Hit animation
-    egg.classList.add("hit");
-    setTimeout(() => egg.classList.remove("hit"), 100);
+    egg.addEventListener("click", (e) => {
+        // Increment token
+        tokens++;
+        tokenCountDisplay.textContent = tokens;
 
-    // Create floating +1
-    const plus = document.createElement("div");
-    plus.classList.add("floating-plus");
-    plus.textContent = "+1";
+        // Hit animation
+        egg.classList.add("hit");
+        setTimeout(() => egg.classList.remove("hit"), 100);
 
-    // Position relative to page (works on mobile)
-    plus.style.position = "absolute";
-    plus.style.left = `${e.pageX}px`;
-    plus.style.top = `${e.pageY}px`;
+        // Create floating +1
+        const plus = document.createElement("div");
+        plus.classList.add("floating-plus");
+        plus.textContent = "+1";
 
-    // Append to body so it shows above everything
-    document.body.appendChild(plus);
+        // Position at click
+        plus.style.left = `${e.pageX}px`;
+        plus.style.top = `${e.pageY}px`;
 
-    // Remove after animation
-    setTimeout(() => plus.remove(), 800);
+        // Append to body
+        document.body.appendChild(plus);
+
+        // Remove after animation
+        setTimeout(() => plus.remove(), 800);
+    });
+
 });
-
-
-
