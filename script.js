@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Tab switching ---
     const tabBtns = document.querySelectorAll(".tab-btn");
     const screens = document.querySelectorAll(".screen");
+
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             screens.forEach(s => s.classList.add("hidden"));
@@ -13,35 +14,38 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- Egg logic ---
-    function initEgg() {
-        const egg = document.getElementById("egg");
-        const tokenCountDisplay = document.getElementById("token-count");
-        let tokens = 0;
+    // --- Egg tapping logic ---
+    const egg = document.getElementById("egg");
+    const tokenCountDisplay = document.getElementById("token-count");
+    let tokens = 0;
 
-        if(!egg) {
-            console.error("Egg element not found!");
-            return;
-        }
-
-        egg.addEventListener("click", (e) => {
-            tokens++;
-            tokenCountDisplay.textContent = tokens;
-
-            // Hit animation
-            egg.classList.add("hit");
-            setTimeout(() => egg.classList.remove("hit"), 100);
-
-            // Floating +1
-            const plus = document.createElement("div");
-            plus.classList.add("floating-plus");
-            plus.textContent = "+1";
-            plus.style.left = `${e.pageX}px`;
-            plus.style.top = `${e.pageY}px`;
-            document.body.appendChild(plus);
-            setTimeout(() => plus.remove(), 800);
-        });
+    if(!egg) {
+        console.error("Egg element not found!");
+        return;
     }
 
-    initEgg(); // call after DOM is ready
+    egg.addEventListener("click", (e) => {
+        // Increment tokens locally
+        tokens++;
+        tokenCountDisplay.textContent = tokens;
+
+        // Hit animation
+        egg.classList.add("hit");
+        setTimeout(() => egg.classList.remove("hit"), 100);
+
+        // Floating +1 animation
+        const plus = document.createElement("div");
+        plus.classList.add("floating-plus");
+        plus.textContent = "+1";
+        plus.style.position = "absolute";
+        plus.style.left = `${e.pageX}px`;
+        plus.style.top = `${e.pageY}px`;
+        plus.style.color = "#fff";
+        plus.style.fontWeight = "bold";
+        plus.style.userSelect = "none";
+        document.body.appendChild(plus);
+
+        setTimeout(() => plus.remove(), 800);
+    });
+
 });
