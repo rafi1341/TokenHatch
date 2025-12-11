@@ -15,9 +15,29 @@ tabBtns.forEach(btn => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // --- Tab switching ---
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const screens = document.querySelectorAll(".screen");
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = btn.dataset.tab;
+
+            // Hide all screens
+            screens.forEach(screen => screen.classList.add("hidden"));
+
+            // Show clicked screen
+            document.getElementById(target).classList.remove("hidden");
+
+            // Active button styling
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        });
+    });
+
+    // --- Egg tapping logic ---
     const egg = document.getElementById("egg");
     const tokenCountDisplay = document.getElementById("token-count");
-
     let tokens = 0;
 
     egg.addEventListener("click", (e) => {
@@ -29,20 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
         egg.classList.add("hit");
         setTimeout(() => egg.classList.remove("hit"), 100);
 
-        // Create floating +1
+        // Floating +1
         const plus = document.createElement("div");
         plus.classList.add("floating-plus");
         plus.textContent = "+1";
-
-        // Position at click
         plus.style.left = `${e.pageX}px`;
         plus.style.top = `${e.pageY}px`;
-
-        // Append to body
         document.body.appendChild(plus);
 
-        // Remove after animation
         setTimeout(() => plus.remove(), 800);
     });
 
 });
+
