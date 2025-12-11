@@ -60,8 +60,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Egg click handler ---
-    egg.addEventListener("click", async (e) => {
-        await incrementToken();
+    egg.addEventListener("click", (e) => {
+    // Hit animation
+    egg.classList.add("hit");
+    setTimeout(() => egg.classList.remove("hit"), 100);
+
+    // Floating +1
+    const plus = document.createElement("div");
+    plus.classList.add("floating-plus");
+    plus.textContent = "+1";
+    plus.style.left = `${e.pageX}px`;
+    plus.style.top = `${e.pageY}px`;
+    document.body.appendChild(plus);
+    setTimeout(() => plus.remove(), 800);
+
+    // Increment tokens locally
+    tokens++;
+    tokenCountDisplay.textContent = tokens;
+
+    // Save to Supabase asynchronously (does not block animation)
+    incrementToken();
+});
+
 
         // Hit animation
         egg.classList.add("hit");
