@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Load tokens from Supabase ---
     async function loadTokens() {
+    try {
         const { data, error } = await supabase
             .from('users_tokens')
             .select('tokens')
@@ -45,9 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
             await supabase.from('users_tokens').insert({ id: userId, tokens: 0 });
             tokenCountDisplay.textContent = 0;
         }
+    } catch(err) {
+        console.error("Supabase loadTokens error:", err);
+        tokenCountDisplay.textContent = tokens; // still show local tokens
     }
+}
 
-    loadTokens();
 
     // --- Increment tokens and update Supabase ---
     async function incrementToken() {
