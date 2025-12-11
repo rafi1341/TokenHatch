@@ -40,6 +40,13 @@ body {
     color: white;
 }
 
+.subheading {
+    font-size: 16px;
+    color: #555;
+    margin-top: 5px;
+}
+
+
 /* Egg wrapper */
 .egg-wrapper {
     display: flex;
