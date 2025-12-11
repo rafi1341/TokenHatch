@@ -45,12 +45,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 50px;
+    margin-top: -50px;
 }
 
 /* Egg image */
 .egg {
-    width: 150px;
+    width: 250px;
     height: auto;
     cursor: pointer;
 }
