@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // --- Configuration ---
-    const BOT_API = "https://telegrambot-or4r.onrender.com/"; // ← CHANGE THIS to your actual Render URL
+    const BOT_API = "https://telegrambot-or4r.onrender.com"; // ← CHANGE THIS to your actual Render URL
     const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c"; // ← CHANGE THIS to your actual API_SECRET
     
     // --- Tab switching ---
