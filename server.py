@@ -11,7 +11,7 @@ import uvicorn
 # CONFIG
 # -------------------------
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-WEB_APP_URL = "https://tokenhatch.netlify.app/"
+WEB_APP_URL = "https://tokenhatch.onrender.com/"
 DB_PATH = "database.db"
 
 if not BOT_TOKEN:
@@ -68,7 +68,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_photo(
         chat_id=user_id,
-        photo=open("banner.png", "rb"),
+        photo=open("assets/banner.png", "rb")
         caption="Welcome to TokenHatch! 🥚\nHatch creatures, earn $EGG tokens, and participate in airdrops!",
         reply_markup=reply_markup
     )
