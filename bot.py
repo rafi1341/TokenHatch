@@ -1,4 +1,5 @@
 import os
+import asyncio
 import time
 import threading
 from datetime import datetime, timedelta
@@ -91,11 +92,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_cache[user_id]["tokens"] += 1
     user_cache[user_id]["last_update"] = datetime.now()
 
+import asyncio
+
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button))
-    app.run_polling()
+
+    asyncio.run(app.run_polling())
+
 
 
 
