@@ -49,7 +49,6 @@ def flush_cache():
     while True:
         now = datetime.now()
         for user_id, data in list(user_cache.items()):
-            # Only flush users updated >10 seconds ago
             if now - data["last_update"] >= timedelta(seconds=10):
                 cursor.execute(
                     """
@@ -60,9 +59,10 @@ def flush_cache():
                     (user_id, data["tokens"])
                 )
                 conn.commit()
+                # Reset cache after flushing
                 user_cache[user_id]["tokens"] = 0
-                user_cache[user_id]["last_update"] = datetime.now() # reset cache
-        time.sleep(5)  # check every 5 seconds
+                user_cache[user_id]["last_update"] = datetime.now()
+        time.sleep(5) # check every 5 seconds
 
 # Start the flush thread
 threading.Thread(target=flush_cache, daemon=True).start()
@@ -87,8 +87,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user_id = query.from_user.id
 
-    # Add tokens to cache
-    user_cache[user_id]["tokens"] = 0
+    # Add token to cache
+    user_cache[user_id]["tokens"] += 1
     user_cache[user_id]["last_update"] = datetime.now()
+
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button))
+    app.run_polling()
+
 
 
