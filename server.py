@@ -1,97 +1,93 @@
-# bot.py
-from flask import Flask, request, jsonify, send_from_directory
-from threading import Thread
+import os
+import sqlite3
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import sqlite3
-import os
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-WEB_APP_URL = "https://your-render-url.onrender.com"
+# ==========================
+# CONFIG
+# ==========================
+BOT_TOKEN = os.getenv("BOT_TOKEN")   # <-- loads it safely
+WEB_APP_URL = "https://tokenhatch.netlify.app/"
+DB_PATH = "database.db"
 
-# ----------------------------
-# SQLite database setup
-# ----------------------------
-DB_FILE = "tokens.db"
+if not BOT_TOKEN:
+    raise Exception("ERROR: BOT_TOKEN environment variable is missing!")
 
+# ==========================
+# DATABASE FUNCTIONS
+# ==========================
 def init_db():
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
+
     c.execute("""
-        CREATE TABLE IF NOT EXISTS users_tokens (
-            user_id TEXT PRIMARY KEY,
-            tokens INTEGER DEFAULT 0
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            token INTEGER DEFAULT 0
         )
     """)
+
     conn.commit()
     conn.close()
 
-def get_tokens(user_id):
-    conn = sqlite3.connect(DB_FILE)
+def add_user(user_id):
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT tokens FROM users_tokens WHERE user_id=?", (user_id,))
+
+    c.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (user_id,))
+
+    conn.commit()
+    conn.close()
+
+def get_user_token(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT token FROM users WHERE user_id = ?", (user_id,))
     row = c.fetchone()
+
     conn.close()
     return row[0] if row else 0
 
-def update_tokens(user_id, new_tokens):
-    conn = sqlite3.connect(DB_FILE)
+def add_token(user_id, amount):
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("""
-        INSERT INTO users_tokens(user_id, tokens)
-        VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET tokens=excluded.tokens
-    """, (user_id, new_tokens))
+
+    c.execute("UPDATE users SET token = token + ? WHERE user_id = ?", (amount, user_id))
+
     conn.commit()
     conn.close()
 
-# ----------------------------
-# Flask app for mini app API
-# ----------------------------
-app = Flask(__name__, static_folder='static')
-
-@app.route("/")
-def index():
-    return send_from_directory('static', 'index.html')
-
-@app.route("/get_tokens/<user_id>")
-def api_get_tokens(user_id):
-    return jsonify({"tokens": get_tokens(user_id)})
-
-@app.route("/add_token/<user_id>", methods=["POST"])
-def api_add_token(user_id):
-    data = request.json
-    amount = data.get("amount", 1)
-    current = get_tokens(user_id)
-    new_total = current + amount
-    update_tokens(user_id, new_total)
-    return jsonify({"tokens": new_total})
-
-# ----------------------------
-# Telegram bot
-# ----------------------------
+# ==========================
+# TELEGRAM BOT
+# ==========================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
+    user_id = update.effective_user.id
+
+    # Add user to DB
+    add_user(user_id)
+
+    # Button to launch your mini-app
     keyboard = [
-        [InlineKeyboardButton("Launch App💵", web_app=WebAppInfo(url=WEB_APP_URL))]
+        [InlineKeyboardButton("Launch App", web_app=WebAppInfo(url=WEB_APP_URL))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
+
     await context.bot.send_photo(
-        chat_id=chat_id,
-        photo=open("static/banner.png", "rb"),
-        caption="Welcome to TokenHatch! 🥚 Collect eggs and earn $EGG tokens!",
+        chat_id=user_id,
+        photo=open("banner.png", "rb"),
+        caption="Welcome to TokenHatch! 🥚\nHatch creatures, earn $EGG tokens, and participate in airdrops!",
         reply_markup=reply_markup
     )
 
-def run_bot():
-    app_bot = ApplicationBuilder().token(BOT_TOKEN).build()
-    app_bot.add_handler(CommandHandler("start", start))
-    app_bot.run_polling()
-
-# ----------------------------
-# Main entry
-# ----------------------------
+# ==========================
+# MAIN
+# ==========================
 if __name__ == "__main__":
     init_db()
-    Thread(target=run_bot).start()
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+
+    print("Bot running...")
+    app.run_polling()
