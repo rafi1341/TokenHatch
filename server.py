@@ -1,7 +1,11 @@
 import os
 import sqlite3
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import threading
+import uvicorn
 
 # -------------------------
 # CONFIG
@@ -69,21 +73,39 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
-# Optional: check token
-async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    token = get_token(user_id)
-    await update.message.reply_text(f"You have {token} $EGG tokens!")
+# -------------------------
+# FASTAPI APP (for mini-app)
+# -------------------------
+api = FastAPI()
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with your Netlify URL in production
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@api.get("/token/{user_id}")
+def read_token(user_id: int):
+    return {"user_id": user_id, "token": get_token(user_id)}
+
+@api.post("/token/{user_id}/{amount}")
+def update_token(user_id: int, amount: int):
+    add_token(user_id, amount)
+    return {"user_id": user_id, "new_token": get_token(user_id)}
+
+# -------------------------
+# RUN TELEGRAM BOT
+# -------------------------
+def run_bot():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    print("Telegram Bot running...")
+    app.run_polling()
 
 # -------------------------
 # MAIN
 # -------------------------
 if __name__ == "__main__":
     init_db()
-
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("balance", balance))
-
-    print("Bot running...")
-    app.run_polling()
+    threading.Thread(target=run_bot).start()
+    uvicorn.run(api, host="0.0.0.0", port=8000)
