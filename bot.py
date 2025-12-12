@@ -11,6 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 # TELEGRAM BOT TOKEN
 # ---------------------------
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
+BOT_TOKEN = "8210266665:AAFArla_n3LA7VqG34h6vxiRK0tFkEdqu-4" 
 if not BOT_TOKEN:
     raise Exception("BOT_TOKEN environment variable not found!")
 
