@@ -46,7 +46,7 @@ user_cache = defaultdict(lambda: {"tokens": 0, "last_update": datetime.now()})
 # ---------------------------
 # CACHE FLUSH FUNCTION
 # ---------------------------
-def flush_cache():
+async def flush_cache():
     while True:
         now = datetime.now()
         for user_id, data in list(user_cache.items()):
@@ -60,10 +60,19 @@ def flush_cache():
                     (user_id, data["tokens"])
                 )
                 conn.commit()
-                # Reset cache after flushing
                 user_cache[user_id]["tokens"] = 0
                 user_cache[user_id]["last_update"] = datetime.now()
-        time.sleep(5) # check every 5 seconds
+        await asyncio.sleep(5)
+        
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button))
+
+    # Start flush cache in background
+    app.job_queue.run_repeating(lambda ctx: asyncio.create_task(flush_cache()), interval=5)
+
+    asyncio.run(app.run_polling())# check every 5 seconds
 
 # Start the flush thread
 threading.Thread(target=flush_cache, daemon=True).start()
