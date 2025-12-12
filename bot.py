@@ -60,7 +60,7 @@ def flush_cache():
                     (user_id, data["tokens"])
                 )
                 conn.commit()
-                user_cache[user_id]["tokens"] += 1 
+                user_cache[user_id]["tokens"] = 0
                 user_cache[user_id]["last_update"] = datetime.now() # reset cache
         time.sleep(5)  # check every 5 seconds
 
@@ -88,7 +88,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     # Add tokens to cache
-    user_cache[user_id]["tokens"] += 1
+    user_cache[user_id]["tokens"] = 0
     user_cache[user_id]["last_update"] = datetime.now()
 
 
