@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 sendBatchToServer(pendingTokens);
                 pendingTokens = 0;
             }
-        }, 2000); // ⭐ 2-SECOND BATCHING - This is the key!
+        }, 1000); // ⭐ 2-SECOND BATCHING - This is the key!
     });
     
     // NEW: Send any pending tokens when user closes the app
