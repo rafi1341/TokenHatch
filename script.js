@@ -30,6 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadTokens() {
         console.log("🔄 Loading tokens for user:", userId);
         
+        // First, check if there are unsaved tokens from last session
+        const unsavedTokens = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
+        if (unsavedTokens > 0) {
+            console.log("💾 Found unsaved tokens from last session:", unsavedTokens);
+            // Send them now
+            await sendBatchToServer(unsavedTokens);
+            localStorage.removeItem(`unsaved_${userId}`);
+        }
+        
         try {
             const res = await fetch(`${BOT_API}/get_balance`, {
                 method: "POST",
@@ -78,8 +87,12 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const data = await res.json();
             console.log("✅ Server response:", data);
+            
+            // Clear localStorage backup after successful send
+            localStorage.removeItem(`unsaved_${userId}`);
         } catch (e) {
             console.error("❌ Failed to send batch:", e);
+            // Keep in localStorage for retry on next load
         }
     }
     
@@ -89,6 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
         tokens++;
         pendingTokens++; // NEW: Track tokens waiting to be sent
         tokenCountDisplay.textContent = tokens;
+        
+        // Save pending tokens to localStorage (backup in case of instant close)
+        localStorage.setItem(`unsaved_${userId}`, pendingTokens);
         
         // Hit animation
         egg.classList.add("hit");
@@ -115,12 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 sendBatchToServer(pendingTokens);
                 pendingTokens = 0;
             }
-        }, 1000); // ⭐ 2-SECOND BATCHING - This is the key!
+        }, 3000); // ⭐ 3-SECOND BATCHING - Faster saves!
     });
     
     // NEW: Send any pending tokens when user closes the app
     window.addEventListener('beforeunload', () => {
         if (pendingTokens > 0) {
+            console.log("🚪 App closing, saving pending tokens:", pendingTokens);
             // Use sendBeacon for reliability when page is closing
             const data = new Blob([JSON.stringify({
                 user_id: userId,
@@ -131,9 +148,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // NEW: Send pending tokens when mini app loses focus
+    // NEW: Send pending tokens when mini app loses focus (switching away)
     window.addEventListener('blur', () => {
         if (pendingTokens > 0) {
+            console.log("👋 App lost focus, saving pending tokens:", pendingTokens);
+            sendBatchToServer(pendingTokens);
+            pendingTokens = 0;
+            clearTimeout(saveTimeout);
+        }
+    });
+    
+    // NEW: Send pending tokens when page becomes hidden (more reliable for mobile)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && pendingTokens > 0) {
+            console.log("🙈 App hidden, saving pending tokens:", pendingTokens);
             sendBatchToServer(pendingTokens);
             pendingTokens = 0;
             clearTimeout(saveTimeout);
