@@ -320,13 +320,19 @@
         .detail-header {
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 201;
+        }
+
+        .detail-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .back-btn {
@@ -344,7 +350,7 @@
         }
 
         .detail-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -718,8 +724,14 @@
     <!-- Creature Detail Screen -->
     <div class="detail-screen" id="creature-detail">
         <div class="detail-header">
-            <button class="back-btn" onclick="closeCreatureDetail()">←</button>
-            <div class="detail-title" id="detail-creature-name">Chick</div>
+            <div class="detail-header-left">
+                <button class="back-btn" onclick="closeCreatureDetail()">←</button>
+                <div class="detail-title" id="detail-creature-name">Chick</div>
+            </div>
+            <div class="balance-display">
+                <div>💰 <span id="hatch-balance-detail">12,450</span> $HATCH</div>
+                <div>💎 <span id="points-balance-detail">245</span> Points</div>
+            </div>
         </div>
 
         <div class="detail-content">
@@ -872,6 +884,9 @@
             selectedCreature = creatures[creatureId];
             if (!selectedCreature) return;
 
+            // Sync balance displays
+            syncBalanceDisplays();
+
             // Populate detail screen
             document.getElementById('detail-creature-name').textContent = selectedCreature.name;
             document.getElementById('detail-creature-title').textContent = selectedCreature.name;
@@ -897,6 +912,17 @@
             document.getElementById('creature-detail').classList.add('active');
         }
 
+        // Sync balance displays between main and detail screens
+        function syncBalanceDisplays() {
+            const mainBalance = document.getElementById('hatch-balance').textContent;
+            const mainPoints = document.getElementById('points-balance').textContent;
+            const detailBalance = document.getElementById('hatch-balance-detail');
+            const detailPoints = document.getElementById('points-balance-detail');
+            
+            if (detailBalance) detailBalance.textContent = mainBalance;
+            if (detailPoints) detailPoints.textContent = mainPoints;
+        }
+
         // Close Creature Detail
         function closeCreatureDetail() {
             document.getElementById('creature-detail').classList.remove('active');
@@ -913,6 +939,7 @@
                 // Deduct cost
                 const newBalance = currentBalance - selectedCreature.upgradeCost;
                 document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
+                syncBalanceDisplays(); // Update detail screen balance too
                 
                 // Upgrade creature
                 selectedCreature.currentLevel++;
@@ -942,6 +969,7 @@
             
             const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
             document.getElementById('hatch-balance').textContent = (currentBalance + currentEgg.hpPerTap).toLocaleString();
+            syncBalanceDisplays(); // Sync with detail screen
             
             showFloatingText('+' + currentEgg.hpPerTap, event.clientX, event.clientY);
             
@@ -1017,6 +1045,7 @@
             const newBalance = currentBalance + amount;
             
             document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
+            syncBalanceDisplays(); // Sync with detail screen
             document.getElementById('collected-amount').textContent = '0';
             
             showFloatingText('+' + amount + ' $HATCH', event.clientX, event.clientY);
@@ -1048,6 +1077,7 @@
             const bonus = 500;
             const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
             document.getElementById('hatch-balance').textContent = (currentBalance + bonus).toLocaleString();
+            syncBalanceDisplays(); // Sync with detail screen
             showFloatingText('+' + bonus + ' Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
         }
 
