@@ -19,44 +19,40 @@
     <!-- Content Area -->
     <div class="content">
         
-        <!-- HOME TAB -->
+                <!-- HOME TAB -->
         <div id="home-screen" class="screen active">
-            <div class="balance-display" style="margin-bottom: 15px;">
+            <div class="passive-income-display">
                 📈 Passive Income: +<span id="passive-income">250</span> $HATCH/hr
             </div>
 
-            <div class="creature-display">
-                <div class="creature-name">
-                    <span id="active-creature-emoji">🐉</span>
-                    <span id="active-creature-name">DRAGON</span>
-                    <span id="active-creature-level">(Lv 4/5)</span>
+            <div class="egg-display">
+                <div class="egg-name">
+                    <span id="egg-name">🐉 Dragon Egg</span>
+                </div>
+                <div class="egg-unlock-status">
+                    <span id="unlock-status">Tap to unlock Dragon!</span>
                 </div>
                 
-                <div class="creature-emoji" id="main-creature" onclick="tapCreature()">🐉</div>
+                <div class="egg-container">
+                    <div class="egg-glow"></div>
+                    <img src="assets/eggs/egg_dragon.png" class="egg-image" id="main-egg" onclick="tapEgg(event)" alt="Dragon Egg">
+                </div>
 
-                <div class="collection-box">
-                    <div style="opacity: 0.8;">Ready to Collect</div>
-                    <div class="collection-amount">💰 <span id="collected-amount">1,250</span> $HATCH</div>
-                    <button class="collect-btn" onclick="collectIncome()">TAP TO COLLECT!</button>
-                    <div class="next-collection">Next collection in: <span id="next-timer">2h 15m</span></div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 45%;">
+                        <span id="progress-percentage">45%</span>
+                    </div>
+                </div>
+                <div class="progress-text">
+                    <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
                 </div>
             </div>
 
-            <div class="upgrade-section">
-                <div style="font-weight: bold; margin-bottom: 10px;">⬆️ Upgrade to Level 5</div>
-                <div class="stats-row">
-                    <span>Cost:</span>
-                    <span>50,000 $HATCH</span>
-                </div>
-                <div class="stats-row">
-                    <span>Income:</span>
-                    <span>+250 → +500/hr 📈</span>
-                </div>
-                <div class="stats-row" style="border-bottom: none;">
-                    <span>ROI:</span>
-                    <span>Pays back in 200 hrs</span>
-                </div>
-                <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW ✨</button>
+            <div class="collection-box">
+                <div class="collection-label">Ready to Collect</div>
+                <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
+                <button class="collect-btn" onclick="collectIncome()">Tap to Collect</button>
+                <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
             </div>
 
             <div class="section-title">Quick Actions</div>
@@ -70,8 +66,8 @@
                 <button class="action-btn" onclick="showReferral()">
                     👥<div class="action-label">Refer</div>
                 </button>
-                <button class="action-btn" onclick="manualTap()">
-                    👆<div class="action-label">Tap</div>
+                <button class="action-btn" onclick="switchTab('hatch')">
+                    🥚<div class="action-label">Hatch</div>
                 </button>
             </div>
 
@@ -83,76 +79,78 @@
         <!-- HATCH TAB (Collection) -->
         <div id="hatch-screen" class="screen">
             <div class="section-title">🥚 Your Collection</div>
-            <div style="opacity: 0.8; margin-bottom: 20px;">
-                Progress: <strong>5/20</strong> Unlocked (25%)<br>
-                Total Income: <strong>+890 $HATCH/hr</strong>
+            <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
+                Progress: <strong>3/20</strong> Unlocked (15%)<br>
+                Total Income: <strong>+250 $HATCH/hr</strong>
             </div>
 
             <div class="creatures-grid">
-                <div class="creature-card" onclick="viewCreature(1)">
-                    <div class="emoji">🐣</div>
+                <!-- Unlocked Creatures (Clickable) -->
+                <div class="creature-card" onclick="openCreatureDetail(1)">
+                    <img src="assets/creatures/creature_chick.png" class="creature-image" alt="Chick">
                     <div class="name">Chick</div>
-                    <div class="level">Level 5 (MAX)</div>
+                    <div class="level">Level 3/5</div>
                     <div class="income">+50/hr</div>
                 </div>
 
-                <div class="creature-card" onclick="viewCreature(2)">
-                    <div class="emoji">🐢</div>
+                <div class="creature-card" onclick="openCreatureDetail(2)">
+                    <img src="assets/creatures/creature_turtle.png" class="creature-image" alt="Turtle">
                     <div class="name">Turtle</div>
-                    <div class="level">Level 3</div>
-                    <div class="income">+150/hr</div>
+                    <div class="level">Level 2/5</div>
+                    <div class="income">+100/hr</div>
                 </div>
 
-                <div class="creature-card" onclick="viewCreature(3)">
-                    <div class="emoji">🦎</div>
+                <div class="creature-card" onclick="openCreatureDetail(3)">
+                    <img src="assets/creatures/creature_lizard.png" class="creature-image" alt="Lizard">
                     <div class="name">Lizard</div>
-                    <div class="level">Level 1</div>
-                    <div class="income">+50/hr</div>
+                    <div class="level">Level 1/5</div>
+                    <div class="income">+100/hr</div>
                 </div>
 
+                <!-- Locked Eggs (Not Clickable) -->
                 <div class="creature-card locked">
-                    <div class="emoji">🐍</div>
-                    <div class="name">Snake</div>
-                    <div class="level">🔒 Locked</div>
-                    <div class="income">35,000 $HATCH</div>
+                    <img src="assets/eggs/egg_snake.png" class="creature-image" alt="Snake Egg">
+                    <div class="name">Snake Egg</div>
+                    <div class="level">🔒 In Progress</div>
+                    <div class="income">4,500/10,000 HP</div>
                     <div class="lock-overlay">🔒</div>
                 </div>
 
                 <div class="creature-card locked">
-                    <div class="emoji">🦅</div>
-                    <div class="name">Eagle</div>
+                    <img src="assets/eggs/egg_eagle.png" class="creature-image" alt="Eagle Egg">
+                    <div class="name">Eagle Egg</div>
                     <div class="level">🔒 Locked</div>
-                    <div class="income">75,000 $HATCH</div>
+                    <div class="income">0/15,000 HP</div>
                     <div class="lock-overlay">🔒</div>
                 </div>
 
                 <div class="creature-card locked">
-                    <div class="emoji">🦖</div>
-                    <div class="name">Dino</div>
+                    <img src="assets/eggs/egg_dino.png" class="creature-image" alt="Dino Egg">
+                    <div class="name">Dino Egg</div>
                     <div class="level">🔒 Locked</div>
-                    <div class="income">150,000 $HATCH</div>
+                    <div class="income">0/35,000 HP</div>
                     <div class="lock-overlay">🔒</div>
                 </div>
 
                 <div class="creature-card locked">
-                    <div class="emoji">🐉</div>
-                    <div class="name">Dragon</div>
+                    <img src="assets/eggs/egg_dragon.png" class="creature-image" alt="Dragon Egg">
+                    <div class="name">Dragon Egg</div>
                     <div class="level">🔒 Locked</div>
-                    <div class="income">350,000 $HATCH</div>
+                    <div class="income">0/75,000 HP</div>
                     <div class="lock-overlay">🔒</div>
                 </div>
 
                 <div class="creature-card locked">
-                    <div class="emoji">🦄</div>
-                    <div class="name">Unicorn</div>
+                    <img src="assets/eggs/egg_unicorn.png" class="creature-image" alt="Unicorn Egg">
+                    <div class="name">Unicorn Egg</div>
                     <div class="level">🔒 Locked</div>
-                    <div class="income">750,000 $HATCH</div>
+                    <div class="income">0/150,000 HP</div>
                     <div class="lock-overlay">🔒</div>
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 30px; opacity: 0.6;">
-                ...12 more creatures to discover!
+            <div style="text-align: center; margin-top: 25px; opacity: 0.6; font-size: 13px;">
+                ...12 more eggs to discover!
             </div>
         </div>
 
