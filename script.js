@@ -1,176 +1,161 @@
-// --- Switch Tab (GLOBAL) ---
-// Place this at the top, outside DOMContentLoaded
-function switchTab(tabName) {
-    // Hide all screens
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
+// Current egg data
+let currentEgg = {
+    id: 4,
+    name: 'Dragon Egg',
+    emoji: '🥚',
+    creature: '🐉',
+    creatureName: 'Dragon',
+    currentHP: 4500,
+    requiredHP: 10000,
+    hpPerTap: 10
+};
 
-    // Show the selected screen
-    const screenId = tabName + "-screen";
-    const activeScreen = document.getElementById(screenId);
-    if (activeScreen) activeScreen.classList.add('active');
+// Tab Switching
+function switchTab(tabName, event) {
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+    document.getElementById(tabName + '-screen').classList.add('active');
 
-    // Update nav buttons active state
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.getAttribute('data-tab') === tabName) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
 }
 
+// Floating Text Animation
+function showFloatingText(text, x, y) {
+    const floatText = document.createElement('div');
+    floatText.className = 'float-text';
+    floatText.textContent = text;
+    floatText.style.left = x + 'px';
+    floatText.style.top = y + 'px';
+    document.body.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 1000);
+}
 
+// Update Progress Bar
+function updateProgress() {
+    const percentage = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
+    document.getElementById('progress-bar').style.width = percentage + '%';
+    document.getElementById('progress-percentage').textContent = Math.floor(percentage) + '%';
+    document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
+    document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
+}
 
-document.addEventListener("DOMContentLoaded", () => {
+// Tap Egg Function
+function tapEgg(event) {
+    currentEgg.currentHP += currentEgg.hpPerTap;
 
-    // --- Configuration ---
-    const BOT_API = "https://telegrambot-or4r.onrender.com"; // Your bot URL (no trailing slash!)
-    const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c"; // ← CHANGE THIS!
+    const balanceEl = document.getElementById('hatch-balance');
+    let currentBalance = parseInt(balanceEl.textContent.replace(/,/g, ''));
+    currentBalance += currentEgg.hpPerTap;
+    balanceEl.textContent = currentBalance.toLocaleString();
 
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tabName = btn.getAttribute('data-tab');
-        switchTab(tabName);
-    });
-});
+    showFloatingText('+' + currentEgg.hpPerTap, event.clientX, event.clientY);
 
-    
- // --- Tokens ---
-    const balanceDisplay = document.getElementById("hatch-balance");
-    let tokens = parseInt(localStorage.getItem("tokens")) || 12450; // start from previous value
-    balanceDisplay.textContent = tokens.toLocaleString();
-
-    // --- Current Egg ---
-    let currentEgg = {
-        name: "Dragon Egg",
-        emoji: "🥚",
-        creature: "🐉",
-        creatureName: "Dragon",
-        currentHP: 4500,
-        requiredHP: 10000,
-        hpPerTap: 10
-    };
-
-    // --- DOM Elements ---
-    const eggEmoji = document.getElementById("main-egg");
-    const eggNameEl = document.getElementById("egg-name");
-    const unlockStatusEl = document.getElementById("unlock-status");
-    const progressBar = document.getElementById("progress-bar");
-    const progressPercentage = document.getElementById("progress-percentage");
-    const currentHPEl = document.getElementById("current-hp");
-    const requiredHPEl = document.getElementById("required-hp");
-
-    // --- Update progress bar ---
-    function updateProgress() {
-        const pct = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
-        progressBar.style.width = pct + "%";
-        progressPercentage.textContent = Math.floor(pct) + "%";
-        currentHPEl.textContent = currentEgg.currentHP.toLocaleString();
-        requiredHPEl.textContent = currentEgg.requiredHP.toLocaleString();
-    }
+    const egg = document.getElementById('main-egg');
+    egg.style.transform = 'scale(0.9) rotate(-5deg)';
+    setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100);
 
     updateProgress();
 
-    // --- Floating text ---
-    function showFloatingText(text, x, y) {
-        const floatText = document.createElement("div");
-        floatText.className = "float-text";
-        floatText.textContent = text;
-        floatText.style.left = x + "px";
-        floatText.style.top = y + "px";
-        document.body.appendChild(floatText);
-        setTimeout(() => floatText.remove(), 1000);
-    }
+    if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg();
+}
 
+// Hatch Egg
+function hatchEgg() {
+    const egg = document.getElementById('main-egg');
+    egg.textContent = currentEgg.creature;
 
+    showFloatingText('🎉 ' + currentEgg.creatureName + ' HATCHED! 🎉', window.innerWidth / 2, window.innerHeight / 2);
 
-    // --- Tap Egg ---
-    function tapEgg(e) {
-        // Increase HP
-        currentEgg.currentHP += currentEgg.hpPerTap;
+    setTimeout(() => {
+        alert(`🎉 Congratulations!\n\n${currentEgg.creatureName} has hatched!`);
 
-        // Increase tokens
-        tokens += currentEgg.hpPerTap;
-        balanceDisplay.textContent = tokens.toLocaleString();
-        localStorage.setItem("tokens", tokens);
+        // Reset for next egg
+        currentEgg = {
+            id: 5,
+            name: 'Eagle Egg',
+            emoji: '🥚',
+            creature: '🦅',
+            creatureName: 'Eagle',
+            currentHP: 0,
+            requiredHP: 15000,
+            hpPerTap: 10
+        };
 
-        // Floating +text
-        showFloatingText("+" + currentEgg.hpPerTap, e.clientX, e.clientY);
-
-        // Egg shake animation
-        eggEmoji.style.transform = "scale(0.9) rotate(-5deg)";
-        setTimeout(() => {
-            eggEmoji.style.transform = "scale(1) rotate(0deg)";
-        }, 100);
-
-        // Update progress bar
+        egg.textContent = currentEgg.emoji;
+        document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name;
+        document.getElementById('unlock-status').textContent = 'Tap to unlock ' + currentEgg.creatureName + '!';
         updateProgress();
+    }, 1500);
+}
 
-        // Check for hatch
-        if (currentEgg.currentHP >= currentEgg.requiredHP) {
-            hatchEgg();
-        }
-    }
+// Collect Passive Income
+function collectIncome(event) {
+    const collectedEl = document.getElementById('collected-amount');
+    let amount = parseInt(collectedEl.textContent);
+    const balanceEl = document.getElementById('hatch-balance');
+    let currentBalance = parseInt(balanceEl.textContent.replace(/,/g, ''));
+    balanceEl.textContent = (currentBalance + amount).toLocaleString();
 
-    eggEmoji.addEventListener("click", tapEgg);
+    showFloatingText('+' + amount + ' $HATCH', event.clientX, event.clientY);
 
-    // --- Hatch Egg ---
-    function hatchEgg() {
-        eggEmoji.textContent = currentEgg.creature;
-        showFloatingText("🎉 " + currentEgg.creatureName + " HATCHED! 🎉", window.innerWidth / 2, window.innerHeight / 2);
+    collectedEl.textContent = '0';
 
-        setTimeout(() => {
-            alert(`🎉 Congratulations!\n\n${currentEgg.creatureName} has hatched!`);
-            // Reset for next egg (example, you can load from backend)
-            currentEgg = {
-                name: "Eagle Egg",
-                emoji: "🥚",
-                creature: "🦅",
-                creatureName: "Eagle",
-                currentHP: 0,
-                requiredHP: 15000,
-                hpPerTap: 10
-            };
-            eggEmoji.textContent = currentEgg.emoji;
-            eggNameEl.textContent = currentEgg.emoji + " " + currentEgg.name;
-            unlockStatusEl.textContent = "Tap to unlock " + currentEgg.creatureName + "!";
-            updateProgress();
-        }, 1500);
-    }
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Collected! ✅';
+    btn.style.background = '#00d68f';
 
-    // --- Passive income simulation ---
-    const collectedAmountEl = document.getElementById("collected-amount");
-    let passiveIncome = 250; // $HATCH per interval
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }, 2000);
+}
+
+// Show Bonus
+function showBonus() {
+    const bonus = 500;
+    const balanceEl = document.getElementById('hatch-balance');
+    let currentBalance = parseInt(balanceEl.textContent.replace(/,/g, ''));
+    balanceEl.textContent = (currentBalance + bonus).toLocaleString();
+    showFloatingText('+' + bonus + ' Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
+}
+
+// Show Referral
+function showReferral() {
+    alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!');
+}
+
+// View Creature in Hatch Tab
+function viewCreature(id) {
+    alert('🐾 Creature #' + id + '\n\nUpgrade system coming soon!\n\nYou\'ll be able to:\n• Upgrade to Level 5\n• Increase passive income\n• Unlock special abilities');
+}
+
+// Initialize after DOM loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Bind Egg Tap
+
+    const BOT_API = "https://telegrambot-or4r.onrender.com"; // Your bot URL
+    const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c"; // Your secret
+    
+    document.getElementById('main-egg').addEventListener('click', tapEgg);
+
+    // Bind Collect Button
+    document.querySelector('.collect-btn').addEventListener('click', collectIncome);
+
+    // Bind Bottom Nav Buttons
+    document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => switchTab(btn.getAttribute('data-tab'), e));
+    });
+
+    // Simulate Passive Income
     setInterval(() => {
-        let collected = parseInt(collectedAmountEl.textContent) || 0;
-        collected += 2; // small increment
-        collectedAmountEl.textContent = collected;
+        const collectedEl = document.getElementById('collected-amount');
+        let current = parseInt(collectedEl.textContent);
+        collectedEl.textContent = current + 2;
     }, 3000);
 
-    // --- Collect income ---
-    window.collectIncome = function (event) {
-        const amount = parseInt(collectedAmountEl.textContent);
-        tokens += amount;
-        balanceDisplay.textContent = tokens.toLocaleString();
-        localStorage.setItem("tokens", tokens);
-
-        showFloatingText("+" + amount + " $HATCH", event.clientX, event.clientY);
-
-        collectedAmountEl.textContent = "0";
-
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = "Collected! ✅";
-        btn.style.background = "#00d68f";
-
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = originalText;
-            btn.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-        }, 2000);
-    };
-
+    // Initialize Progress
+    updateProgress();
 });
