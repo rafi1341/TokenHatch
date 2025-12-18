@@ -1,30 +1,365 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
-}
 
-.egg-container {
-    margin: 20px auto;
-    width: 200px;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-#egg {
-    width: 100%;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+            color: #fff;
+            overflow-x: hidden;
+        }
 
-#egg.hit {
-    transform: scale(0.9);
-}
+        /* Top Bar */
+        .top-bar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.floating-plus {
-    position: absolute;
-    font-weight: bold;
-    color: #ff0;
-    user-select: none;
-    pointer-events: none;
-}
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .balance-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+
+        .balance-display div {
+            margin: 2px 0;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Egg Display */
+        .egg-display {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .egg-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .egg-unlock-status {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .egg-container {
+            position: relative;
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .egg-emoji {
+            font-size: 100px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .egg-emoji:active {
+            transform: scale(0.95);
+        }
+
+        .egg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .progress-bar-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 15px 0 10px 0;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Collection Box - Smaller */
+        .collection-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .collection-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .collection-amount {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 5px 0;
+        }
+
+        .collect-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .collect-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .collect-btn:active {
+            transform: scale(0.98);
+        }
+
+        .next-collection {
+            margin-top: 8px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 8px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .action-label {
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .daily-streak {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* Floating text animation */
+        .float-text {
+            position: fixed;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 1000;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes floatUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-60px);
+            }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 22px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s;
+        }
+
+        .nav-btn.active {
+            color: #667eea;
+        }
+
+        .nav-label {
+            font-size: 10px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Hatch Tab Styles */
+        .creatures-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .creature-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            position: relative;
+        }
+
+        .creature-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .creature-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .creature-card .emoji {
+            font-size: 50px;
+            margin: 10px 0;
+        }
+
+        .creature-card .name {
+            font-weight: bold;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .creature-card .level {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .creature-card .income {
+            color: #ffd700;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 35px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+        }
+
+        .passive-income-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
