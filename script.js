@@ -12,10 +12,15 @@ function switchTab(tabName) {
     if (activeScreen) activeScreen.classList.add('active');
 
     // Update nav buttons active state
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    const btn = document.querySelector(`.nav-btn[onclick="switchTab('${tabName}')"]`);
-    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 }
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,6 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Configuration ---
     const BOT_API = "https://telegrambot-or4r.onrender.com"; // Your bot URL (no trailing slash!)
     const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c"; // ← CHANGE THIS!
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab');
+        switchTab(tabName);
+    });
+});
+
     
  // --- Tokens ---
     const balanceDisplay = document.getElementById("hatch-balance");
