@@ -82,16 +82,18 @@
             justify-content: center;
         }
 
-        .egg-emoji {
-            font-size: 100px;
+        .egg-image {
+            width: 120px;
+            height: 120px;
             cursor: pointer;
             user-select: none;
             transition: transform 0.1s;
             position: relative;
             z-index: 1;
+            object-fit: contain;
         }
 
-        .egg-emoji:active {
+        .egg-image:active {
             transform: scale(0.95);
         }
 
@@ -136,7 +138,7 @@
             opacity: 0.9;
         }
 
-        /* Collection Box - Smaller */
+        /* Collection Box */
         .collection-box {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
@@ -223,6 +225,224 @@
             font-size: 14px;
         }
 
+        /* Hatch Tab Styles */
+        .creatures-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .creature-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            position: relative;
+        }
+
+        .creature-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .creature-card.locked {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .creature-card.locked:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .creature-image {
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+            object-fit: contain;
+        }
+
+        .creature-card .name {
+            font-weight: bold;
+            margin: 8px 0 4px 0;
+            font-size: 14px;
+        }
+
+        .creature-card .level {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .creature-card .income {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            pointer-events: none;
+        }
+
+        /* Creature Detail Screen */
+        .detail-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 200;
+            overflow-y: auto;
+            padding-bottom: 100px;
+            display: none;
+        }
+
+        .detail-screen.active {
+            display: block;
+        }
+
+        .detail-header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 201;
+        }
+
+        .detail-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .detail-content {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .detail-creature-display {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .detail-creature-image {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            object-fit: contain;
+        }
+
+        .detail-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-weight: bold;
+        }
+
+        .upgrade-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .upgrade-arrow {
+            text-align: center;
+            font-size: 30px;
+            margin: 15px 0;
+        }
+
+        .upgrade-btn {
+            background: #00d68f;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+
+        .upgrade-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .upgrade-btn:active {
+            transform: scale(0.98);
+        }
+
+        .upgrade-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         /* Floating text animation */
         .float-text {
             position: fixed;
@@ -290,65 +510,6 @@
             display: block;
         }
 
-        /* Hatch Tab Styles */
-        .creatures-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .creature-card {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
-            position: relative;
-        }
-
-        .creature-card:hover {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .creature-card.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .creature-card .emoji {
-            font-size: 50px;
-            margin: 10px 0;
-        }
-
-        .creature-card .name {
-            font-weight: bold;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .creature-card .level {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .creature-card .income {
-            color: #ffd700;
-            font-weight: bold;
-            margin-top: 5px;
-            font-size: 13px;
-        }
-
-        .lock-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 35px;
-        }
-
         .section-title {
             font-size: 18px;
             font-weight: bold;
@@ -361,4 +522,20 @@
             border-radius: 10px;
             font-size: 13px;
             margin-bottom: 15px;
+        }
+
+        .cost-badge {
+            background: rgba(255, 107, 107, 0.3);
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .income-badge {
+            background: rgba(0, 214, 143, 0.3);
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
         }
