@@ -7,6 +7,7 @@
 </head>
 <body>
 
+    <!-- Top Bar -->
     <div class="top-bar">
         <div class="logo">🥚 TokenHatch</div>
         <div class="balance-display">
@@ -15,64 +16,373 @@
         </div>
     </div>
 
-    <!-- Screens -->
-    <div id="home-screen" class="screen active">
-        <h2>🏠 Home</h2>
-        <p>Welcome to Egg Clicker!</p>
-    </div>
-
-    <div id="hatch-screen" class="screen">
-        <div class="section-title">🥚 Your Collection</div>
-        <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
-            Progress: <strong>3/20</strong> Unlocked (15%)<br>
-            Total Income: <strong>+250 $HATCH/hr</strong>
-        </div>
-        <div class="egg-display">
-            <div class="egg-name" id="egg-name">🐉 Dragon Egg</div>
-            <div class="egg-unlock-status" id="unlock-status">Tap to unlock Dragon!</div>
-            <div class="egg-container">
-                <div class="egg-glow"></div>
-                <div class="egg-emoji" id="main-egg">🥚</div>
+    <!-- Content Area -->
+    <div class="content">
+        
+        <!-- HOME TAB -->
+        <div id="home-screen" class="screen active">
+            <div class="balance-display" style="margin-bottom: 15px;">
+                📈 Passive Income: +<span id="passive-income">250</span> $HATCH/hr
             </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar" style="width: 45%;">
-                    <span id="progress-percentage">45%</span>
+
+            <div class="creature-display">
+                <div class="creature-name">
+                    <span id="active-creature-emoji">🐉</span>
+                    <span id="active-creature-name">DRAGON</span>
+                    <span id="active-creature-level">(Lv 4/5)</span>
+                </div>
+                
+                <div class="creature-emoji" id="main-creature" onclick="tapCreature()">🐉</div>
+
+                <div class="collection-box">
+                    <div style="opacity: 0.8;">Ready to Collect</div>
+                    <div class="collection-amount">💰 <span id="collected-amount">1,250</span> $HATCH</div>
+                    <button class="collect-btn" onclick="collectIncome()">TAP TO COLLECT!</button>
+                    <div class="next-collection">Next collection in: <span id="next-timer">2h 15m</span></div>
                 </div>
             </div>
-            <div class="progress-text">
-                <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
+
+            <div class="upgrade-section">
+                <div style="font-weight: bold; margin-bottom: 10px;">⬆️ Upgrade to Level 5</div>
+                <div class="stats-row">
+                    <span>Cost:</span>
+                    <span>50,000 $HATCH</span>
+                </div>
+                <div class="stats-row">
+                    <span>Income:</span>
+                    <span>+250 → +500/hr 📈</span>
+                </div>
+                <div class="stats-row" style="border-bottom: none;">
+                    <span>ROI:</span>
+                    <span>Pays back in 200 hrs</span>
+                </div>
+                <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW ✨</button>
+            </div>
+
+            <div class="section-title">Quick Actions</div>
+            <div class="quick-actions">
+                <button class="action-btn" onclick="switchTab('tasks')">
+                    🎯<div class="action-label">Tasks</div>
+                </button>
+                <button class="action-btn" onclick="showBonus()">
+                    🎁<div class="action-label">Bonus</div>
+                </button>
+                <button class="action-btn" onclick="showReferral()">
+                    👥<div class="action-label">Refer</div>
+                </button>
+                <button class="action-btn" onclick="manualTap()">
+                    👆<div class="action-label">Tap</div>
+                </button>
+            </div>
+
+            <div class="daily-streak">
+                🏆 Daily Streak: <strong>7 days</strong> 🔥
             </div>
         </div>
-        <div class="collection-box">
-            <div class="collection-label">Ready to Collect</div>
-            <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
-            <button class="collect-btn" id="collect-btn">Tap to Collect</button>
-            <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
+
+        <!-- HATCH TAB (Collection) -->
+        <div id="hatch-screen" class="screen">
+            <div class="section-title">🥚 Your Collection</div>
+            <div style="opacity: 0.8; margin-bottom: 20px;">
+                Progress: <strong>5/20</strong> Unlocked (25%)<br>
+                Total Income: <strong>+890 $HATCH/hr</strong>
+            </div>
+
+            <div class="creatures-grid">
+                <div class="creature-card" onclick="viewCreature(1)">
+                    <div class="emoji">🐣</div>
+                    <div class="name">Chick</div>
+                    <div class="level">Level 5 (MAX)</div>
+                    <div class="income">+50/hr</div>
+                </div>
+
+                <div class="creature-card" onclick="viewCreature(2)">
+                    <div class="emoji">🐢</div>
+                    <div class="name">Turtle</div>
+                    <div class="level">Level 3</div>
+                    <div class="income">+150/hr</div>
+                </div>
+
+                <div class="creature-card" onclick="viewCreature(3)">
+                    <div class="emoji">🦎</div>
+                    <div class="name">Lizard</div>
+                    <div class="level">Level 1</div>
+                    <div class="income">+50/hr</div>
+                </div>
+
+                <div class="creature-card locked">
+                    <div class="emoji">🐍</div>
+                    <div class="name">Snake</div>
+                    <div class="level">🔒 Locked</div>
+                    <div class="income">35,000 $HATCH</div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+
+                <div class="creature-card locked">
+                    <div class="emoji">🦅</div>
+                    <div class="name">Eagle</div>
+                    <div class="level">🔒 Locked</div>
+                    <div class="income">75,000 $HATCH</div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+
+                <div class="creature-card locked">
+                    <div class="emoji">🦖</div>
+                    <div class="name">Dino</div>
+                    <div class="level">🔒 Locked</div>
+                    <div class="income">150,000 $HATCH</div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+
+                <div class="creature-card locked">
+                    <div class="emoji">🐉</div>
+                    <div class="name">Dragon</div>
+                    <div class="level">🔒 Locked</div>
+                    <div class="income">350,000 $HATCH</div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+
+                <div class="creature-card locked">
+                    <div class="emoji">🦄</div>
+                    <div class="name">Unicorn</div>
+                    <div class="level">🔒 Locked</div>
+                    <div class="income">750,000 $HATCH</div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; opacity: 0.6;">
+                ...12 more creatures to discover!
+            </div>
         </div>
-    </div>
 
-    <div id="tasks-screen" class="screen">
-        <h2>📋 Tasks</h2>
-        <p>Complete tasks to earn rewards.</p>
-    </div>
+        <!-- TASKS TAB -->
+        <div id="tasks-screen" class="screen">
+            <div class="section-title">📋 Earn More</div>
+            <div style="opacity: 0.8; margin-bottom: 20px;">
+                Available Tasks: <strong>24</strong>
+            </div>
 
-    <div id="airdrop-screen" class="screen">
-        <h2>🎁 Airdrop</h2>
-        <p>Get your free tokens here!</p>
-    </div>
+            <div class="task-card" style="background: rgba(255, 107, 107, 0.2);">
+                <div class="task-info">
+                    <div class="task-title">🔥 FEATURED: Complete Survey</div>
+                    <div class="task-reward">Reward: 50 Points 💎</div>
+                    <div style="font-size: 12px; opacity: 0.7;">Time: ~5 minutes</div>
+                </div>
+                <button class="task-btn">START →</button>
+            </div>
 
-    <div id="profile-screen" class="screen">
-        <h2>👤 Profile</h2>
-        <p>View your stats and collection.</p>
+            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Quick Tasks (1-2 min)</div>
+            
+            <div class="task-card">
+                <div class="task-info">
+                    <div class="task-title">📱 Follow on Twitter</div>
+                    <div class="task-reward">+50 $HATCH 🥚</div>
+                </div>
+                <button class="task-btn">DO IT</button>
+            </div>
+
+            <div class="task-card">
+                <div class="task-info">
+                    <div class="task-title">💬 Join Telegram Group</div>
+                    <div class="task-reward">+100 $HATCH 🥚</div>
+                </div>
+                <button class="task-btn">DO IT</button>
+            </div>
+
+            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Earn Points (High Value)</div>
+            
+            <div class="task-card">
+                <div class="task-info">
+                    <div class="task-title">📊 Complete Survey</div>
+                    <div class="task-reward">50 Points 💎 • 5 min</div>
+                </div>
+                <button class="task-btn">START</button>
+            </div>
+
+            <div class="task-card">
+                <div class="task-info">
+                    <div class="task-title">📲 Install & Try App</div>
+                    <div class="task-reward">100 Points 💎 • 10 min</div>
+                </div>
+                <button class="task-btn">START</button>
+            </div>
+
+            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Referral</div>
+            
+            <div class="task-card" style="flex-direction: column; align-items: flex-start;">
+                <div class="task-info" style="width: 100%;">
+                    <div class="task-title">👥 Invite 5 Friends</div>
+                    <div class="task-reward">3,000 $HATCH + 5 Points 💎</div>
+                    <div style="margin: 10px 0;">Progress: 2/5</div>
+                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: #667eea; height: 100%; width: 40%;"></div>
+                    </div>
+                </div>
+                <button class="task-btn" style="width: 100%; margin-top: 10px;">SHARE LINK</button>
+            </div>
+        </div>
+
+        <!-- AIRDROP TAB -->
+        <div id="airdrop-screen" class="screen">
+            <div class="section-title">🎁 Airdrop Allocation</div>
+            
+            <div class="creature-display">
+                <div style="opacity: 0.8;">🗓️ Airdrop Date: June 1, 2026</div>
+                <div style="font-size: 14px; opacity: 0.6; margin-bottom: 20px;">⏳ Time remaining: 168 days</div>
+                
+                <div class="collection-amount" style="margin: 20px 0;">
+                    Estimated: 1,250 $HATCH
+                </div>
+                
+                <div style="font-size: 18px;">
+                    Your Rank: <strong>#234</strong> / 5,000
+                </div>
+            </div>
+
+            <div class="upgrade-section">
+                <div style="font-weight: bold; margin-bottom: 15px;">📊 Your Stats</div>
+                <div class="stats-row">
+                    <span>$HATCH earned:</span>
+                    <span>12,450</span>
+                </div>
+                <div class="stats-row">
+                    <span>Points held:</span>
+                    <span>245 (2.45x)</span>
+                </div>
+                <div class="stats-row">
+                    <span>Points withdrawn:</span>
+                    <span>50</span>
+                </div>
+                <div class="stats-row">
+                    <span>Referrals:</span>
+                    <span>12 friends</span>
+                </div>
+                <div class="stats-row" style="border-bottom: none;">
+                    <span>Days active:</span>
+                    <span>45 days</span>
+                </div>
+            </div>
+
+            <div class="section-title">🏆 Top 10 Leaderboard</div>
+            <div class="upgrade-section">
+                <div class="stats-row">
+                    <span>1. 🥇 CryptoKing</span>
+                    <span>25,000</span>
+                </div>
+                <div class="stats-row">
+                    <span>2. 🥈 DiamondHands</span>
+                    <span>22,500</span>
+                </div>
+                <div class="stats-row">
+                    <span>3. 🥉 MoonShot</span>
+                    <span>20,100</span>
+                </div>
+                <div class="stats-row">
+                    <span>...</span>
+                    <span></span>
+                </div>
+                <div class="stats-row" style="background: rgba(102, 126, 234, 0.3); padding: 10px; border-radius: 10px; border: none;">
+                    <span>234. 😊 You</span>
+                    <span>1,250</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="profile-screen" class="screen">
+            <div class="section-title">👤 Profile</div>
+            
+            <div class="creature-display">
+                <div style="font-size: 60px; margin: 20px 0;">👤</div>
+                <div style="font-size: 20px; font-weight: bold;">@username</div>
+                <div style="opacity: 0.6; margin-top: 5px;">Member since: Jan 2026</div>
+            </div>
+
+            <div class="upgrade-section">
+                <div class="stats-row">
+                    <span>💰 $HATCH Balance:</span>
+                    <span>12,450</span>
+                </div>
+                <div class="stats-row">
+                    <span>💎 Points:</span>
+                    <span>245</span>
+                </div>
+                <div class="stats-row">
+                    <span>🏆 Rank:</span>
+                    <span>#234</span>
+                </div>
+                <div class="stats-row" style="border-bottom: none;">
+                    <span>📈 Level:</span>
+                    <span>12</span>
+                </div>
+            </div>
+
+            <div class="section-title">👥 Referrals</div>
+            <div class="upgrade-section">
+                <div class="stats-row">
+                    <span>Total Invited:</span>
+                    <span>12</span>
+                </div>
+                <div class="stats-row">
+                    <span>Active:</span>
+                    <span>8</span>
+                </div>
+                <div class="stats-row" style="border-bottom: none;">
+                    <span>Earnings:</span>
+                    <span>12,000 $HATCH</span>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px; text-align: center;">
+                    Your Code: <strong>HATCH-ABC123</strong>
+                </div>
+                <button class="upgrade-btn" style="margin-top: 10px;">COPY & SHARE</button>
+            </div>
+
+            <div class="section-title">📊 Statistics</div>
+            <div class="upgrade-section">
+                <div class="stats-row">
+                    <span>Days active:</span>
+                    <span>45</span>
+                </div>
+                <div class="stats-row">
+                    <span>Creatures owned:</span>
+                    <span>5/20</span>
+                </div>
+                <div class="stats-row">
+                    <span>Tasks completed:</span>
+                    <span>127</span>
+                </div>
+                <div class="stats-row" style="border-bottom: none;">
+                    <span>Total collected:</span>
+                    <span>145,230 $HATCH</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <button class="nav-btn active" data-tab="home">🏠<span class="nav-label">Home</span></button>
-        <button class="nav-btn" data-tab="hatch">🥚<span class="nav-label">Hatch</span></button>
-        <button class="nav-btn" data-tab="tasks">📋<span class="nav-label">Tasks</span></button>
-        <button class="nav-btn" data-tab="airdrop">🎁<span class="nav-label">Airdrop</span></button>
-        <button class="nav-btn" data-tab="profile">👤<span class="nav-label">Profile</span></button>
+        <button class="nav-btn active" onclick="switchTab('home')">
+            🏠
+            <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('hatch')">
+            🥚
+            <span class="nav-label">Hatch</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('tasks')">
+            📋
+            <span class="nav-label">Tasks</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('airdrop')">
+            🎁
+            <span class="nav-label">Airdrop</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('profile')">
+            👤
+            <span class="nav-label">Me</span>
+        </button>
     </div>
 
     <script src="script.js"></script>
