@@ -1,197 +1,30 @@
-/* Improved Creature Grid */
-.creatures-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 15px;
-    padding-bottom: 80px;
-}
-
-.creature-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 15px;
+body {
+    font-family: Arial, sans-serif;
     text-align: center;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+.egg-container {
+    margin: 20px auto;
+    width: 200px;
+}
+
+#egg {
+    width: 100%;
     cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    min-height: 160px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    border: 2px solid transparent;
+    transition: transform 0.1s;
 }
 
-.creature-card.unlocked {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 215, 0, 0.3);
+#egg.hit {
+    transform: scale(0.9);
 }
 
-.creature-card.current {
-    background: rgba(102, 126, 234, 0.2);
-    border-color: #667eea;
-    animation: pulse-border 2s infinite;
-}
-
-@keyframes pulse-border {
-    0%, 100% { border-color: rgba(102, 126, 234, 0.5); }
-    50% { border-color: rgba(102, 126, 234, 1); }
-}
-
-.creature-card.locked {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.creature-card .emoji {
-    font-size: 40px;
-    margin: 10px 0;
-    transition: transform 0.3s;
-}
-
-.creature-card:hover .emoji {
-    transform: scale(1.1);
-}
-
-.creature-card .name {
-    font-weight: bold;
-    margin: 5px 0;
-    font-size: 14px;
-}
-
-.creature-card .description {
-    font-size: 11px;
-    opacity: 0.8;
-    margin: 3px 0;
-    min-height: 30px;
-}
-
-.creature-card .level {
-    font-size: 10px;
-    color: #ffd700;
-    margin: 3px 0;
-}
-
-.creature-card .income {
-    color: #4cd964;
-    font-weight: bold;
-    margin-top: 5px;
-    font-size: 12px;
-}
-
-.creature-card .hp-required {
-    font-size: 10px;
-    opacity: 0.7;
-    margin-top: 3px;
-}
-
-.lock-overlay {
+.floating-plus {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 30px;
-    background: rgba(0, 0, 0, 0.7);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 13px;
-}
-
-/* Scrollable content */
-.screen {
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
-    padding-bottom: 20px;
-}
-
-/* Creature Modal */
-.creature-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.creature-modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    padding: 25px;
-    max-width: 90%;
-    width: 350px;
-    text-align: center;
-    animation: modalAppear 0.3s ease-out;
-}
-
-@keyframes modalAppear {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.modal-emoji {
-    font-size: 80px;
-    margin: 15px 0;
-}
-
-.modal-name {
-    font-size: 24px;
     font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.modal-description {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-bottom: 15px;
-    line-height: 1.4;
-}
-
-.modal-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.stat-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 12px;
-}
-
-.stat-value {
-    font-weight: bold;
-    color: #ffd700;
-    font-size: 14px;
-}
-
-.close-modal {
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 15px;
-    width: 100%;
-    transition: background 0.3s;
-}
-
-.close-modal:hover {
-    background: rgba(0, 0, 0, 0.5);
+    color: #ff0;
+    user-select: none;
+    pointer-events: none;
 }
