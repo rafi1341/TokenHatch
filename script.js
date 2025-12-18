@@ -51,6 +51,23 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => floatText.remove(), 1000);
     }
 
+    function switchTab(tabName) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+
+    // Show the selected screen
+    const screenId = tabName + "-screen"; // match your HTML IDs
+    const activeScreen = document.getElementById(screenId);
+    if (activeScreen) activeScreen.classList.add('active');
+
+    // Update nav buttons active state
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    const btn = document.querySelector(`.nav-btn[onclick="switchTab('${tabName}')"]`);
+    if (btn) btn.classList.add('active');
+}
+
     // --- Tap Egg ---
     function tapEgg(e) {
         // Increase HP
