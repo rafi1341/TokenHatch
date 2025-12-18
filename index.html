@@ -359,6 +359,74 @@
 
     </div>
 
+        <!-- Creature Detail Screen -->
+    <div class="detail-screen" id="creature-detail">
+        <div class="detail-header">
+            <div class="detail-header-left">
+                <button class="back-btn" onclick="closeCreatureDetail()">←</button>
+                <div class="detail-title" id="detail-creature-name">Chick</div>
+            </div>
+            <div class="balance-display">
+                <div>💰 <span id="hatch-balance-detail">12,450</span> $HATCH</div>
+                <div>💎 <span id="points-balance-detail">245</span> Points</div>
+            </div>
+        </div>
+
+        <div class="detail-content">
+            <div class="detail-creature-display">
+                <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
+                <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Chick</div>
+                <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 3/5</div>
+            </div>
+
+            <div class="detail-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Current Income:</span>
+                    <span class="stat-value" id="detail-current-income">+50 $HATCH/hr</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Earned:</span>
+                    <span class="stat-value" id="detail-total-earned">45,200 $HATCH</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Owned for:</span>
+                    <span class="stat-value">15 days</span>
+                </div>
+            </div>
+
+            <div class="upgrade-section">
+                <div class="upgrade-header">⬆️ Upgrade to Level 4</div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">Current Production:</span>
+                    <span class="stat-value">+50 $HATCH/hr</span>
+                </div>
+
+                <div class="upgrade-arrow">↓</div>
+
+                <div class="stat-row">
+                    <span class="stat-label">After Upgrade:</span>
+                    <span class="stat-value" style="color: #00d68f;">+100 $HATCH/hr 📈</span>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <div class="cost-badge">
+                        💰 Upgrade Cost: <strong id="detail-upgrade-cost">2,500 $HATCH</strong>
+                    </div>
+                    <div class="income-badge">
+                        📈 Production Increase: <strong>+50/hr</strong>
+                    </div>
+                </div>
+
+                <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
+            </div>
+
+            <div style="text-align: center; opacity: 0.6; font-size: 12px; margin-top: 20px;">
+                💡 Tip: Higher levels = More passive income!
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <button class="nav-btn active" onclick="switchTab('home')">
