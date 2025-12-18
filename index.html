@@ -14,19 +14,45 @@
         <div>💎 <span id="points-balance">245</span> Points</div>
     </div>
 </div>
-        
-    <div class="container">
-        <h1>Egg Clicker</h1>
-        <p>Tokens: <span id="token-count">0</span></p>
 
-        <div class="egg-container">
-            <img id="egg" src="assets/eggs/egg_chick.png" alt="Egg">
-        </div>
+    <div class="screen" id="home-screen">...</div>
+    <div class="screen" id="hatch-screen">...</div>
+    <div class="screen" id="tasks-screen">...</div>
+    <div class="screen" id="airdrop-screen">...</div>
+    <div class="screen" id="profile-screen">...</div>
 
-        <h3 id="egg-name"></h3>
-        <p id="egg-desc"></p>
-        <p id="egg-hp"></p>
+    <div class="egg-display">
+    <div class="egg-name" id="egg-name">🐉 Dragon Egg</div>
+    <div class="egg-unlock-status" id="unlock-status">Tap to unlock Dragon!</div>
+    <div class="egg-container">
+        <div class="egg-glow"></div>
+        <div class="egg-emoji" id="main-egg" onclick="tapEgg(event)">🥚</div>
     </div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar" style="width: 45%;">
+            <span id="progress-percentage">45%</span>
+        </div>
+    </div>
+    <div class="progress-text">
+        <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
+    </div>
+</div>
+
+    <div class="collection-box">
+    <div class="collection-label">Ready to Collect</div>
+    <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
+    <button class="collect-btn" onclick="collectIncome()">Tap to Collect</button>
+    <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
+</div>
+
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('home')">🏠<span class="nav-label">Home</span></button>
+        <button class="nav-btn" onclick="switchTab('hatch')">🥚<span class="nav-label">Hatch</span></button>
+        <button class="nav-btn" onclick="switchTab('tasks')">📋<span class="nav-label">Tasks</span></button>
+        <button class="nav-btn" onclick="switchTab('airdrop')">🎁<span class="nav-label">Airdrop</span></button>
+        <button class="nav-btn" onclick="switchTab('profile')">👤<span class="nav-label">Me</span></button>
+    </div>
+
 
     <script src="script.js"></script>
 </body>
