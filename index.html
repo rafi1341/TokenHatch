@@ -7,86 +7,73 @@
 </head>
 <body>
 
-    <div class= "top-bar">
-        <div class= "logo">🥚 TokenHatch</div>
-        <div class= "balance-display">
-             <div>💰 <span id="hatch-balance">12,450</span> $HATCH</div>
-        <div>💎 <span id="points-balance">245</span> Points</div>
-    </div>
-</div>
-
-    <div class="screen" id="home-screen">...</div>
-    <div class="screen" id="hatch-screen">...</div>
-    <div class="screen" id="tasks-screen">...</div>
-    <div class="screen" id="airdrop-screen">...</div>
-    <div class="screen" id="profile-screen">...</div>
-
-    <!-- Home Screen -->
-<div id="home-screen" class="screen active">
-    <h2>🏠 Home</h2>
-    <p>Welcome to Egg Clicker!</p>
-</div>
-
-<!-- Hatch Screen -->
-<div id="hatch-screen" class="screen">
-    <div class="section-title">🥚 Your Collection</div>
-    <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
-        Progress: <strong>3/20</strong> Unlocked (15%)<br>
-        Total Income: <strong>+250 $HATCH/hr</strong>
-    </div>
-</div>
-
-<!-- Tasks Screen -->
-<div id="tasks-screen" class="screen">
-    <h2>📋 Tasks</h2>
-    <p>Complete daily tasks to earn $HATCH.</p>
-</div>
-
-<!-- Airdrop Screen -->
-<div id="airdrop-screen" class="screen">
-    <h2>🎁 Airdrop</h2>
-    <p>Check your airdrops here!</p>
-</div>
-
-<!-- Profile Screen -->
-<div id="profile-screen" class="screen">
-    <h2>👤 Profile</h2>
-    <p>View your stats and achievements.</p>
-</div>
-
-
-    <div class="egg-display">
-    <div class="egg-name" id="egg-name">🐉 Dragon Egg</div>
-    <div class="egg-unlock-status" id="unlock-status">Tap to unlock Dragon!</div>
-    <div class="egg-container">
-        <div class="egg-glow"></div>
-        <div class="egg-emoji" id="main-egg">🥚</div>
-    </div>
-    <div class="progress-bar-container">
-        <div class="progress-bar" id="progress-bar" style="width: 45%;">
-            <span id="progress-percentage">45%</span>
+    <div class="top-bar">
+        <div class="logo">🥚 TokenHatch</div>
+        <div class="balance-display">
+            <div>💰 <span id="hatch-balance">12,450</span> $HATCH</div>
+            <div>💎 <span id="points-balance">245</span> Points</div>
         </div>
     </div>
-    <div class="progress-text">
-        <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
+
+    <!-- Screens -->
+    <div id="home-screen" class="screen active">
+        <h2>🏠 Home</h2>
+        <p>Welcome to Egg Clicker!</p>
     </div>
-</div>
 
-    <div class="collection-box">
-    <div class="collection-label">Ready to Collect</div>
-    <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
-    <button class="collect-btn" onclick="collectIncome()">Tap to Collect</button>
-    <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
-</div>
+    <div id="hatch-screen" class="screen">
+        <div class="section-title">🥚 Your Collection</div>
+        <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
+            Progress: <strong>3/20</strong> Unlocked (15%)<br>
+            Total Income: <strong>+250 $HATCH/hr</strong>
+        </div>
+        <div class="egg-display">
+            <div class="egg-name" id="egg-name">🐉 Dragon Egg</div>
+            <div class="egg-unlock-status" id="unlock-status">Tap to unlock Dragon!</div>
+            <div class="egg-container">
+                <div class="egg-glow"></div>
+                <div class="egg-emoji" id="main-egg">🥚</div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar" style="width: 45%;">
+                    <span id="progress-percentage">45%</span>
+                </div>
+            </div>
+            <div class="progress-text">
+                <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
+            </div>
+        </div>
+        <div class="collection-box">
+            <div class="collection-label">Ready to Collect</div>
+            <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
+            <button class="collect-btn" id="collect-btn">Tap to Collect</button>
+            <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
+        </div>
+    </div>
 
-<div class="bottom-nav">
-    <button class="nav-btn active" data-tab="home">🏠<span class="nav-label">Home</span></button>
-    <button class="nav-btn" data-tab="hatch">🥚<span class="nav-label">Hatch</span></button>
-    <button class="nav-btn" data-tab="tasks">📋<span class="nav-label">Tasks</span></button>
-    <button class="nav-btn" data-tab="airdrop">🎁<span class="nav-label">Airdrop</span></button>
-    <button class="nav-btn" data-tab="profile">👤<span class="nav-label">Profile</span></button>
-</div>
+    <div id="tasks-screen" class="screen">
+        <h2>📋 Tasks</h2>
+        <p>Complete tasks to earn rewards.</p>
+    </div>
 
+    <div id="airdrop-screen" class="screen">
+        <h2>🎁 Airdrop</h2>
+        <p>Get your free tokens here!</p>
+    </div>
+
+    <div id="profile-screen" class="screen">
+        <h2>👤 Profile</h2>
+        <p>View your stats and collection.</p>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" data-tab="home">🏠<span class="nav-label">Home</span></button>
+        <button class="nav-btn" data-tab="hatch">🥚<span class="nav-label">Hatch</span></button>
+        <button class="nav-btn" data-tab="tasks">📋<span class="nav-label">Tasks</span></button>
+        <button class="nav-btn" data-tab="airdrop">🎁<span class="nav-label">Airdrop</span></button>
+        <button class="nav-btn" data-tab="profile">👤<span class="nav-label">Profile</span></button>
+    </div>
 
     <script src="script.js"></script>
 </body>
