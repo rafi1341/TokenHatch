@@ -956,7 +956,7 @@
 
     function hatchEgg() {
         creatures[currentEgg.id] = {
-            id: currentEgg.id, name: currentEgg.name, emoji: currentEgg.emoji,
+            id: currentEgg.id, name: currentEgg.name,
             image: currentEgg.creatureImg, currentLevel: 1, maxLevel: 5,
             currentIncome: 25, nextLevelIncome: 50, upgradeCost: 1000, totalEarned: 0
         };
@@ -966,7 +966,7 @@
     function showHatchAnimation(egg) {
         const overlay = document.getElementById('hatch-overlay');
         document.getElementById('hatch-creature-img').src = egg.creatureImg;
-        document.getElementById('hatch-title').textContent = `🎉 ${egg.emoji} ${egg.name.toUpperCase()} HATCHED! 🎉`;
+        document.getElementById('hatch-title').textContent = `🎉 ${egg.name.toUpperCase()} HATCHED! 🎉`;
         document.getElementById('hatch-message').textContent = `${egg.name} has joined your collection!`;
         document.getElementById('hatch-stat-name').textContent = egg.name;
         document.getElementById('hatch-stat-income').textContent = '+25 $HATCH/hr';
@@ -980,7 +980,7 @@
                 currentEgg.currentHP = 0;
                 const eggElement = document.getElementById('main-egg');
                 eggElement.src = currentEgg.eggImg;
-                document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+                document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
                 document.getElementById('egg-description').textContent = currentEgg.description;
                 updateProgress();
                 setupEggImage();
@@ -1027,10 +1027,10 @@
                 card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name">${c.emoji} ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
             } else if (i === currentEggIndex) {
                 card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name">${egg.emoji} ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
             } else {
                 card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name">${egg.emoji} ${egg.name} Egg</div><div class="level">🔒 Locked</div><div class="income">0/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 Locked</div><div class="income">0/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
             }
             grid.appendChild(card);
         });
@@ -1151,7 +1151,7 @@
 
     loadGameState();
     loadBalanceFromBackend();
-    document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+    document.getElementById('egg-name').textContent =  currentEgg.name + ' Egg';
     document.getElementById('egg-description').textContent = currentEgg.description;
     document.getElementById('main-egg').src = currentEgg.eggImg;
     updateProgress();
