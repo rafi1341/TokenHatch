@@ -149,6 +149,23 @@ function switchTab(tabName) {
     event.currentTarget.classList.add('active');
 }
 
+const eggElement = document.getElementById('main-egg');
+const hitCanvas = document.createElement('canvas');
+const hitCtx = hitCanvas.getContext('2d');
+
+const eggImage = new Image();
+eggImage.src = eggElement.src;
+
+// Prepare canvas once image loads
+eggImage.onload = () => {
+    hitCanvas.width = eggImage.naturalWidth;
+    hitCanvas.height = eggImage.naturalHeight;
+    hitCtx.drawImage(eggImage, 0, 0);
+};
+
+
+
+
 // Tap Egg Function - WITH 2-SECOND BATCHING
 function tapEgg(event) {
     // Update egg HP immediately (local)
@@ -193,6 +210,31 @@ function tapEgg(event) {
         hatchEgg();
     }
 }
+
+eggElement.addEventListener('click', (event) => {
+    const rect = eggElement.getBoundingClientRect();
+
+    // Convert click position to image pixel
+    const x = Math.floor(
+        (event.clientX - rect.left) * (hitCanvas.width / rect.width)
+    );
+    const y = Math.floor(
+        (event.clientY - rect.top) * (hitCanvas.height / rect.height)
+    );
+
+    // Read pixel alpha
+    const pixel = hitCtx.getImageData(x, y, 1, 1).data;
+
+    const alpha = pixel[3]; // 0 = fully transparent
+
+    if (alpha > 20) { // threshold (ignore tiny edges)
+        tapEgg(event); // ✅ REAL HIT
+    } else {
+        // ❌ Transparent click ignored
+        console.log('Transparent pixel ignored');
+    }
+});
+
 
 // Also send pending tokens when user closes/switches away
 window.addEventListener('beforeunload', () => {
