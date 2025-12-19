@@ -75,8 +75,8 @@
         .egg-container {
             position: relative;
             margin: 20px auto;
-            width: 150px;
-            height: 150px;
+            width: 250px;
+            height: 250px;
             display: flex;
             align-items: center;
             justify-content: center;
