@@ -83,8 +83,8 @@
         }
 
         .egg-image {
-            width: 250px;
-            height: 250px;
+            width: 35px;
+            height: 350px;
             cursor: pointer;
             user-select: none;
             transition: transform 0.1s;
