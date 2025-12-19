@@ -629,8 +629,8 @@
             <div class="collection-box">
                 <div class="collection-label">Ready to Collect</div>
                 <div class="collection-amount">💰 <span id="collected-amount">0</span> $HATCH</div>
-                <button class="collect-btn" onclick="collectIncome()">Tap to Collect</button>
-                <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
+                <button class="collect-btn" onclick="collectIncome(this)">Tap to Collect</button>
+                <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div> 
             </div>
 
             <div class="section-title">Quick Actions</div>
@@ -1051,7 +1051,7 @@
         setTimeout(() => ft.remove(), 1000);
     }
 
-    function collectIncome() {
+    function collectIncome(btn) {
         const amt = parseInt(document.getElementById('collected-amount').textContent);
         const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
         document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString();
@@ -1059,7 +1059,6 @@
         document.getElementById('collected-amount').textContent = '0';
         sendBatchToBackend(amt);
         showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3);
-        const btn = event.target;
         const orig = btn.textContent;
         btn.disabled = true;
         btn.textContent = 'Collected! ✅';
