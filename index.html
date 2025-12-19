@@ -766,10 +766,8 @@
         const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
 
         // Get Telegram user ID
-        const userId = "test_user_" + Date.now();
-console.log("Testing User ID:", userId);
-        localStorage.removeItem(`gameState_${userId}`);
-localStorage.removeItem(`unsaved_${userId}`);
+     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
+
 
 
         // Batching variables
