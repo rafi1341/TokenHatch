@@ -376,14 +376,8 @@
         }
 
         @keyframes floatUp {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
         }
 
         .detail-screen {
@@ -485,7 +479,7 @@
             margin: 15px 0;
         }
 
-        .cost-badge, .income-badge {
+        .cost-badge {
             background: rgba(0, 0, 0, 0.3);
             padding: 10px 15px;
             border-radius: 10px;
@@ -509,11 +503,96 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        .hatch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .hatch-overlay.active {
+            display: flex;
+            animation: fadeIn 0.5s;
+        }
+
+        .hatch-animation-content {
+            text-align: center;
+        }
+
+        .hatch-creature-reveal {
+            width: 250px;
+            height: 250px;
+            margin: 30px auto;
+            animation: hatchReveal 1.5s ease-out;
+        }
+
+        @keyframes hatchReveal {
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .hatch-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .hatch-message {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .hatch-stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 300px;
+            animation: fadeIn 1s ease-out 1s both;
+        }
+
+        .hatch-stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hatch-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: confettiFall 3s linear;
+        }
+
+        @keyframes confettiFall {
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
-
-    <!-- Top Bar -->
     <div class="top-bar">
         <div class="logo">🥚 TokenHatch</div>
         <div class="balance-display">
@@ -522,26 +601,19 @@
         </div>
     </div>
 
-    <!-- Content Area -->
     <div class="content">
-        
-        <!-- HOME TAB -->
         <div id="home-screen" class="screen active">
             <div class="passive-income-display">
                 📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
             </div>
 
             <div class="egg-display">
-                <div class="egg-name">
-                    <span id="egg-name">🐣 Chick Egg</span>
-                </div>
-                <div class="egg-description">
-                    <span id="egg-description">Description will appear here</span>
-                </div>
+                <div class="egg-name"><span id="egg-name">🐣 Chick Egg</span></div>
+                <div class="egg-description"><span id="egg-description">Description</span></div>
                 
                 <div class="egg-container">
                     <div class="egg-glow"></div>
-                    <img src="assets/eggs/egg_chick.png" class="egg-image" id="main-egg" alt="Chick Egg">
+                    <img src="assets/eggs/egg_chick.png" class="egg-image" id="main-egg" alt="Egg">
                 </div>
 
                 <div class="progress-bar-container">
@@ -563,45 +635,27 @@
 
             <div class="section-title">Quick Actions</div>
             <div class="quick-actions">
-                <button class="action-btn" onclick="switchTab('tasks')">
-                    🎯<div class="action-label">Tasks</div>
-                </button>
-                <button class="action-btn" onclick="showBonus()">
-                    🎁<div class="action-label">Bonus</div>
-                </button>
-                <button class="action-btn" onclick="showReferral()">
-                    👥<div class="action-label">Refer</div>
-                </button>
-                <button class="action-btn" onclick="switchTab('hatch')">
-                    🥚<div class="action-label">Hatch</div>
-                </button>
+                <button class="action-btn" onclick="switchTab('tasks')">🎯<div class="action-label">Tasks</div></button>
+                <button class="action-btn" onclick="showBonus()">🎁<div class="action-label">Bonus</div></button>
+                <button class="action-btn" onclick="showReferral()">👥<div class="action-label">Refer</div></button>
+                <button class="action-btn" onclick="switchTab('hatch')">🥚<div class="action-label">Hatch</div></button>
             </div>
 
-            <div class="daily-streak">
-                🏆 Daily Streak: <strong>1 day</strong> 🔥
-            </div>
+            <div class="daily-streak">🏆 Daily Streak: <strong>1 day</strong> 🔥</div>
         </div>
 
-        <!-- HATCH TAB (Collection) -->
         <div id="hatch-screen" class="screen">
             <div class="section-title">🥚 Your Collection</div>
             <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
                 Progress: <strong><span id="unlocked-count">0</span>/20</strong> Unlocked (<span id="unlock-percentage">0</span>%)<br>
                 Total Income: <strong>+<span id="total-income">0</span> $HATCH/hr</strong>
             </div>
-
-            <div class="creatures-grid" id="creatures-grid">
-                <!-- Creatures will be dynamically generated here -->
-            </div>
+            <div class="creatures-grid" id="creatures-grid"></div>
         </div>
 
-        <!-- TASKS TAB -->
         <div id="tasks-screen" class="screen">
             <div class="section-title">📋 Earn More</div>
-            <div style="opacity: 0.8; margin-bottom: 20px;">
-                Available Tasks: <strong>24</strong>
-            </div>
-
+            <div style="opacity: 0.8; margin-bottom: 20px;">Available Tasks: <strong>24</strong></div>
             <div class="task-card" style="background: rgba(255, 107, 107, 0.2);">
                 <div class="task-info">
                     <div class="task-title">🔥 FEATURED: Complete Survey</div>
@@ -610,9 +664,7 @@
                 </div>
                 <button class="task-btn">START →</button>
             </div>
-
             <div class="section-title" style="font-size: 16px; margin-top: 30px;">Quick Tasks (1-2 min)</div>
-            
             <div class="task-card">
                 <div class="task-info">
                     <div class="task-title">📱 Follow on Twitter</div>
@@ -620,7 +672,6 @@
                 </div>
                 <button class="task-btn">DO IT</button>
             </div>
-
             <div class="task-card">
                 <div class="task-info">
                     <div class="task-title">💬 Join Telegram Group</div>
@@ -630,53 +681,43 @@
             </div>
         </div>
 
-        <!-- AIRDROP TAB -->
         <div id="airdrop-screen" class="screen">
             <div class="section-title">🎁 Airdrop Allocation</div>
-            
             <div class="creature-display">
                 <div style="opacity: 0.8;">🗓️ Airdrop Date: June 1, 2026</div>
                 <div style="font-size: 14px; opacity: 0.6; margin-bottom: 20px;">⏳ Time remaining: 168 days</div>
-                
-                <div class="collection-amount" style="margin: 20px 0;">
-                    Estimated: 0 $HATCH
-                </div>
-                
-                <div style="font-size: 18px;">
-                    Your Rank: <strong>#-</strong>
-                </div>
+                <div class="collection-amount" style="margin: 20px 0;">Estimated: 0 $HATCH</div>
+                <div style="font-size: 18px;">Your Rank: <strong>#-</strong></div>
             </div>
         </div>
 
-        <!-- PROFILE TAB -->
         <div id="profile-screen" class="screen">
             <div class="section-title">👤 Profile</div>
-            
             <div class="creature-display">
                 <div style="font-size: 60px; margin: 20px 0;">👤</div>
                 <div style="font-size: 20px; font-weight: bold;">@username</div>
                 <div style="opacity: 0.6; margin-top: 5px;">Member since: Dec 2024</div>
             </div>
-
             <div class="upgrade-section">
-                <div class="stats-row">
-                    <span>💰 $HATCH Balance:</span>
-                    <span id="profile-hatch">0</span>
-                </div>
-                <div class="stats-row">
-                    <span>💎 Points:</span>
-                    <span id="profile-points">0</span>
-                </div>
-                <div class="stats-row" style="border-bottom: none;">
-                    <span>🥚 Creatures Owned:</span>
-                    <span id="profile-creatures">0/20</span>
-                </div>
+                <div class="stats-row"><span>💰 $HATCH Balance:</span><span id="profile-hatch">0</span></div>
+                <div class="stats-row"><span>💎 Points:</span><span id="profile-points">0</span></div>
+                <div class="stats-row" style="border-bottom: none;"><span>🥚 Creatures Owned:</span><span id="profile-creatures">0/20</span></div>
             </div>
         </div>
-
     </div>
 
-    <!-- Creature Detail Screen -->
+    <div class="hatch-overlay" id="hatch-overlay">
+        <div class="hatch-animation-content">
+            <div class="hatch-title" id="hatch-title">🎉 HATCHED! 🎉</div>
+            <img src="" class="hatch-creature-reveal" id="hatch-creature-img" alt="Creature">
+            <div class="hatch-message" id="hatch-message">A new creature has joined your collection!</div>
+            <div class="hatch-stats" id="hatch-stats">
+                <div class="hatch-stat-item"><span>Creature:</span><span id="hatch-stat-name">-</span></div>
+                <div class="hatch-stat-item"><span>Income:</span><span id="hatch-stat-income" style="color: #00d68f;">+0 $HATCH/hr</span></div>
+            </div>
+        </div>
+    </div>
+
     <div class="detail-screen" id="creature-detail">
         <div class="detail-header">
             <div class="detail-header-left">
@@ -688,74 +729,54 @@
                 <div>💎 <span id="points-balance-detail">0</span> Points</div>
             </div>
         </div>
-
         <div class="detail-content">
             <div class="detail-creature-display">
                 <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
                 <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Creature</div>
                 <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 1/5</div>
             </div>
-
             <div class="detail-stats">
-                <div class="stat-row">
-                    <span class="stat-label">Current Income:</span>
-                    <span class="stat-value" id="detail-current-income">+0 $HATCH/hr</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Total Earned:</span>
-                    <span class="stat-value" id="detail-total-earned">0 $HATCH</span>
-                </div>
+                <div class="stat-row"><span>Current Income:</span><span id="detail-current-income">+0 $HATCH/hr</span></div>
+                <div class="stat-row"><span>Total Earned:</span><span id="detail-total-earned">0 $HATCH</span></div>
             </div>
-
             <div class="upgrade-section">
                 <div class="upgrade-header">⬆️ Upgrade</div>
-                
-                <div class="stat-row">
-                    <span class="stat-label">Current Production:</span>
-                    <span class="stat-value" id="detail-current-prod">+0 $HATCH/hr</span>
-                </div>
-
+                <div class="stat-row"><span>Current Production:</span><span id="detail-current-prod">+0 $HATCH/hr</span></div>
                 <div class="upgrade-arrow">↓</div>
-
-                <div class="stat-row">
-                    <span class="stat-label">After Upgrade:</span>
-                    <span class="stat-value" style="color: #00d68f;" id="detail-next-prod">+0 $HATCH/hr 📈</span>
-                </div>
-
+                <div class="stat-row"><span>After Upgrade:</span><span style="color: #00d68f;" id="detail-next-prod">+0 $HATCH/hr 📈</span></div>
                 <div style="margin-top: 20px; text-align: center;">
-                    <div class="cost-badge">
-                        💰 Upgrade Cost: <strong id="detail-upgrade-cost">0 $HATCH</strong>
-                    </div>
+                    <div class="cost-badge">💰 Upgrade Cost: <strong id="detail-upgrade-cost">0 $HATCH</strong></div>
                 </div>
-
                 <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('home')">
-            🏠
-            <span class="nav-label">Home</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('hatch')">
-            🥚
-            <span class="nav-label">Hatch</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('tasks')">
-            📋
-            <span class="nav-label">Tasks</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('airdrop')">
-            🎁
-            <span class="nav-label">Airdrop</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('profile')">
-            👤
-            <span class="nav-label">Me</span>
-        </button>
+        <button class="nav-btn active" onclick="switchTab('home')">🏠<span class="nav-label">Home</span></button>
+        <button class="nav-btn" onclick="switchTab('hatch')">🥚<span class="nav-label">Hatch</span></button>
+        <button class="nav-btn" onclick="switchTab('tasks')">📋<span class="nav-label">Tasks</span></button>
+        <button class="nav-btn" onclick="switchTab('airdrop')">🎁<span class="nav-label">Airdrop</span></button>
+        <button class="nav-btn" onclick="switchTab('profile')">👤<span class="nav-label">Me</span></button>
     </div>
+
+    <script>
+        const BOT_API = "https://telegrambot-or4r.onrender.com";
+        const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
+        const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
+        
+        let pendingTokens = 0;
+        let saveTimeout = null;
+
+        const allEggs = [
+            { id: 1, name: 'Chick', emoji: '🐣', eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Soft warmth seeps through the fragile shell]' },
+            { id: 2, name: 'Turtle', emoji: '🐢', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: '[Heavy and calm, built to endure time]' },
+            { id: 3, name: 'Lizard', emoji: '🦎', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: '[A faint pulse hints at swift movement inside]' },
+            { id: 4, name: 'Snake', emoji: '🐍', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: '[Cold and silent, yet watching]' },
+            { id: 5, name: 'Eagle', emoji: '🦅', eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: '[Light as air, humming with skybound energy]' },
+            { id: 6, name: 'Dino', emoji: '🦕', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: '[Ancient power sleeps beneath its surface]' },
+            { id: 7, name: 'Dragon', emoji: '🐉', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: '[Intense heat radiates from within]' },
+            { id: 8, name: 'Unicorn', emoji: '🦄', eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description:
 
     <script>
         // Configuration
@@ -795,534 +816,373 @@
         ];
 
         // Creatures that have been hatched
-        const creatures = {};
+  const creatures = {};
+    let currentEgg = null;
+    let currentEggIndex = 0;
+    let selectedCreature = null;
 
-        // Current egg being hatched
-        let currentEgg = null;
-        let currentEggIndex = 0;
-
-        let selectedCreature = null;
-
-        // Load game state from localStorage
-        function loadGameState() {
-            const savedState = localStorage.getItem(`gameState_${userId}`);
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                currentEggIndex = state.currentEggIndex || 0;
-                
-                // Load creatures
-                if (state.creatures) {
-                    Object.assign(creatures, state.creatures);
-                }
-                
-                // Load current egg progress
-                currentEgg = allEggs[currentEggIndex];
-                currentEgg.currentHP = state.currentHP || 0;
-                
-                console.log("✅ Loaded game state:", state);
-            } else {
-                // First time - start with first egg
-                currentEgg = allEggs[0];
-                currentEgg.currentHP = 0;
-            }
+    function loadGameState() {
+        const s = localStorage.getItem(`gameState_${userId}`);
+        if (s) {
+            const state = JSON.parse(s);
+            currentEggIndex = state.currentEggIndex || 0;
+            if (state.creatures) Object.assign(creatures, state.creatures);
+            currentEgg = allEggs[currentEggIndex];
+            currentEgg.currentHP = state.currentHP || 0;
+        } else {
+            currentEgg = allEggs[0];
+            currentEgg.currentHP = 0;
         }
+    }
 
-        // Save game state to localStorage
-        function saveGameState() {
-            const state = {
-                currentEggIndex: currentEggIndex,
-                currentHP: currentEgg.currentHP,
-                creatures: creatures
-            };
-            localStorage.setItem(`gameState_${userId}`, JSON.stringify(state));
-            console.log("💾 Saved game state");
+    function saveGameState() {
+        localStorage.setItem(`gameState_${userId}`, JSON.stringify({
+            currentEggIndex, currentHP: currentEgg.currentHP, creatures
+        }));
+    }
+
+    async function loadBalanceFromBackend() {
+        const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
+        if (unsaved > 0) {
+            await sendBatchToBackend(unsaved);
+            localStorage.removeItem(`unsaved_${userId}`);
         }
-
-        // Load balance from backend on startup
-        async function loadBalanceFromBackend() {
-            console.log("🔄 Loading balance from backend...");
-            
-            const unsavedTokens = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
-            if (unsavedTokens > 0) {
-                console.log("💾 Found unsaved tokens:", unsavedTokens);
-                await sendBatchToBackend(unsavedTokens);
-                localStorage.removeItem(`unsaved_${userId}`);
-            }
-            
-            try {
-                const res = await fetch(`${BOT_API}/get_balance`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        user_id: userId,
-                        api_secret: API_SECRET
-                    })
-                });
-                
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                
+        try {
+            const res = await fetch(`${BOT_API}/get_balance`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, api_secret: API_SECRET })
+            });
+            if (res.ok) {
                 const data = await res.json();
-                const balance = data.balance || 0;
-                
-                document.getElementById('hatch-balance').textContent = balance.toLocaleString();
+                document.getElementById('hatch-balance').textContent = (data.balance || 0).toLocaleString();
                 syncBalanceDisplays();
-                
-                console.log("✅ Loaded balance:", balance);
-            } catch (e) {
-                console.error("❌ Failed to load balance:", e);
             }
-        }
+        } catch (e) { console.error(e); }
+    }
 
-        // Send batched tokens to backend
-        async function sendBatchToBackend(amount) {
-            console.log("📤 Sending batch to backend: +", amount, "tokens");
-            
-            try {
-                const res = await fetch(`${BOT_API}/update_tokens`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        user_id: userId,
-                        tokens: amount,
-                        api_secret: API_SECRET
-                    })
-                });
-                
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                
+    async function sendBatchToBackend(amount) {
+        try {
+            const res = await fetch(`${BOT_API}/update_tokens`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, tokens: amount, api_secret: API_SECRET })
+            });
+            if (res.ok) {
                 const data = await res.json();
-                console.log("✅ Backend response:", data);
-                
                 if (data.new_balance !== undefined) {
                     document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString();
                     syncBalanceDisplays();
                 }
-                
                 localStorage.removeItem(`unsaved_${userId}`);
-            } catch (e) {
-                console.error("❌ Failed to send batch:", e);
             }
-        }
+        } catch (e) { console.error(e); }
+    }
 
-        // Tab Switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + '-screen').classList.add('active');
-            event.currentTarget.classList.add('active');
-            
-            if (tabName === 'hatch') {
-                renderCreaturesGrid();
-            }
-        }
-
-        // Setup egg transparency detection
-        const eggElement = document.getElementById('main-egg');
-        const hitCanvas = document.createElement('canvas');
-        const hitCtx = hitCanvas.getContext('2d');
-        let eggImageLoaded = false;
-
-        function setupEggImage() {
-            const eggImage = new Image();
-            eggImage.crossOrigin = "anonymous";
-            eggImage.src = currentEgg.eggImg;
-            
-            eggImage.onload = () => {
-                hitCanvas.width = eggImage.naturalWidth;
-                hitCanvas.height = eggImage.naturalHeight;
-                hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
-                hitCtx.drawImage(eggImage, 0, 0);
-                eggImageLoaded = true;
-                console.log("✅ Egg image loaded for transparency detection");
-            };
-            
-            eggImage.onerror = () => {
-                console.error("❌ Failed to load egg image");
-                eggImageLoaded = false;
-            };
-        }
-
-        // Tap Egg Function
-        function tapEgg(event) {
-            currentEgg.currentHP += currentEgg.hpPerTap;
-            
-            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-            document.getElementById('hatch-balance').textContent = (currentBalance + currentEgg.hpPerTap).toLocaleString();
-            syncBalanceDisplays();
-            
-            pendingTokens += currentEgg.hpPerTap;
-            localStorage.setItem(`unsaved_${userId}`, pendingTokens);
-            
-            showFloatingText('+' + currentEgg.hpPerTap, event.clientX, event.clientY);
-            
-            updateProgress();
-            saveGameState();
-            
-            const egg = document.getElementById('main-egg');
-            egg.style.transform = 'scale(0.9) rotate(-5deg)';
-            setTimeout(() => {
-                egg.style.transform = 'scale(1) rotate(0deg)';
-            }, 100);
-            
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                if (pendingTokens > 0) {
-                    console.log(`📦 Batching ${pendingTokens} taps`);
-                    sendBatchToBackend(pendingTokens);
-                    pendingTokens = 0;
-                }
-            }, 2000);
-            
-            if (currentEgg.currentHP >= currentEgg.requiredHP) {
-                hatchEgg();
-            }
-        }
-
-        eggElement.addEventListener('click', (event) => {
-            if (!eggImageLoaded) {
-                tapEgg(event);
-                return;
-            }
-            
-            const rect = eggElement.getBoundingClientRect();
-            const x = Math.floor((event.clientX - rect.left) * (hitCanvas.width / rect.width));
-            const y = Math.floor((event.clientY - rect.top) * (hitCanvas.height / rect.height));
-
-            if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) {
-                console.log('Click outside egg bounds');
-                return;
-            }
-
-            const pixel = hitCtx.getImageData(x, y, 1, 1).data;
-            const alpha = pixel[3];
-
-            if (alpha > 20) {
-                tapEgg(event);
-            } else {
-                console.log('Transparent pixel ignored');
+    function switchTab(t) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const screen = document.getElementById(t + '-screen');
+        if (screen) screen.classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const label = btn.querySelector('.nav-label');
+            if (label) {
+                const lt = label.textContent.toLowerCase();
+                if ((t === 'home' && lt === 'home') || (t === 'hatch' && lt === 'hatch') ||
+                    (t === 'tasks' && lt === 'tasks') || (t === 'airdrop' && lt === 'airdrop') ||
+                    (t === 'profile' && lt === 'me')) btn.classList.add('active');
             }
         });
+        if (t === 'hatch') renderCreaturesGrid();
+    }
 
-        // Save pending tokens on app close/blur
-        window.addEventListener('beforeunload', () => {
-            if (pendingTokens > 0) {
-                const data = new Blob([JSON.stringify({
-                    user_id: userId,
-                    tokens: pendingTokens,
-                    api_secret: API_SECRET
-                })], { type: 'application/json' });
-                navigator.sendBeacon(`${BOT_API}/update_tokens`, data);
-            }
-        });
+    const eggEl = document.getElementById('main-egg');
+    const hitCanvas = document.createElement('canvas');
+    const hitCtx = hitCanvas.getContext('2d');
+    let eggLoaded = false;
 
-        window.addEventListener('blur', () => {
-            if (pendingTokens > 0) {
-                sendBatchToBackend(pendingTokens);
-                pendingTokens = 0;
-                clearTimeout(saveTimeout);
-            }
-        });
+    function setupEggImage() {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = currentEgg.eggImg;
+        img.onload = () => {
+            hitCanvas.width = img.naturalWidth;
+            hitCanvas.height = img.naturalHeight;
+            hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
+            hitCtx.drawImage(img, 0, 0);
+            eggLoaded = true;
+        };
+        img.onerror = () => eggLoaded = false;
+    }
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && pendingTokens > 0) {
-                sendBatchToBackend(pendingTokens);
-                pendingTokens = 0;
-                clearTimeout(saveTimeout);
-            }
-        });
-
-        // Update Progress Bar
-        function updateProgress() {
-            const percentage = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
-            document.getElementById('progress-bar').style.width = percentage + '%';
-            document.getElementById('progress-percentage').textContent = Math.floor(percentage) + '%';
-            document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
-            document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
-        }
-
-        // Hatch Egg
-        function hatchEgg() {
-            const egg = document.getElementById('main-egg');
-            egg.src = currentEgg.creatureImg;
-            
-            showFloatingText('🎉 ' + currentEgg.name + ' HATCHED! 🎉', window.innerWidth / 2, window.innerHeight / 2);
-            
-            // Add creature to collection
-            creatures[currentEgg.id] = {
-                id: currentEgg.id,
-                name: currentEgg.name,
-                image: currentEgg.creatureImg,
-                currentLevel: 1,
-                maxLevel: 5,
-                currentIncome: 25,
-                nextLevelIncome: 50,
-                upgradeCost: 1000,
-                totalEarned: 0
-            };
-            
-            setTimeout(() => {
-                alert('🎉 Congratulations!\n\n' + currentEgg.name + ' has hatched!\n\nGo to Hatch tab to manage your creatures!');
-                
-                // Move to next egg
-                currentEggIndex++;
-                if (currentEggIndex < allEggs.length) {
-                    currentEgg = allEggs[currentEggIndex];
-                    currentEgg.currentHP = 0;
-                    
-                    egg.src = currentEgg.eggImg;
-                    document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
-                    document.getElementById('egg-description').textContent = currentEgg.description;
-                    updateProgress();
-                    setupEggImage();
-                } else {
-                    alert('🎊 Amazing! You\'ve hatched all 20 creatures! 🎊');
-                }
-                
-                saveGameState();
-                updatePassiveIncome();
-            }, 2000);
-        }
-
-        // Update passive income display
-        function updatePassiveIncome() {
-            let totalIncome = 0;
-            Object.values(creatures).forEach(c => {
-                totalIncome += c.currentIncome;
-            });
-            document.getElementById('passive-income').textContent = totalIncome;
-        }
-
-        // Render creatures grid
-        function renderCreaturesGrid() {
-            const grid = document.getElementById('creatures-grid');
-            grid.innerHTML = '';
-            
-            let unlockedCount = Object.keys(creatures).length;
-            
-            allEggs.forEach((egg, index) => {
-                const card = document.createElement('div');
-                
-                if (creatures[egg.id]) {
-                    // Unlocked creature
-                    const creature = creatures[egg.id];
-                    card.className = 'creature-card';
-                    card.onclick = () => openCreatureDetail(egg.id);
-                    card.innerHTML = `
-                        <img src="${creature.image}" class="creature-image" alt="${creature.name}">
-                        <div class="name">${creature.name}</div>
-                        <div class="level">Level ${creature.currentLevel}/${creature.maxLevel}</div>
-                        <div class="income">+${creature.currentIncome}/hr</div>
-                    `;
-                } else if (index === currentEggIndex) {
-                    // Current egg in progress
-                    card.className = 'creature-card locked';
-                    card.innerHTML = `
-                        <img src="${egg.eggImg}" class="creature-image" alt="${egg.name} Egg">
-                        <div class="name">${egg.name} Egg</div>
-                        <div class="level">🔒 In Progress</div>
-                        <div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div>
-                        <div class="lock-overlay">🔒</div>
-                    `;
-                } else {
-                    // Locked egg
-                    card.className = 'creature-card locked';
-                    card.innerHTML = `
-                        <img src="${egg.eggImg}" class="creature-image" alt="${egg.name} Egg">
-                        <div class="name">${egg.name} Egg</div>
-                        <div class="level">🔒 Locked</div>
-                        <div class="income">0/${egg.requiredHP.toLocaleString()} HP</div>
-                        <div class="lock-overlay">🔒</div>
-                    `;
-                }
-                
-                grid.appendChild(card);
-            });
-            
-            // Update stats
-            document.getElementById('unlocked-count').textContent = unlockedCount;
-            document.getElementById('unlock-percentage').textContent = Math.floor((unlockedCount / 20) * 100);
-            
-            let totalIncome = 0;
-            Object.values(creatures).forEach(c => {
-                totalIncome += c.currentIncome;
-            });
-            document.getElementById('total-income').textContent = totalIncome;
-        }
-
-        // Floating Text Animation
-        function showFloatingText(text, x, y) {
-            const floatText = document.createElement('div');
-            floatText.className = 'float-text';
-            floatText.textContent = text;
-            floatText.style.left = x + 'px';
-            floatText.style.top = y + 'px';
-            document.body.appendChild(floatText);
-            
-            setTimeout(() => {
-                floatText.remove();
-            }, 1000);
-        }
-
-        // Collect Passive Income
-        function collectIncome() {
-            const amount = parseInt(document.getElementById('collected-amount').textContent);
-            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-            const newBalance = currentBalance + amount;
-            
-            document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
-            syncBalanceDisplays();
-            document.getElementById('collected-amount').textContent = '0';
-            
-            sendBatchToBackend(amount);
-            showFloatingText('+' + amount + ' $HATCH', event.clientX, event.clientY);
-            
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Collected! ✅';
-            btn.style.background = '#00d68f';
-            
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
-                btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            }, 2000);
-        }
-
-        // Show Bonus
-        function showBonus() {
-            const bonus = 500;
-            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-            document.getElementById('hatch-balance').textContent = (currentBalance + bonus).toLocaleString();
-            syncBalanceDisplays();
-            
-            sendBatchToBackend(bonus);
-            showFloatingText('+' + bonus + ' Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
-        }
-
-        // Show Referral
-        function showReferral() {
-            alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!');
-        }
-
-        // Open Creature Detail
-        function openCreatureDetail(creatureId) {
-            selectedCreature = creatures[creatureId];
-            if (!selectedCreature) return;
-
-            syncBalanceDisplays();
-
-            document.getElementById('detail-creature-name').textContent = selectedCreature.name;
-            document.getElementById('detail-creature-title').textContent = selectedCreature.name;
-            document.getElementById('detail-creature-img').src = selectedCreature.image;
-            document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
-            document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
-            document.getElementById('detail-total-earned').textContent = `${selectedCreature.totalEarned.toLocaleString()} $HATCH`;
-            document.getElementById('detail-upgrade-cost').textContent = `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`;
-            document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
-            document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`;
-
-            const upgradeBtn = document.querySelector('.upgrade-btn');
-            if (selectedCreature.currentLevel >= selectedCreature.maxLevel) {
-                upgradeBtn.disabled = true;
-                upgradeBtn.textContent = 'MAX LEVEL REACHED';
-                document.querySelector('.upgrade-header').textContent = '⭐ Maximum Level';
-            } else {
-                upgradeBtn.disabled = false;
-                upgradeBtn.textContent = 'UPGRADE NOW';
-                document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
-            }
-
-            document.getElementById('creature-detail').classList.add('active');
-        }
-
-        // Sync balance displays
-        function syncBalanceDisplays() {
-            const mainBalance = document.getElementById('hatch-balance').textContent;
-            const mainPoints = document.getElementById('points-balance').textContent;
-            const detailBalance = document.getElementById('hatch-balance-detail');
-            const detailPoints = document.getElementById('points-balance-detail');
-            const profileHatch = document.getElementById('profile-hatch');
-            const profilePoints = document.getElementById('profile-points');
-            const profileCreatures = document.getElementById('profile-creatures');
-            
-            if (detailBalance) detailBalance.textContent = mainBalance;
-            if (detailPoints) detailPoints.textContent = mainPoints;
-            if (profileHatch) profileHatch.textContent = mainBalance;
-            if (profilePoints) profilePoints.textContent = mainPoints;
-            if (profileCreatures) {
-                const unlockedCount = Object.keys(creatures).length;
-                profileCreatures.textContent = `${unlockedCount}/20`;
-            }
-        }
-
-        // Close Creature Detail
-        function closeCreatureDetail() {
-            document.getElementById('creature-detail').classList.remove('active');
-            selectedCreature = null;
-        }
-
-        // Upgrade Creature
-        function upgradeCreature() {
-            if (!selectedCreature) return;
-
-            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-            
-            if (currentBalance >= selectedCreature.upgradeCost) {
-                const newBalance = currentBalance - selectedCreature.upgradeCost;
-                document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
-                syncBalanceDisplays();
-                
-                sendBatchToBackend(-selectedCreature.upgradeCost);
-                
-                selectedCreature.currentLevel++;
-                selectedCreature.currentIncome = selectedCreature.nextLevelIncome;
-                selectedCreature.upgradeCost = Math.floor(selectedCreature.upgradeCost * 2.5);
-                selectedCreature.nextLevelIncome = Math.floor(selectedCreature.nextLevelIncome * 2);
-                
-                saveGameState();
-                updatePassiveIncome();
-                
-                showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
-                
-                setTimeout(() => {
-                    openCreatureDetail(selectedCreature.id);
-                }, 500);
-            } else {
-                alert('❌ Not enough $HATCH!\n\nNeed: ' + selectedCreature.upgradeCost.toLocaleString() + '\nHave: ' + currentBalance.toLocaleString());
-            }
-        }
-
-        // Initialize on page load
-        loadGameState();
-        loadBalanceFromBackend();
-        
-        // Setup current egg
-        document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
-        document.getElementById('egg-description').textContent = currentEgg.description;
-        document.getElementById('main-egg').src = currentEgg.eggImg;
+    function tapEgg(e) {
+        currentEgg.currentHP += currentEgg.hpPerTap;
+        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+        document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString();
+        syncBalanceDisplays();
+        pendingTokens += currentEgg.hpPerTap;
+        localStorage.setItem(`unsaved_${userId}`, pendingTokens);
+        showFloatingText('+' + currentEgg.hpPerTap, e.clientX, e.clientY);
         updateProgress();
-        updatePassiveIncome();
-        setupEggImage();
-
-        // Simulate passive income accumulation
-        setInterval(() => {
-            const current = parseInt(document.getElementById('collected-amount').textContent);
-            const passiveIncome = parseInt(document.getElementById('passive-income').textContent);
-            if (current < passiveIncome * 2) {
-                document.getElementById('collected-amount').textContent = current + Math.max(1, Math.floor(passiveIncome / 100));
+        saveGameState();
+        const egg = document.getElementById('main-egg');
+        egg.style.transform = 'scale(0.9) rotate(-5deg)';
+        setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100);
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            if (pendingTokens > 0) {
+                sendBatchToBackend(pendingTokens);
+                pendingTokens = 0;
             }
-        }, 3000);
-    </script>
+        }, 2000);
+        if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg();
+    }
+
+    eggEl.addEventListener('click', (e) => {
+        if (!eggLoaded) { tapEgg(e); return; }
+        const rect = eggEl.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width));
+        const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height));
+        if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return;
+        const pixel = hitCtx.getImageData(x, y, 1, 1).data;
+        if (pixel[3] > 20) tapEgg(e);
+    });
+
+    window.addEventListener('beforeunload', () => {
+        if (pendingTokens > 0) {
+            navigator.sendBeacon(`${BOT_API}/update_tokens`, new Blob([JSON.stringify({
+                user_id: userId, tokens: pendingTokens, api_secret: API_SECRET
+            })], { type: 'application/json' }));
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
+    });
+
+    function updateProgress() {
+        const pct = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-percentage').textContent = Math.floor(pct) + '%';
+        document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
+        document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
+    }
+
+    function hatchEgg() {
+        creatures[currentEgg.id] = {
+            id: currentEgg.id, name: currentEgg.name, emoji: currentEgg.emoji,
+            image: currentEgg.creatureImg, currentLevel: 1, maxLevel: 5,
+            currentIncome: 25, nextLevelIncome: 50, upgradeCost: 1000, totalEarned: 0
+        };
+        showHatchAnimation(currentEgg);
+    }
+
+    function showHatchAnimation(egg) {
+        const overlay = document.getElementById('hatch-overlay');
+        document.getElementById('hatch-creature-img').src = egg.creatureImg;
+        document.getElementById('hatch-title').textContent = `🎉 ${egg.emoji} ${egg.name.toUpperCase()} HATCHED! 🎉`;
+        document.getElementById('hatch-message').textContent = `${egg.name} has joined your collection!`;
+        document.getElementById('hatch-stat-name').textContent = egg.name;
+        document.getElementById('hatch-stat-income').textContent = '+25 $HATCH/hr';
+        createConfetti();
+        overlay.classList.add('active');
+        setTimeout(() => {
+            overlay.classList.remove('active');
+            currentEggIndex++;
+            if (currentEggIndex < allEggs.length) {
+                currentEgg = allEggs[currentEggIndex];
+                currentEgg.currentHP = 0;
+                const eggElement = document.getElementById('main-egg');
+                eggElement.src = currentEgg.eggImg;
+                document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+                document.getElementById('egg-description').textContent = currentEgg.description;
+                updateProgress();
+                setupEggImage();
+            } else showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
+            saveGameState();
+            updatePassiveIncome();
+            switchTab('hatch');
+        }, 3500);
+    }
+
+    function createConfetti() {
+        const colors = ['#FFD700', '#FF69B4', '#00D68F', '#667eea', '#FF6347'];
+        const overlay = document.getElementById('hatch-overlay');
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + '%';
+                c.style.top = '-10px';
+                c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDelay = Math.random() * 0.5 + 's';
+                overlay.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }, i * 50);
+        }
+    }
+
+    function updatePassiveIncome() {
+        let total = 0;
+        Object.values(creatures).forEach(c => total += c.currentIncome);
+        document.getElementById('passive-income').textContent = total;
+    }
+
+    function renderCreaturesGrid() {
+        const grid = document.getElementById('creatures-grid');
+        grid.innerHTML = '';
+        let unlocked = Object.keys(creatures).length;
+        allEggs.forEach((egg, i) => {
+            const card = document.createElement('div');
+            if (creatures[egg.id]) {
+                const c = creatures[egg.id];
+                card.className = 'creature-card';
+                card.onclick = () => openCreatureDetail(egg.id);
+                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name">${c.emoji} ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
+            } else if (i === currentEggIndex) {
+                card.className = 'creature-card locked';
+                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name">${egg.emoji} ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+            } else {
+                card.className = 'creature-card locked';
+                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name">${egg.emoji} ${egg.name} Egg</div><div class="level">🔒 Locked</div><div class="income">0/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+            }
+            grid.appendChild(card);
+        });
+        document.getElementById('unlocked-count').textContent = unlocked;
+        document.getElementById('unlock-percentage').textContent = Math.floor((unlocked / 20) * 100);
+        let totalInc = 0;
+        Object.values(creatures).forEach(c => totalInc += c.currentIncome);
+        document.getElementById('total-income').textContent = totalInc;
+    }
+
+    function showFloatingText(txt, x, y) {
+        const ft = document.createElement('div');
+        ft.className = 'float-text';
+        ft.textContent = txt;
+        ft.style.left = x + 'px';
+        ft.style.top = y + 'px';
+        document.body.appendChild(ft);
+        setTimeout(() => ft.remove(), 1000);
+    }
+
+    function collectIncome() {
+        const amt = parseInt(document.getElementById('collected-amount').textContent);
+        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+        document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString();
+        syncBalanceDisplays();
+        document.getElementById('collected-amount').textContent = '0';
+        sendBatchToBackend(amt);
+        showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3);
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Collected! ✅';
+        btn.style.background = '#00d68f';
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = orig;
+            btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }, 2000);
+    }
+
+    function showBonus() {
+        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+        document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString();
+        syncBalanceDisplays();
+        sendBatchToBackend(500);
+        showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
+    }
+
+    function showReferral() {
+        alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!');
+    }
+
+    function openCreatureDetail(id) {
+        selectedCreature = creatures[id];
+        if (!selectedCreature) return;
+        syncBalanceDisplays();
+        document.getElementById('detail-creature-name').textContent = selectedCreature.emoji + ' ' + selectedCreature.name;
+        document.getElementById('detail-creature-title').textContent = selectedCreature.emoji + ' ' + selectedCreature.name;
+        document.getElementById('detail-creature-img').src = selectedCreature.image;
+        document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
+        document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
+        document.getElementById('detail-total-earned').textContent = `${selectedCreature.totalEarned.toLocaleString()} $HATCH`;
+        document.getElementById('detail-upgrade-cost').textContent = `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`;
+        document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
+        document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`;
+        const upgradeBtn = document.querySelector('.upgrade-btn');
+        if (selectedCreature.currentLevel >= selectedCreature.maxLevel) {
+            upgradeBtn.disabled = true;
+            upgradeBtn.textContent = 'MAX LEVEL REACHED';
+            document.querySelector('.upgrade-header').textContent = '⭐ Maximum Level';
+        } else {
+            upgradeBtn.disabled = false;
+            upgradeBtn.textContent = 'UPGRADE NOW';
+            document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
+        }
+        document.getElementById('creature-detail').classList.add('active');
+    }
+
+    function syncBalanceDisplays() {
+        const mb = document.getElementById('hatch-balance').textContent;
+        const mp = document.getElementById('points-balance').textContent;
+        const db = document.getElementById('hatch-balance-detail');
+        const dp = document.getElementById('points-balance-detail');
+        const ph = document.getElementById('profile-hatch');
+        const pp = document.getElementById('profile-points');
+        const pc = document.getElementById('profile-creatures');
+        if (db) db.textContent = mb;
+        if (dp) dp.textContent = mp;
+        if (ph) ph.textContent = mb;
+        if (pp) pp.textContent = mp;
+        if (pc) pc.textContent = `${Object.keys(creatures).length}/20`;
+    }
+
+    function closeCreatureDetail() {
+        document.getElementById('creature-detail').classList.remove('active');
+        selectedCreature = null;
+    }
+
+    function upgradeCreature() {
+        if (!selectedCreature) return;
+        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+        if (bal >= selectedCreature.upgradeCost) {
+            document.getElementById('hatch-balance').textContent = (bal - selectedCreature.upgradeCost).toLocaleString();
+            syncBalanceDisplays();
+            sendBatchToBackend(-selectedCreature.upgradeCost);
+            selectedCreature.currentLevel++;
+            selectedCreature.currentIncome = selectedCreature.nextLevelIncome;
+            selectedCreature.upgradeCost = Math.floor(selectedCreature.upgradeCost * 2.5);
+            selectedCreature.nextLevelIncome = Math.floor(selectedCreature.nextLevelIncome * 2);
+            saveGameState();
+            updatePassiveIncome();
+            showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
+            setTimeout(() => openCreatureDetail(selectedCreature.id), 500);
+        } else {
+            alert('❌ Not enough $HATCH!\n\nNeed: ' + selectedCreature.upgradeCost.toLocaleString() + '\nHave: ' + bal.toLocaleString());
+        }
+    }
+
+    loadGameState();
+    loadBalanceFromBackend();
+    document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+    document.getElementById('egg-description').textContent = currentEgg.description;
+    document.getElementById('main-egg').src = currentEgg.eggImg;
+    updateProgress();
+    updatePassiveIncome();
+    setupEggImage();
+
+    setInterval(() => {
+        const curr = parseInt(document.getElementById('collected-amount').textContent);
+        const passiveInc = parseInt(document.getElementById('passive-income').textContent);
+        if (curr < passiveInc * 2) {
+            document.getElementById('collected-amount').textContent = curr + Math.max(1, Math.floor(passiveInc / 100));
+        }
+    }, 3000);
+</script>
 </body>
 </html>
