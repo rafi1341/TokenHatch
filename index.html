@@ -803,19 +803,54 @@
     let currentEggIndex = 0;
     let selectedCreature = null;
 
-    function loadGameState() {
-        const s = localStorage.getItem(`gameState_${userId}`);
-        if (s) {
+   function loadGameState() {
+    const key = `gameState_${userId}`;
+    const s = localStorage.getItem(key);
+
+    if (s) {
+        try {
             const state = JSON.parse(s);
-            currentEggIndex = state.currentEggIndex || 0;
-            if (state.creatures) Object.assign(creatures, state.creatures);
+
+            // Make sure creatures object exists
+            if (state.creatures && typeof state.creatures === 'object') {
+                Object.assign(creatures, state.creatures);
+            }
+
+            // Validate currentEggIndex
+            if (typeof state.currentEggIndex === 'number' &&
+                state.currentEggIndex >= 0 &&
+                state.currentEggIndex < allEggs.length) {
+                currentEggIndex = state.currentEggIndex;
+            } else {
+                currentEggIndex = 0;
+            }
+
+            // Set current egg
             currentEgg = allEggs[currentEggIndex];
-            currentEgg.currentHP = state.currentHP || 0;
-        } else {
+            currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
+
+        } catch (err) {
+            console.error("Failed to parse saved game state, resetting to first egg.", err);
+            currentEggIndex = 0;
             currentEgg = allEggs[0];
             currentEgg.currentHP = 0;
         }
+
+    } else {
+        // No saved state – new user
+        currentEggIndex = 0;
+        currentEgg = allEggs[0];
+        currentEgg.currentHP = 0;
     }
+
+    // Update UI immediately
+    document.getElementById('main-egg').src = currentEgg.eggImg;
+    document.getElementById('egg-name').textContent = (currentEgg.emoji ? currentEgg.emoji + ' ' : '') + currentEgg.name + ' Egg';
+    document.getElementById('egg-description').textContent = currentEgg.description;
+    updateProgress();
+    setupEggImage();
+}
+
 
     function saveGameState() {
         localStorage.setItem(`gameState_${userId}`, JSON.stringify({
