@@ -113,8 +113,8 @@
         }
 
         .egg-image {
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
             position: relative;
             z-index: 2;
             cursor: pointer;
@@ -1056,7 +1056,7 @@ function loadGameState() {
                 const c = creatures[egg.id];
                 card.className = 'creature-card';
                 card.onclick = () => openCreatureDetail(egg.id);
-                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name">$ ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
+                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name"> ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
             } else if (i === currentEggIndex) {
                 card.className = 'creature-card locked';
                 card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
