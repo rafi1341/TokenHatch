@@ -105,6 +105,7 @@
             background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
             border-radius: 50%;
             animation: pulse 2s infinite;
+            pointer-events: none;
         }
 
         @keyframes pulse {
@@ -120,6 +121,9 @@
             cursor: pointer;
             transition: transform 0.1s;
             user-select: none;
+            background: transparent; 
+            will-change: transform; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         .progress-bar-container {
@@ -909,58 +913,103 @@ function loadGameState() {
         });
         if (t === 'hatch') renderCreaturesGrid();
     }
+const eggEl = document.getElementById('main-egg');
+// offscreen canvas used for alpha hit testing
+const hitCanvas = document.createElement('canvas');
+const hitCtx = hitCanvas.getContext('2d');
+let eggLoaded = false;
+let lastDrawnImage = null;
 
-    const eggEl = document.getElementById('main-egg');
-    const hitCanvas = document.createElement('canvas');
-    const hitCtx = hitCanvas.getContext('2d');
-    let eggLoaded = false;
+function setupEggImage() {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = currentEgg.eggImg;
+    img.onload = () => {
+        lastDrawnImage = img;
+        // Use devicePixelRatio so mapping is crisp on high-DPI screens
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        hitCanvas.width = Math.round(img.naturalWidth * dpr);
+        hitCanvas.height = Math.round(img.naturalHeight * dpr);
+        // reset transform and draw image scaled by dpr
+        hitCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
+        hitCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+        eggLoaded = true;
+    };
+    img.onerror = () => {
+        eggLoaded = false;
+        lastDrawnImage = null;
+    };
+}
 
-    function setupEggImage() {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = currentEgg.eggImg;
-        img.onload = () => {
-            hitCanvas.width = img.naturalWidth;
-            hitCanvas.height = img.naturalHeight;
-            hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
-            hitCtx.drawImage(img, 0, 0);
-            eggLoaded = true;
-        };
-        img.onerror = () => eggLoaded = false;
+// helper to map click/touch to canvas pixel coords (accounts for CSS size and DPR)
+function getImagePixelCoords(evt) {
+    const rect = eggEl.getBoundingClientRect();
+    // accept MouseEvent or TouchEvent
+    const clientX = (evt.touches && evt.touches[0]) ? evt.touches[0].clientX : evt.clientX;
+    const clientY = (evt.touches && evt.touches[0]) ? evt.touches[0].clientY : evt.clientY;
+
+    // Map to element coordinate
+    const relX = clientX - rect.left;
+    const relY = clientY - rect.top;
+
+    // Map element-space to image natural pixel space, considering DPR
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const canvasX = Math.floor((relX / rect.width) * (hitCanvas.width) / dpr * dpr); // simplified but safe
+    const canvasY = Math.floor((relY / rect.height) * (hitCanvas.height) / dpr * dpr);
+
+    // Better calculation: map to natural pixels
+    const imgPixelX = Math.floor((relX / rect.width) * lastDrawnImage.naturalWidth);
+    const imgPixelY = Math.floor((relY / rect.height) * lastDrawnImage.naturalHeight);
+
+    return { imgPixelX, imgPixelY };
+}
+
+// unified handler for clicks & touches
+function onEggPointer(e) {
+    // allow touch events
+    if (e.cancelable) e.preventDefault();
+
+    // if image data not ready, still allow tapping (fallback)
+    if (!eggLoaded || !lastDrawnImage) {
+        tapEgg(e);
+        return;
     }
 
-    function tapEgg(e) {
-        currentEgg.currentHP += currentEgg.hpPerTap;
-        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-        document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString();
-        syncBalanceDisplays();
-        pendingTokens += currentEgg.hpPerTap;
-        localStorage.setItem(`unsaved_${userId}`, pendingTokens);
-        showFloatingText('+' + currentEgg.hpPerTap, e.clientX, e.clientY);
-        updateProgress();
-        saveGameState();
-        const egg = document.getElementById('main-egg');
-        egg.style.transform = 'scale(0.9) rotate(-5deg)';
-        setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100);
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-            if (pendingTokens > 0) {
-                sendBatchToBackend(pendingTokens);
-                pendingTokens = 0;
-            }
-        }, 2000);
-        if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg();
+    const { imgPixelX: x, imgPixelY: y } = getImagePixelCoords(e);
+
+    // Guard bounds
+    if (x < 0 || y < 0 || x >= lastDrawnImage.naturalWidth || y >= lastDrawnImage.naturalHeight) {
+        return;
     }
 
-    eggEl.addEventListener('click', (e) => {
-        if (!eggLoaded) { tapEgg(e); return; }
-        const rect = eggEl.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width));
-        const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height));
-        if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return;
-        const pixel = hitCtx.getImageData(x, y, 1, 1).data;
-        if (pixel[3] > 20) tapEgg(e);
-    });
+    // read alpha from offscreen canvas - note we drew image at natural size into the canvas (accounted by setup)
+    // getImageData must be on integer coords; small performance hit but acceptable for single pixel
+    try {
+        // Because hitCanvas was drawn using devicePixelRatio transform, map coordinates to canvas pixels:
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const canvasX = Math.floor(x * dpr);
+        const canvasY = Math.floor(y * dpr);
+        const pixel = hitCtx.getImageData(canvasX, canvasY, 1, 1).data;
+        const alpha = pixel[3]; // 0-255
+        const ALPHA_THRESHOLD = 10; // tweakable; >10 considered opaque
+        if (alpha > ALPHA_THRESHOLD) {
+            tapEgg(e);
+        } else {
+            // clicked on transparent area — ignore or give small feedback
+            // optional: showFloatingText('miss', e.clientX, e.clientY);
+        }
+    } catch (err) {
+        // Some browsers may throw on getImageData if CORS not allowed - fallback to simple tap
+        console.warn('hit test failed, falling back to full-tap', err);
+        tapEgg(e);
+    }
+}
+
+// attach both mouse and touch handlers
+eggEl.addEventListener('click', onEggPointer);
+eggEl.addEventListener('touchstart', onEggPointer, { passive: false });
+
 
     window.addEventListener('beforeunload', () => {
         if (pendingTokens > 0) {
