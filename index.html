@@ -775,26 +775,26 @@
 
         // All 20 eggs database
         const allEggs = [
-            { id: 1, name: 'Chick',  emoji: '🐣' , eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Soft warmth seeps through the fragile shell]' },
-            { id: 2, name: 'Turtle', emoji: '🐢', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: '[Heavy and calm, built to endure time]' },
-            { id: 3, name: 'Lizard', emoji: '🦎', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: '[A faint pulse hints at swift movement inside]' },
-            { id: 4, name: 'Snake', emoji: '🐍', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: '[Cold and silent, yet watching]' },
-            { id: 5, name: 'Eagle', emoji: '🐸', eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: '[Light as air, humming with skybound energy]' },
-            { id: 6, name: 'Dino', emoji: '🐰', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: '[Ancient power sleeps beneath its surface]' },
-            { id: 7, name: 'Dragon', emoji: '🐱', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: '[Intense heat radiates from within]' },
-            { id: 8, name: 'Unicorn', emoji: '🐶', eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description: '[A gentle glow of pure magic surrounds it]' },
-            { id: 9, name: 'Phoenix', emoji: '🦉', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 40000, hpPerTap: 10, description: '[Warmth rises and falls like a heartbeat]' },
-            { id: 10, name: 'Griffin', emoji: '🦅', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 55000, hpPerTap: 10, description: '[Strength and pride rest within]' },
-            { id: 11, name: 'Pegasus', emoji: '🦊', eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 75000, hpPerTap: 10, description: '[It feels lighter than it should]' },
-            { id: 12, name: 'Golem', emoji: '🐺', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', requiredHP: 100000, hpPerTap: 10, description: '[Solid and unmoving, yet alive]' },
-            { id: 13, name: 'Fairy', emoji: '🐻', eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', requiredHP: 150000, hpPerTap: 10, description: '[A soft hum fills the air around it]' },
-            { id: 14, name: 'Hydra', emoji: '🦁', eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', requiredHP: 200000, hpPerTap: 10, description: '[Danger lingers beneath its shell]' },
-            { id: 15, name: 'Cerberus', emoji: '🦕', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', requiredHP: 300000, hpPerTap: 10, description: '[Dark energy coils within]' },
-            { id: 16, name: 'Kraken', emoji: '🐉', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', requiredHP: 500000, hpPerTap: 10, description: '[It vibrates with deep ocean force]' },
-            { id: 17, name: 'Minotaur', emoji: '🔥', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', requiredHP: 750000, hpPerTap: 10, description: '[Raw power presses against the shell]' },
-            { id: 18, name: 'Sphinx', emoji: '🦄', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', requiredHP: 1000000, hpPerTap: 10, description: '[Ancient wisdom watches silently]' },
-            { id: 19, name: 'Chimera', emoji: '🦅', eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', requiredHP: 1500000, hpPerTap: 10, description: '[Chaos stirs in unpredictable patterns]' },
-            { id: 20, name: 'Elemental', emoji: '🦄', eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', requiredHP: 2000000, hpPerTap: 10, description: '[Conflicting forces remain perfectly balanced]' }
+            { id: 1, name: 'Chick',  eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Soft warmth seeps through the fragile shell]' },
+            { id: 2, name: 'Turtle', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: '[Heavy and calm, built to endure time]' },
+            { id: 3, name: 'Lizard', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: '[A faint pulse hints at swift movement inside]' },
+            { id: 4, name: 'Snake',  eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: '[Cold and silent, yet watching]' },
+            { id: 5, name: 'Eagle',  eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: '[Light as air, humming with skybound energy]' },
+            { id: 6, name: 'Dino', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: '[Ancient power sleeps beneath its surface]' },
+            { id: 7, name: 'Dragon', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: '[Intense heat radiates from within]' },
+            { id: 8, name: 'Unicorn',  eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description: '[A gentle glow of pure magic surrounds it]' },
+            { id: 9, name: 'Phoenix', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 40000, hpPerTap: 10, description: '[Warmth rises and falls like a heartbeat]' },
+            { id: 10, name: 'Griffin', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 55000, hpPerTap: 10, description: '[Strength and pride rest within]' },
+            { id: 11, name: 'Pegasus',  eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 75000, hpPerTap: 10, description: '[It feels lighter than it should]' },
+            { id: 12, name: 'Golem', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', requiredHP: 100000, hpPerTap: 10, description: '[Solid and unmoving, yet alive]' },
+            { id: 13, name: 'Fairy',  eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', requiredHP: 150000, hpPerTap: 10, description: '[A soft hum fills the air around it]' },
+            { id: 14, name: 'Hydra',  eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', requiredHP: 200000, hpPerTap: 10, description: '[Danger lingers beneath its shell]' },
+            { id: 15, name: 'Cerberus', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', requiredHP: 300000, hpPerTap: 10, description: '[Dark energy coils within]' },
+            { id: 16, name: 'Kraken', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', requiredHP: 500000, hpPerTap: 10, description: '[It vibrates with deep ocean force]' },
+            { id: 17, name: 'Minotaur', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', requiredHP: 750000, hpPerTap: 10, description: '[Raw power presses against the shell]' },
+            { id: 18, name: 'Sphinx', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', requiredHP: 1000000, hpPerTap: 10, description: '[Ancient wisdom watches silently]' },
+            { id: 19, name: 'Chimera',  eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', requiredHP: 1500000, hpPerTap: 10, description: '[Chaos stirs in unpredictable patterns]' },
+            { id: 20, name: 'Elemental',  eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', requiredHP: 2000000, hpPerTap: 10, description: '[Conflicting forces remain perfectly balanced]' }
         ];
 
         // Creatures that have been hatched
