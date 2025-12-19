@@ -841,7 +841,7 @@ function loadGameState() {
 
     // Update UI immediately
     document.getElementById('main-egg').src = currentEgg.eggImg;
-    document.getElementById('egg-name').textContent = (currentEgg.emoji ? currentEgg.emoji + ' ' : '') + currentEgg.name + ' Egg';
+    document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
     document.getElementById('egg-description').textContent = currentEgg.description;
     updateProgress();
     setupEggImage();
@@ -1056,7 +1056,7 @@ function loadGameState() {
                 const c = creatures[egg.id];
                 card.className = 'creature-card';
                 card.onclick = () => openCreatureDetail(egg.id);
-                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name">${c.emoji} ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
+                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name">$ ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
             } else if (i === currentEggIndex) {
                 card.className = 'creature-card locked';
                 card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
@@ -1118,8 +1118,8 @@ function loadGameState() {
         selectedCreature = creatures[id];
         if (!selectedCreature) return;
         syncBalanceDisplays();
-        document.getElementById('detail-creature-name').textContent = selectedCreature.emoji + ' ' + selectedCreature.name;
-        document.getElementById('detail-creature-title').textContent = selectedCreature.emoji + ' ' + selectedCreature.name;
+        document.getElementById('detail-creature-name').textContent =  selectedCreature.name;
+        document.getElementById('detail-creature-title').textContent = selectedCreature.name;
         document.getElementById('detail-creature-img').src = selectedCreature.image;
         document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
         document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
