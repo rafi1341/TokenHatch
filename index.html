@@ -803,7 +803,7 @@
     let currentEggIndex = 0;
     let selectedCreature = null;
 
-   function loadGameState() {
+function loadGameState() {
     const key = `gameState_${userId}`;
     const s = localStorage.getItem(key);
 
@@ -811,21 +811,17 @@
         try {
             const state = JSON.parse(s);
 
-            // Make sure creatures object exists
+            // Merge saved creatures
             if (state.creatures && typeof state.creatures === 'object') {
                 Object.assign(creatures, state.creatures);
             }
 
-            // Validate currentEggIndex
-            if (typeof state.currentEggIndex === 'number' &&
-                state.currentEggIndex >= 0 &&
-                state.currentEggIndex < allEggs.length) {
-                currentEggIndex = state.currentEggIndex;
-            } else {
-                currentEggIndex = 0;
-            }
+            // Find the first unhatched egg
+            currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
 
-            // Set current egg
+            // If all eggs hatched, start at the last one
+            if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
+
             currentEgg = allEggs[currentEggIndex];
             currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
 
@@ -835,7 +831,6 @@
             currentEgg = allEggs[0];
             currentEgg.currentHP = 0;
         }
-
     } else {
         // No saved state – new user
         currentEggIndex = 0;
@@ -850,6 +845,7 @@
     updateProgress();
     setupEggImage();
 }
+
 
 
     function saveGameState() {
