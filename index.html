@@ -3,7 +3,513 @@
 <head>
     <meta charset="UTF-8">
     <title>Egg Clicker</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .balance-display {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .screen {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .passive-income-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .egg-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .egg-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .egg-description {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+            padding: 0 20px;
+            line-height: 1.4;
+        }
+
+        .egg-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .egg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .egg-image {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d68f 0%, #00b8a9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .collection-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .collection-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .collection-amount {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .collect-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .next-collection {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 15px 10px;
+            border-radius: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-label {
+            font-size: 12px;
+        }
+
+        .daily-streak {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .creatures-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .creature-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .creature-card:not(.locked):hover {
+            transform: scale(1.05);
+        }
+
+        .creature-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            pointer-events: none;
+        }
+
+        .creature-image {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .creature-card .name {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .creature-card .level {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .creature-card .income {
+            font-size: 14px;
+            color: #00d68f;
+            margin-top: 5px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .task-reward {
+            font-size: 13px;
+            color: #00d68f;
+        }
+
+        .task-btn {
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .creature-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 15px;
+        }
+
+        .nav-btn.active {
+            color: white;
+        }
+
+        .nav-label {
+            font-size: 11px;
+        }
+
+        .float-text {
+            position: fixed;
+            color: #00d68f;
+            font-weight: bold;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .detail-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            animation: slideIn 0.3s;
+        }
+
+        .detail-screen.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .detail-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .detail-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .detail-creature-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .detail-creature-image {
+            width: 150px;
+            height: 150px;
+        }
+
+        .detail-stats {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .upgrade-header {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-arrow {
+            text-align: center;
+            font-size: 30px;
+            margin: 15px 0;
+        }
+
+        .cost-badge, .income-badge {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .upgrade-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
@@ -11,46 +517,46 @@
     <div class="top-bar">
         <div class="logo">🥚 TokenHatch</div>
         <div class="balance-display">
-            <div>💰 <span id="hatch-balance">12,450</span> $HATCH</div>
-            <div>💎 <span id="points-balance">245</span> Points</div>
+            <div>💰 <span id="hatch-balance">0</span> $HATCH</div>
+            <div>💎 <span id="points-balance">0</span> Points</div>
         </div>
     </div>
 
     <!-- Content Area -->
     <div class="content">
         
-                <!-- HOME TAB -->
+        <!-- HOME TAB -->
         <div id="home-screen" class="screen active">
             <div class="passive-income-display">
-                📈 Passive Income: +<span id="passive-income">250</span> $HATCH/hr
+                📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
             </div>
 
             <div class="egg-display">
                 <div class="egg-name">
-                    <span id="egg-name">🐉 Dragon Egg</span>
+                    <span id="egg-name">🐣 Chick Egg</span>
                 </div>
-                <div class="egg-unlock-status">
-                    <span id="unlock-status">Tap to unlock Dragon!</span>
+                <div class="egg-description">
+                    <span id="egg-description">Description will appear here</span>
                 </div>
                 
                 <div class="egg-container">
                     <div class="egg-glow"></div>
-                    <img src="assets/eggs/egg_dragon.png" class="egg-image" id="main-egg" alt="Dragon Egg">
+                    <img src="assets/eggs/egg_chick.png" class="egg-image" id="main-egg" alt="Chick Egg">
                 </div>
 
                 <div class="progress-bar-container">
-                    <div class="progress-bar" id="progress-bar" style="width: 45%;">
-                        <span id="progress-percentage">45%</span>
+                    <div class="progress-bar" id="progress-bar" style="width: 0%;">
+                        <span id="progress-percentage">0%</span>
                     </div>
                 </div>
                 <div class="progress-text">
-                    <span id="current-hp">4,500</span> / <span id="required-hp">10,000</span> HP
+                    <span id="current-hp">0</span> / <span id="required-hp">1000</span> HP
                 </div>
             </div>
 
             <div class="collection-box">
                 <div class="collection-label">Ready to Collect</div>
-                <div class="collection-amount">💰 <span id="collected-amount">422</span> $HATCH</div>
+                <div class="collection-amount">💰 <span id="collected-amount">0</span> $HATCH</div>
                 <button class="collect-btn" onclick="collectIncome()">Tap to Collect</button>
                 <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div>
             </div>
@@ -72,7 +578,7 @@
             </div>
 
             <div class="daily-streak">
-                🏆 Daily Streak: <strong>7 days</strong> 🔥
+                🏆 Daily Streak: <strong>1 day</strong> 🔥
             </div>
         </div>
 
@@ -80,77 +586,12 @@
         <div id="hatch-screen" class="screen">
             <div class="section-title">🥚 Your Collection</div>
             <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
-                Progress: <strong>3/20</strong> Unlocked (15%)<br>
-                Total Income: <strong>+250 $HATCH/hr</strong>
+                Progress: <strong><span id="unlocked-count">0</span>/20</strong> Unlocked (<span id="unlock-percentage">0</span>%)<br>
+                Total Income: <strong>+<span id="total-income">0</span> $HATCH/hr</strong>
             </div>
 
-            <div class="creatures-grid">
-                <!-- Unlocked Creatures (Clickable) -->
-                <div class="creature-card" onclick="openCreatureDetail(1)">
-                    <img src="assets/creatures/creature_chick.png" class="creature-image" alt="Chick">
-                    <div class="name">Chick</div>
-                    <div class="level">Level 3/5</div>
-                    <div class="income">+50/hr</div>
-                </div>
-
-                <div class="creature-card" onclick="openCreatureDetail(2)">
-                    <img src="assets/creatures/creature_turtle.png" class="creature-image" alt="Turtle">
-                    <div class="name">Turtle</div>
-                    <div class="level">Level 2/5</div>
-                    <div class="income">+100/hr</div>
-                </div>
-
-                <div class="creature-card" onclick="openCreatureDetail(3)">
-                    <img src="assets/creatures/creature_lizard.png" class="creature-image" alt="Lizard">
-                    <div class="name">Lizard</div>
-                    <div class="level">Level 1/5</div>
-                    <div class="income">+100/hr</div>
-                </div>
-
-                <!-- Locked Eggs (Not Clickable) -->
-                <div class="creature-card locked">
-                    <img src="assets/eggs/egg_snake.png" class="creature-image" alt="Snake Egg">
-                    <div class="name">Snake Egg</div>
-                    <div class="level">🔒 In Progress</div>
-                    <div class="income">4,500/10,000 HP</div>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-
-                <div class="creature-card locked">
-                    <img src="assets/eggs/egg_eagle.png" class="creature-image" alt="Eagle Egg">
-                    <div class="name">Eagle Egg</div>
-                    <div class="level">🔒 Locked</div>
-                    <div class="income">0/15,000 HP</div>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-
-                <div class="creature-card locked">
-                    <img src="assets/eggs/egg_dino.png" class="creature-image" alt="Dino Egg">
-                    <div class="name">Dino Egg</div>
-                    <div class="level">🔒 Locked</div>
-                    <div class="income">0/35,000 HP</div>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-
-                <div class="creature-card locked">
-                    <img src="assets/eggs/egg_dragon.png" class="creature-image" alt="Dragon Egg">
-                    <div class="name">Dragon Egg</div>
-                    <div class="level">🔒 Locked</div>
-                    <div class="income">0/75,000 HP</div>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-
-                <div class="creature-card locked">
-                    <img src="assets/eggs/egg_unicorn.png" class="creature-image" alt="Unicorn Egg">
-                    <div class="name">Unicorn Egg</div>
-                    <div class="level">🔒 Locked</div>
-                    <div class="income">0/150,000 HP</div>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 25px; opacity: 0.6; font-size: 13px;">
-                ...12 more eggs to discover!
+            <div class="creatures-grid" id="creatures-grid">
+                <!-- Creatures will be dynamically generated here -->
             </div>
         </div>
 
@@ -187,38 +628,6 @@
                 </div>
                 <button class="task-btn">DO IT</button>
             </div>
-
-            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Earn Points (High Value)</div>
-            
-            <div class="task-card">
-                <div class="task-info">
-                    <div class="task-title">📊 Complete Survey</div>
-                    <div class="task-reward">50 Points 💎 • 5 min</div>
-                </div>
-                <button class="task-btn">START</button>
-            </div>
-
-            <div class="task-card">
-                <div class="task-info">
-                    <div class="task-title">📲 Install & Try App</div>
-                    <div class="task-reward">100 Points 💎 • 10 min</div>
-                </div>
-                <button class="task-btn">START</button>
-            </div>
-
-            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Referral</div>
-            
-            <div class="task-card" style="flex-direction: column; align-items: flex-start;">
-                <div class="task-info" style="width: 100%;">
-                    <div class="task-title">👥 Invite 5 Friends</div>
-                    <div class="task-reward">3,000 $HATCH + 5 Points 💎</div>
-                    <div style="margin: 10px 0;">Progress: 2/5</div>
-                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="background: #667eea; height: 100%; width: 40%;"></div>
-                    </div>
-                </div>
-                <button class="task-btn" style="width: 100%; margin-top: 10px;">SHARE LINK</button>
-            </div>
         </div>
 
         <!-- AIRDROP TAB -->
@@ -230,59 +639,11 @@
                 <div style="font-size: 14px; opacity: 0.6; margin-bottom: 20px;">⏳ Time remaining: 168 days</div>
                 
                 <div class="collection-amount" style="margin: 20px 0;">
-                    Estimated: 1,250 $HATCH
+                    Estimated: 0 $HATCH
                 </div>
                 
                 <div style="font-size: 18px;">
-                    Your Rank: <strong>#234</strong> / 5,000
-                </div>
-            </div>
-
-            <div class="upgrade-section">
-                <div style="font-weight: bold; margin-bottom: 15px;">📊 Your Stats</div>
-                <div class="stats-row">
-                    <span>$HATCH earned:</span>
-                    <span>12,450</span>
-                </div>
-                <div class="stats-row">
-                    <span>Points held:</span>
-                    <span>245 (2.45x)</span>
-                </div>
-                <div class="stats-row">
-                    <span>Points withdrawn:</span>
-                    <span>50</span>
-                </div>
-                <div class="stats-row">
-                    <span>Referrals:</span>
-                    <span>12 friends</span>
-                </div>
-                <div class="stats-row" style="border-bottom: none;">
-                    <span>Days active:</span>
-                    <span>45 days</span>
-                </div>
-            </div>
-
-            <div class="section-title">🏆 Top 10 Leaderboard</div>
-            <div class="upgrade-section">
-                <div class="stats-row">
-                    <span>1. 🥇 CryptoKing</span>
-                    <span>25,000</span>
-                </div>
-                <div class="stats-row">
-                    <span>2. 🥈 DiamondHands</span>
-                    <span>22,500</span>
-                </div>
-                <div class="stats-row">
-                    <span>3. 🥉 MoonShot</span>
-                    <span>20,100</span>
-                </div>
-                <div class="stats-row">
-                    <span>...</span>
-                    <span></span>
-                </div>
-                <div class="stats-row" style="background: rgba(102, 126, 234, 0.3); padding: 10px; border-radius: 10px; border: none;">
-                    <span>234. 😊 You</span>
-                    <span>1,250</span>
+                    Your Rank: <strong>#-</strong>
                 </div>
             </div>
         </div>
@@ -294,135 +655,80 @@
             <div class="creature-display">
                 <div style="font-size: 60px; margin: 20px 0;">👤</div>
                 <div style="font-size: 20px; font-weight: bold;">@username</div>
-                <div style="opacity: 0.6; margin-top: 5px;">Member since: Jan 2026</div>
+                <div style="opacity: 0.6; margin-top: 5px;">Member since: Dec 2024</div>
             </div>
 
             <div class="upgrade-section">
                 <div class="stats-row">
                     <span>💰 $HATCH Balance:</span>
-                    <span>12,450</span>
+                    <span id="profile-hatch">0</span>
                 </div>
                 <div class="stats-row">
                     <span>💎 Points:</span>
-                    <span>245</span>
-                </div>
-                <div class="stats-row">
-                    <span>🏆 Rank:</span>
-                    <span>#234</span>
+                    <span id="profile-points">0</span>
                 </div>
                 <div class="stats-row" style="border-bottom: none;">
-                    <span>📈 Level:</span>
-                    <span>12</span>
-                </div>
-            </div>
-
-            <div class="section-title">👥 Referrals</div>
-            <div class="upgrade-section">
-                <div class="stats-row">
-                    <span>Total Invited:</span>
-                    <span>12</span>
-                </div>
-                <div class="stats-row">
-                    <span>Active:</span>
-                    <span>8</span>
-                </div>
-                <div class="stats-row" style="border-bottom: none;">
-                    <span>Earnings:</span>
-                    <span>12,000 $HATCH</span>
-                </div>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px; text-align: center;">
-                    Your Code: <strong>HATCH-ABC123</strong>
-                </div>
-                <button class="upgrade-btn" style="margin-top: 10px;">COPY & SHARE</button>
-            </div>
-
-            <div class="section-title">📊 Statistics</div>
-            <div class="upgrade-section">
-                <div class="stats-row">
-                    <span>Days active:</span>
-                    <span>45</span>
-                </div>
-                <div class="stats-row">
-                    <span>Creatures owned:</span>
-                    <span>5/20</span>
-                </div>
-                <div class="stats-row">
-                    <span>Tasks completed:</span>
-                    <span>127</span>
-                </div>
-                <div class="stats-row" style="border-bottom: none;">
-                    <span>Total collected:</span>
-                    <span>145,230 $HATCH</span>
+                    <span>🥚 Creatures Owned:</span>
+                    <span id="profile-creatures">0/20</span>
                 </div>
             </div>
         </div>
 
     </div>
 
-        <!-- Creature Detail Screen -->
+    <!-- Creature Detail Screen -->
     <div class="detail-screen" id="creature-detail">
         <div class="detail-header">
             <div class="detail-header-left">
                 <button class="back-btn" onclick="closeCreatureDetail()">←</button>
-                <div class="detail-title" id="detail-creature-name">Chick</div>
+                <div class="detail-title" id="detail-creature-name">Creature</div>
             </div>
             <div class="balance-display">
-                <div>💰 <span id="hatch-balance-detail">12,450</span> $HATCH</div>
-                <div>💎 <span id="points-balance-detail">245</span> Points</div>
+                <div>💰 <span id="hatch-balance-detail">0</span> $HATCH</div>
+                <div>💎 <span id="points-balance-detail">0</span> Points</div>
             </div>
         </div>
 
         <div class="detail-content">
             <div class="detail-creature-display">
                 <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
-                <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Chick</div>
-                <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 3/5</div>
+                <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Creature</div>
+                <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 1/5</div>
             </div>
 
             <div class="detail-stats">
                 <div class="stat-row">
                     <span class="stat-label">Current Income:</span>
-                    <span class="stat-value" id="detail-current-income">+50 $HATCH/hr</span>
+                    <span class="stat-value" id="detail-current-income">+0 $HATCH/hr</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Total Earned:</span>
-                    <span class="stat-value" id="detail-total-earned">45,200 $HATCH</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Owned for:</span>
-                    <span class="stat-value">15 days</span>
+                    <span class="stat-value" id="detail-total-earned">0 $HATCH</span>
                 </div>
             </div>
 
             <div class="upgrade-section">
-                <div class="upgrade-header">⬆️ Upgrade to Level 4</div>
+                <div class="upgrade-header">⬆️ Upgrade</div>
                 
                 <div class="stat-row">
                     <span class="stat-label">Current Production:</span>
-                    <span class="stat-value">+50 $HATCH/hr</span>
+                    <span class="stat-value" id="detail-current-prod">+0 $HATCH/hr</span>
                 </div>
 
                 <div class="upgrade-arrow">↓</div>
 
                 <div class="stat-row">
                     <span class="stat-label">After Upgrade:</span>
-                    <span class="stat-value" style="color: #00d68f;">+100 $HATCH/hr 📈</span>
+                    <span class="stat-value" style="color: #00d68f;" id="detail-next-prod">+0 $HATCH/hr 📈</span>
                 </div>
 
                 <div style="margin-top: 20px; text-align: center;">
                     <div class="cost-badge">
-                        💰 Upgrade Cost: <strong id="detail-upgrade-cost">2,500 $HATCH</strong>
-                    </div>
-                    <div class="income-badge">
-                        📈 Production Increase: <strong>+50/hr</strong>
+                        💰 Upgrade Cost: <strong id="detail-upgrade-cost">0 $HATCH</strong>
                     </div>
                 </div>
 
                 <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
-            </div>
-
-            <div style="text-align: center; opacity: 0.6; font-size: 12px; margin-top: 20px;">
-                💡 Tip: Higher levels = More passive income!
             </div>
         </div>
     </div>
@@ -451,6 +757,572 @@
         </button>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Configuration
+        const BOT_API = "https://telegrambot-or4r.onrender.com";
+        const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
+
+        // Get Telegram user ID
+        const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
+        console.log("User ID:", userId);
+
+        // Batching variables
+        let pendingTokens = 0;
+        let saveTimeout = null;
+
+        // All 20 eggs database
+        const allEggs = [
+            { id: 1, name: 'Chick', emoji: '🐣', eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Add your description for Chick]' },
+            { id: 2, name: 'Turtle', emoji: '🐢', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: '[Add your description for Turtle]' },
+            { id: 3, name: 'Lizard', emoji: '🦎', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: '[Add your description for Lizard]' },
+            { id: 4, name: 'Snake', emoji: '🐍', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: '[Add your description for Snake]' },
+            { id: 5, name: 'Frog', emoji: '🐸', eggImg: 'assets/eggs/egg_frog.png', creatureImg: 'assets/creatures/creature_frog.png', requiredHP: 10000, hpPerTap: 10, description: '[Add your description for Frog]' },
+            { id: 6, name: 'Rabbit', emoji: '🐰', eggImg: 'assets/eggs/egg_rabbit.png', creatureImg: 'assets/creatures/creature_rabbit.png', requiredHP: 15000, hpPerTap: 10, description: '[Add your description for Rabbit]' },
+            { id: 7, name: 'Cat', emoji: '🐱', eggImg: 'assets/eggs/egg_cat.png', creatureImg: 'assets/creatures/creature_cat.png', requiredHP: 20000, hpPerTap: 10, description: '[Add your description for Cat]' },
+            { id: 8, name: 'Dog', emoji: '🐶', eggImg: 'assets/eggs/egg_dog.png', creatureImg: 'assets/creatures/creature_dog.png', requiredHP: 30000, hpPerTap: 10, description: '[Add your description for Dog]' },
+            { id: 9, name: 'Owl', emoji: '🦉', eggImg: 'assets/eggs/egg_owl.png', creatureImg: 'assets/creatures/creature_owl.png', requiredHP: 40000, hpPerTap: 10, description: '[Add your description for Owl]' },
+            { id: 10, name: 'Eagle', emoji: '🦅', eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 55000, hpPerTap: 10, description: '[Add your description for Eagle]' },
+            { id: 11, name: 'Fox', emoji: '🦊', eggImg: 'assets/eggs/egg_fox.png', creatureImg: 'assets/creatures/creature_fox.png', requiredHP: 75000, hpPerTap: 10, description: '[Add your description for Fox]' },
+            { id: 12, name: 'Wolf', emoji: '🐺', eggImg: 'assets/eggs/egg_wolf.png', creatureImg: 'assets/creatures/creature_wolf.png', requiredHP: 100000, hpPerTap: 10, description: '[Add your description for Wolf]' },
+            { id: 13, name: 'Bear', emoji: '🐻', eggImg: 'assets/eggs/egg_bear.png', creatureImg: 'assets/creatures/creature_bear.png', requiredHP: 150000, hpPerTap: 10, description: '[Add your description for Bear]' },
+            { id: 14, name: 'Lion', emoji: '🦁', eggImg: 'assets/eggs/egg_lion.png', creatureImg: 'assets/creatures/creature_lion.png', requiredHP: 200000, hpPerTap: 10, description: '[Add your description for Lion]' },
+            { id: 15, name: 'Dino', emoji: '🦕', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 300000, hpPerTap: 10, description: '[Add your description for Dino]' },
+            { id: 16, name: 'Dragon', emoji: '🐉', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 500000, hpPerTap: 10, description: '[Add your description for Dragon]' },
+            { id: 17, name: 'Phoenix', emoji: '🔥', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 750000, hpPerTap: 10, description: '[Add your description for Phoenix]' },
+            { id: 18, name: 'Unicorn', emoji: '🦄', eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 1000000, hpPerTap: 10, description: '[Add your description for Unicorn]' },
+            { id: 19, name: 'Griffin', emoji: '🦅', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 1500000, hpPerTap: 10, description: '[Add your description for Griffin]' },
+            { id: 20, name: 'Pegasus', emoji: '🦄', eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 2000000, hpPerTap: 10, description: '[Add your description for Pegasus]' }
+        ];
+
+        // Creatures that have been hatched
+        const creatures = {};
+
+        // Current egg being hatched
+        let currentEgg = null;
+        let currentEggIndex = 0;
+
+        let selectedCreature = null;
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem(`gameState_${userId}`);
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                currentEggIndex = state.currentEggIndex || 0;
+                
+                // Load creatures
+                if (state.creatures) {
+                    Object.assign(creatures, state.creatures);
+                }
+                
+                // Load current egg progress
+                currentEgg = allEggs[currentEggIndex];
+                currentEgg.currentHP = state.currentHP || 0;
+                
+                console.log("✅ Loaded game state:", state);
+            } else {
+                // First time - start with first egg
+                currentEgg = allEggs[0];
+                currentEgg.currentHP = 0;
+            }
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            const state = {
+                currentEggIndex: currentEggIndex,
+                currentHP: currentEgg.currentHP,
+                creatures: creatures
+            };
+            localStorage.setItem(`gameState_${userId}`, JSON.stringify(state));
+            console.log("💾 Saved game state");
+        }
+
+        // Load balance from backend on startup
+        async function loadBalanceFromBackend() {
+            console.log("🔄 Loading balance from backend...");
+            
+            const unsavedTokens = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
+            if (unsavedTokens > 0) {
+                console.log("💾 Found unsaved tokens:", unsavedTokens);
+                await sendBatchToBackend(unsavedTokens);
+                localStorage.removeItem(`unsaved_${userId}`);
+            }
+            
+            try {
+                const res = await fetch(`${BOT_API}/get_balance`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        user_id: userId,
+                        api_secret: API_SECRET
+                    })
+                });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const data = await res.json();
+                const balance = data.balance || 0;
+                
+                document.getElementById('hatch-balance').textContent = balance.toLocaleString();
+                syncBalanceDisplays();
+                
+                console.log("✅ Loaded balance:", balance);
+            } catch (e) {
+                console.error("❌ Failed to load balance:", e);
+            }
+        }
+
+        // Send batched tokens to backend
+        async function sendBatchToBackend(amount) {
+            console.log("📤 Sending batch to backend: +", amount, "tokens");
+            
+            try {
+                const res = await fetch(`${BOT_API}/update_tokens`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        user_id: userId,
+                        tokens: amount,
+                        api_secret: API_SECRET
+                    })
+                });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const data = await res.json();
+                console.log("✅ Backend response:", data);
+                
+                if (data.new_balance !== undefined) {
+                    document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString();
+                    syncBalanceDisplays();
+                }
+                
+                localStorage.removeItem(`unsaved_${userId}`);
+            } catch (e) {
+                console.error("❌ Failed to send batch:", e);
+            }
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + '-screen').classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (tabName === 'hatch') {
+                renderCreaturesGrid();
+            }
+        }
+
+        // Setup egg transparency detection
+        const eggElement = document.getElementById('main-egg');
+        const hitCanvas = document.createElement('canvas');
+        const hitCtx = hitCanvas.getContext('2d');
+        let eggImageLoaded = false;
+
+        function setupEggImage() {
+            const eggImage = new Image();
+            eggImage.crossOrigin = "anonymous";
+            eggImage.src = currentEgg.eggImg;
+            
+            eggImage.onload = () => {
+                hitCanvas.width = eggImage.naturalWidth;
+                hitCanvas.height = eggImage.naturalHeight;
+                hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
+                hitCtx.drawImage(eggImage, 0, 0);
+                eggImageLoaded = true;
+                console.log("✅ Egg image loaded for transparency detection");
+            };
+            
+            eggImage.onerror = () => {
+                console.error("❌ Failed to load egg image");
+                eggImageLoaded = false;
+            };
+        }
+
+        // Tap Egg Function
+        function tapEgg(event) {
+            currentEgg.currentHP += currentEgg.hpPerTap;
+            
+            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+            document.getElementById('hatch-balance').textContent = (currentBalance + currentEgg.hpPerTap).toLocaleString();
+            syncBalanceDisplays();
+            
+            pendingTokens += currentEgg.hpPerTap;
+            localStorage.setItem(`unsaved_${userId}`, pendingTokens);
+            
+            showFloatingText('+' + currentEgg.hpPerTap, event.clientX, event.clientY);
+            
+            updateProgress();
+            saveGameState();
+            
+            const egg = document.getElementById('main-egg');
+            egg.style.transform = 'scale(0.9) rotate(-5deg)';
+            setTimeout(() => {
+                egg.style.transform = 'scale(1) rotate(0deg)';
+            }, 100);
+            
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                if (pendingTokens > 0) {
+                    console.log(`📦 Batching ${pendingTokens} taps`);
+                    sendBatchToBackend(pendingTokens);
+                    pendingTokens = 0;
+                }
+            }, 2000);
+            
+            if (currentEgg.currentHP >= currentEgg.requiredHP) {
+                hatchEgg();
+            }
+        }
+
+        eggElement.addEventListener('click', (event) => {
+            if (!eggImageLoaded) {
+                tapEgg(event);
+                return;
+            }
+            
+            const rect = eggElement.getBoundingClientRect();
+            const x = Math.floor((event.clientX - rect.left) * (hitCanvas.width / rect.width));
+            const y = Math.floor((event.clientY - rect.top) * (hitCanvas.height / rect.height));
+
+            if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) {
+                console.log('Click outside egg bounds');
+                return;
+            }
+
+            const pixel = hitCtx.getImageData(x, y, 1, 1).data;
+            const alpha = pixel[3];
+
+            if (alpha > 20) {
+                tapEgg(event);
+            } else {
+                console.log('Transparent pixel ignored');
+            }
+        });
+
+        // Save pending tokens on app close/blur
+        window.addEventListener('beforeunload', () => {
+            if (pendingTokens > 0) {
+                const data = new Blob([JSON.stringify({
+                    user_id: userId,
+                    tokens: pendingTokens,
+                    api_secret: API_SECRET
+                })], { type: 'application/json' });
+                navigator.sendBeacon(`${BOT_API}/update_tokens`, data);
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            if (pendingTokens > 0) {
+                sendBatchToBackend(pendingTokens);
+                pendingTokens = 0;
+                clearTimeout(saveTimeout);
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && pendingTokens > 0) {
+                sendBatchToBackend(pendingTokens);
+                pendingTokens = 0;
+                clearTimeout(saveTimeout);
+            }
+        });
+
+        // Update Progress Bar
+        function updateProgress() {
+            const percentage = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-percentage').textContent = Math.floor(percentage) + '%';
+            document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
+            document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
+        }
+
+        // Hatch Egg
+        function hatchEgg() {
+            const egg = document.getElementById('main-egg');
+            egg.src = currentEgg.creatureImg;
+            
+            showFloatingText('🎉 ' + currentEgg.name + ' HATCHED! 🎉', window.innerWidth / 2, window.innerHeight / 2);
+            
+            // Add creature to collection
+            creatures[currentEgg.id] = {
+                id: currentEgg.id,
+                name: currentEgg.name,
+                image: currentEgg.creatureImg,
+                currentLevel: 1,
+                maxLevel: 5,
+                currentIncome: 25,
+                nextLevelIncome: 50,
+                upgradeCost: 1000,
+                totalEarned: 0
+            };
+            
+            setTimeout(() => {
+                alert('🎉 Congratulations!\n\n' + currentEgg.name + ' has hatched!\n\nGo to Hatch tab to manage your creatures!');
+                
+                // Move to next egg
+                currentEggIndex++;
+                if (currentEggIndex < allEggs.length) {
+                    currentEgg = allEggs[currentEggIndex];
+                    currentEgg.currentHP = 0;
+                    
+                    egg.src = currentEgg.eggImg;
+                    document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+                    document.getElementById('egg-description').textContent = currentEgg.description;
+                    updateProgress();
+                    setupEggImage();
+                } else {
+                    alert('🎊 Amazing! You\'ve hatched all 20 creatures! 🎊');
+                }
+                
+                saveGameState();
+                updatePassiveIncome();
+            }, 2000);
+        }
+
+        // Update passive income display
+        function updatePassiveIncome() {
+            let totalIncome = 0;
+            Object.values(creatures).forEach(c => {
+                totalIncome += c.currentIncome;
+            });
+            document.getElementById('passive-income').textContent = totalIncome;
+        }
+
+        // Render creatures grid
+        function renderCreaturesGrid() {
+            const grid = document.getElementById('creatures-grid');
+            grid.innerHTML = '';
+            
+            let unlockedCount = Object.keys(creatures).length;
+            
+            allEggs.forEach((egg, index) => {
+                const card = document.createElement('div');
+                
+                if (creatures[egg.id]) {
+                    // Unlocked creature
+                    const creature = creatures[egg.id];
+                    card.className = 'creature-card';
+                    card.onclick = () => openCreatureDetail(egg.id);
+                    card.innerHTML = `
+                        <img src="${creature.image}" class="creature-image" alt="${creature.name}">
+                        <div class="name">${creature.name}</div>
+                        <div class="level">Level ${creature.currentLevel}/${creature.maxLevel}</div>
+                        <div class="income">+${creature.currentIncome}/hr</div>
+                    `;
+                } else if (index === currentEggIndex) {
+                    // Current egg in progress
+                    card.className = 'creature-card locked';
+                    card.innerHTML = `
+                        <img src="${egg.eggImg}" class="creature-image" alt="${egg.name} Egg">
+                        <div class="name">${egg.name} Egg</div>
+                        <div class="level">🔒 In Progress</div>
+                        <div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div>
+                        <div class="lock-overlay">🔒</div>
+                    `;
+                } else {
+                    // Locked egg
+                    card.className = 'creature-card locked';
+                    card.innerHTML = `
+                        <img src="${egg.eggImg}" class="creature-image" alt="${egg.name} Egg">
+                        <div class="name">${egg.name} Egg</div>
+                        <div class="level">🔒 Locked</div>
+                        <div class="income">0/${egg.requiredHP.toLocaleString()} HP</div>
+                        <div class="lock-overlay">🔒</div>
+                    `;
+                }
+                
+                grid.appendChild(card);
+            });
+            
+            // Update stats
+            document.getElementById('unlocked-count').textContent = unlockedCount;
+            document.getElementById('unlock-percentage').textContent = Math.floor((unlockedCount / 20) * 100);
+            
+            let totalIncome = 0;
+            Object.values(creatures).forEach(c => {
+                totalIncome += c.currentIncome;
+            });
+            document.getElementById('total-income').textContent = totalIncome;
+        }
+
+        // Floating Text Animation
+        function showFloatingText(text, x, y) {
+            const floatText = document.createElement('div');
+            floatText.className = 'float-text';
+            floatText.textContent = text;
+            floatText.style.left = x + 'px';
+            floatText.style.top = y + 'px';
+            document.body.appendChild(floatText);
+            
+            setTimeout(() => {
+                floatText.remove();
+            }, 1000);
+        }
+
+        // Collect Passive Income
+        function collectIncome() {
+            const amount = parseInt(document.getElementById('collected-amount').textContent);
+            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+            const newBalance = currentBalance + amount;
+            
+            document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
+            syncBalanceDisplays();
+            document.getElementById('collected-amount').textContent = '0';
+            
+            sendBatchToBackend(amount);
+            showFloatingText('+' + amount + ' $HATCH', event.clientX, event.clientY);
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Collected! ✅';
+            btn.style.background = '#00d68f';
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 2000);
+        }
+
+        // Show Bonus
+        function showBonus() {
+            const bonus = 500;
+            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+            document.getElementById('hatch-balance').textContent = (currentBalance + bonus).toLocaleString();
+            syncBalanceDisplays();
+            
+            sendBatchToBackend(bonus);
+            showFloatingText('+' + bonus + ' Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
+        }
+
+        // Show Referral
+        function showReferral() {
+            alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!');
+        }
+
+        // Open Creature Detail
+        function openCreatureDetail(creatureId) {
+            selectedCreature = creatures[creatureId];
+            if (!selectedCreature) return;
+
+            syncBalanceDisplays();
+
+            document.getElementById('detail-creature-name').textContent = selectedCreature.name;
+            document.getElementById('detail-creature-title').textContent = selectedCreature.name;
+            document.getElementById('detail-creature-img').src = selectedCreature.image;
+            document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
+            document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
+            document.getElementById('detail-total-earned').textContent = `${selectedCreature.totalEarned.toLocaleString()} $HATCH`;
+            document.getElementById('detail-upgrade-cost').textContent = `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`;
+            document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
+            document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`;
+
+            const upgradeBtn = document.querySelector('.upgrade-btn');
+            if (selectedCreature.currentLevel >= selectedCreature.maxLevel) {
+                upgradeBtn.disabled = true;
+                upgradeBtn.textContent = 'MAX LEVEL REACHED';
+                document.querySelector('.upgrade-header').textContent = '⭐ Maximum Level';
+            } else {
+                upgradeBtn.disabled = false;
+                upgradeBtn.textContent = 'UPGRADE NOW';
+                document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
+            }
+
+            document.getElementById('creature-detail').classList.add('active');
+        }
+
+        // Sync balance displays
+        function syncBalanceDisplays() {
+            const mainBalance = document.getElementById('hatch-balance').textContent;
+            const mainPoints = document.getElementById('points-balance').textContent;
+            const detailBalance = document.getElementById('hatch-balance-detail');
+            const detailPoints = document.getElementById('points-balance-detail');
+            const profileHatch = document.getElementById('profile-hatch');
+            const profilePoints = document.getElementById('profile-points');
+            const profileCreatures = document.getElementById('profile-creatures');
+            
+            if (detailBalance) detailBalance.textContent = mainBalance;
+            if (detailPoints) detailPoints.textContent = mainPoints;
+            if (profileHatch) profileHatch.textContent = mainBalance;
+            if (profilePoints) profilePoints.textContent = mainPoints;
+            if (profileCreatures) {
+                const unlockedCount = Object.keys(creatures).length;
+                profileCreatures.textContent = `${unlockedCount}/20`;
+            }
+        }
+
+        // Close Creature Detail
+        function closeCreatureDetail() {
+            document.getElementById('creature-detail').classList.remove('active');
+            selectedCreature = null;
+        }
+
+        // Upgrade Creature
+        function upgradeCreature() {
+            if (!selectedCreature) return;
+
+            const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+            
+            if (currentBalance >= selectedCreature.upgradeCost) {
+                const newBalance = currentBalance - selectedCreature.upgradeCost;
+                document.getElementById('hatch-balance').textContent = newBalance.toLocaleString();
+                syncBalanceDisplays();
+                
+                sendBatchToBackend(-selectedCreature.upgradeCost);
+                
+                selectedCreature.currentLevel++;
+                selectedCreature.currentIncome = selectedCreature.nextLevelIncome;
+                selectedCreature.upgradeCost = Math.floor(selectedCreature.upgradeCost * 2.5);
+                selectedCreature.nextLevelIncome = Math.floor(selectedCreature.nextLevelIncome * 2);
+                
+                saveGameState();
+                updatePassiveIncome();
+                
+                showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
+                
+                setTimeout(() => {
+                    openCreatureDetail(selectedCreature.id);
+                }, 500);
+            } else {
+                alert('❌ Not enough $HATCH!\n\nNeed: ' + selectedCreature.upgradeCost.toLocaleString() + '\nHave: ' + currentBalance.toLocaleString());
+            }
+        }
+
+        // Initialize on page load
+        loadGameState();
+        loadBalanceFromBackend();
+        
+        // Setup current egg
+        document.getElementById('egg-name').textContent = currentEgg.emoji + ' ' + currentEgg.name + ' Egg';
+        document.getElementById('egg-description').textContent = currentEgg.description;
+        document.getElementById('main-egg').src = currentEgg.eggImg;
+        updateProgress();
+        updatePassiveIncome();
+        setupEggImage();
+
+        // Simulate passive income accumulation
+        setInterval(() => {
+            const current = parseInt(document.getElementById('collected-amount').textContent);
+            const passiveIncome = parseInt(document.getElementById('passive-income').textContent);
+            if (current < passiveIncome * 2) {
+                document.getElementById('collected-amount').textContent = current + Math.max(1, Math.floor(passiveIncome / 100));
+            }
+        }, 3000);
+    </script>
 </body>
 </html>
