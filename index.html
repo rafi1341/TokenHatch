@@ -775,7 +775,7 @@
 
         // All 20 eggs database
         const allEggs = [
-            { id: 1, name: 'Chick', , eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Soft warmth seeps through the fragile shell]' },
+            { id: 1, name: 'Chick',  emoji: '🐣' , eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: '[Soft warmth seeps through the fragile shell]' },
             { id: 2, name: 'Turtle', emoji: '🐢', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: '[Heavy and calm, built to endure time]' },
             { id: 3, name: 'Lizard', emoji: '🦎', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: '[A faint pulse hints at swift movement inside]' },
             { id: 4, name: 'Snake', emoji: '🐍', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: '[Cold and silent, yet watching]' },
@@ -1165,6 +1165,6 @@
             document.getElementById('collected-amount').textContent = curr + Math.max(1, Math.floor(passiveInc / 100));
         }
     }, 3000);
-</script>
+    </script>
 </body>
 </html>
