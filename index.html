@@ -924,18 +924,14 @@ function setupEggImage() {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = currentEgg.eggImg;
-    img.onload = () => {
-        lastDrawnImage = img;
-        // Use devicePixelRatio so mapping is crisp on high-DPI screens
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-        hitCanvas.width = Math.round(img.naturalWidth * dpr);
-        hitCanvas.height = Math.round(img.naturalHeight * dpr);
-        // reset transform and draw image scaled by dpr
-        hitCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
-        hitCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-        eggLoaded = true;
-    };
+img.onload = () => {
+    hitCanvas.width = eggEl.clientWidth;
+    hitCanvas.height = eggEl.clientHeight;
+    hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
+    hitCtx.drawImage(img, 0, 0, hitCanvas.width, hitCanvas.height); // scale to DOM size
+    eggLoaded = true;
+};
+
     img.onerror = () => {
         eggLoaded = false;
         lastDrawnImage = null;
