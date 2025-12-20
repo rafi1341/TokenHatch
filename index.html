@@ -113,18 +113,19 @@
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
         }
 
-        .egg-image {
-            width: 350px;
-            height: 350px;
-            position: relative;
-            z-index: 2;
-            cursor: pointer;
-            transition: transform 0.1s;
-            user-select: none;
-            background: transparent; 
-            will-change: transform; 
-            -webkit-tap-highlight-color: transparent;
-        }
+.egg-image {
+    width: 50%;   /* takes 50% of the parent container width */
+    height: auto; /* keeps aspect ratio */
+    max-width: 350px; /* optional: limit max size */
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 0.1s;
+    user-select: none;
+    background: transparent; 
+    will-change: transform; 
+    -webkit-tap-highlight-color: transparent;
+}
 
         .progress-bar-container {
             width: 100%;
