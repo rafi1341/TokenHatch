@@ -606,29 +606,53 @@
     </div>
 
     <div class="content">
-        <div id="home-screen" class="screen active">
-            <div class="passive-income-display">
-                📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
+<div id="home-screen" class="screen active">
+
+    <div class="passive-income-display">
+        📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
+    </div>
+
+    <div class="egg-display">
+
+        <!-- ONE unified card -->
+        <div class="egg-card">
+
+            <div class="egg-name">
+                <span id="egg-name">Chick Egg</span>
             </div>
 
-            <div class="egg-display">
-                <div class="egg-name"><span id="egg-name">🐣 Chick Egg</span></div>
-                <div class="egg-description"><span id="egg-description">Description</span></div>
-                
-                <div class="egg-container">
-                    <div class="egg-glow"></div>
-                    <img src="assets/eggs/egg_chick.png" class="egg-image" id="main-egg" alt="Egg">
-                </div>
-
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="progress-bar" style="width: 0%;">
-                        <span id="progress-percentage">0%</span>
-                    </div>
-                </div>
-                <div class="progress-text">
-                    <span id="current-hp">0</span> / <span id="required-hp">1000</span> HP
-                </div>
+            <div class="egg-container">
+                <div class="egg-glow"></div>
+                <img
+                    src="assets/eggs/egg_chick.png"
+                    class="egg-image"
+                    id="main-egg"
+                    alt="Egg"
+                    draggable="false"
+                >
             </div>
+
+            <div class="egg-description">
+                <span id="egg-description">Description</span>
+            </div>
+
+        </div>
+
+        <!-- progress stays outside the card -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar" style="width: 0%;">
+                <span id="progress-percentage">0%</span>
+            </div>
+        </div>
+
+        <div class="progress-text">
+            <span id="current-hp">0</span> /
+            <span id="required-hp">1000</span> HP
+        </div>
+
+    </div>
+</div>
+
 
             <div class="collection-box">
                 <div class="collection-label">Ready to Collect</div>
