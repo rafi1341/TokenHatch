@@ -941,7 +941,7 @@ function tapEgg(e) {
     currentEgg.currentHP += currentEgg.hpPerTap; 
     const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); 
     document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString(); 
-    syncBalanceDisplays(); pendingTokens += currentEgg.hpPerTap; localStorage.setItem(unsaved_${userId}, pendingTokens); 
+    syncBalanceDisplays(); pendingTokens += currentEgg.hpPerTap; localStorage.setItem(`unsaved_${userId}`, pendingTokens);
     showFloatingText('+' + currentEgg.hpPerTap, e.clientX, e.clientY); updateProgress(); saveGameState(); 
     const egg = document.getElementById('main-egg'); egg.style.transform = 'scale(0.9) rotate(-5deg)'; 
     setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100); 
