@@ -951,7 +951,8 @@ function tapEgg(e) {
         const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width)); 
         const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height)); 
         if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return; 
-        const pixel = hitCtx.getImageData(x, y, 1, 1).data; if (pixel[3] > 20) tapEgg(e); });
+        const pixel = hitCtx.getImageData(x, y, 1, 1).data; 
+        if (pixel[3] > 20) tapEgg(e); });
 
 
     window.addEventListener('beforeunload', () => {
