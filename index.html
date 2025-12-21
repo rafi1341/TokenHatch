@@ -820,16 +820,8 @@ document.getElementById('home-username').textContent = '@' + generatedUsername;
 
 
 // Update top-left logo or profile UI
-document.querySelector('.logo').textContent = `🥚 ${username}`;
-document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + username;
-
-// Send username to backend/bot for storage
-fetch(`${BOT_API}/save_username`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: userId, username, api_secret: API_SECRET })
-});
-
+document.querySelector('.logo').textContent = generatedUsername;
+document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + generatedUsername;
 
 
         // Batching variables
@@ -913,7 +905,7 @@ function loadGameState() {
 
     function saveGameState() {
         localStorage.setItem(`gameState_${userId}`, JSON.stringify({
-            currentEggIndex, currentHP: currentEgg.currentHP, creatures, let generatedUsername
+            currentEggIndex, currentHP: currentEgg.currentHP, creatures, username: generatedUsername
         }));
     }
 
