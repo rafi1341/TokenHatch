@@ -915,6 +915,7 @@ function loadGameState() {
         localStorage.setItem(`gameState_${userId}`, JSON.stringify({
             currentEggIndex, currentHP: currentEgg.currentHP, creatures
         }));
+        fetch(`${BOT_API}/save_username`, { ... })
     }
 
     async function loadBalanceFromBackend() {
