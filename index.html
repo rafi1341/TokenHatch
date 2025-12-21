@@ -812,7 +812,7 @@ function generateUsername() {
 }
 
 // Generate username for this user
-// Generate username for this user
+
 let generatedUsername = generateUsername();
 
 // Display in the UI
@@ -913,7 +913,7 @@ function loadGameState() {
 
     function saveGameState() {
         localStorage.setItem(`gameState_${userId}`, JSON.stringify({
-            currentEggIndex, currentHP: currentEgg.currentHP, creatures, username
+            currentEggIndex, currentHP: currentEgg.currentHP, creatures, let generatedUsername
         }));
     }
 
