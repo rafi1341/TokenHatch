@@ -818,7 +818,14 @@ let generatedUsername = generateUsername();
 // Display in the UI
 document.getElementById('home-username').textContent = '@' + generatedUsername;
 
-
+const saved = localStorage.getItem(`gameState_${userId}`);
+if (saved) {
+    const state = JSON.parse(saved);
+    if (state.username) generatedUsername = state.username;  // <- restore saved username
+} else {
+    generatedUsername = generateUsername();  // only generate if no saved state
+}
+        
 // Update top-left logo or profile UI
 document.querySelector('.logo').textContent = generatedUsername;
 document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + generatedUsername;
