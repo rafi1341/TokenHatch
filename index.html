@@ -601,7 +601,9 @@
 </head>
 <body>
     <div class="top-bar">
-        <div class="logo">🥚 TokenHatch</div>
+        <div class="logo">
+    <span id="home-username"></span>
+</div>
         <div class="balance-display">
             <div>💰 <span id="hatch-balance">0</span> $HATCH</div>
             <div>💎 <span id="points-balance">0</span> Points</div>
@@ -798,6 +800,36 @@
         // Get Telegram user ID
      const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
     console.log("User ID:", userId);
+
+        // Username generator function
+function generateUsername() {
+    const adjectives = ['Swift', 'Brave', 'Mighty', 'Silent', 'Fierce'];
+    const nouns = ['eagle', 'pegasus', 'Dragon', 'griffin', 'Phoenix'];
+    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+    const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit
+    return `${randomAdj}${randomNoun}#${randomNumber}`;
+}
+
+// Generate username for this user
+// Generate username for this user
+let generatedUsername = generateUsername();
+
+// Display in the UI
+document.getElementById('home-username').textContent = '@' + generatedUsername;
+
+
+// Update top-left logo or profile UI
+document.querySelector('.logo').textContent = `🥚 ${username}`;
+document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + username;
+
+// Send username to backend/bot for storage
+fetch(`${BOT_API}/save_username`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: userId, username, api_secret: API_SECRET })
+});
+
 
 
         // Batching variables
