@@ -31,13 +31,12 @@
         }
 
         .top-bar {
-            height: 10px; /* adjust to your top-bar height */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -354,13 +353,15 @@
         }
 
         .bottom-nav {
-            height: 70px; /* adjust to your nav height */
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
         }
 
         .nav-btn {
