@@ -11,13 +11,23 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+
+        #app-container {
+            flex: 1;              /* fill remaining space */
+            position: relative;    /* for absolute-positioned screens */
+            overflow: hidden;      /* optional */
         }
 
         .top-bar {
@@ -47,14 +57,17 @@
         }
 
         .screen {
-            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow-y: auto;
             padding: 20px;
-            animation: fadeIn 0.3s;
+            display: none;
         }
 
-        .screen.active {
+         .screen.active {
             display: block;
         }
+
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -675,11 +688,6 @@
         </div>   
             
      </div>
-
-        <!-- progress stays outside the card -->
-
-
-
            
 
         <div id="hatch-screen" class="screen">
