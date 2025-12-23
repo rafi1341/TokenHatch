@@ -570,35 +570,43 @@
             cursor: not-allowed;
         }
 
-        .hatch-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
+.hatch-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-y: auto; /* allow scrolling if content is taller than viewport */
+}
 
-        .hatch-overlay.active {
-            display: flex;
-            animation: fadeIn 0.5s;
-        }
+.hatch-overlay.active {
+    display: flex;
+    animation: fadeIn 0.5s;
+}
 
-        .hatch-animation-content {
-            text-align: center;
-        }
+.hatch-animation-content {
+    text-align: center;
+    max-width: 90vw;   /* never exceed viewport width */
+    max-height: 90vh;  /* never exceed viewport height */
+    padding: 20px;
+    overflow-y: auto;  /* scroll if content too tall */
+}
 
-        .hatch-creature-reveal {
-            width: 250px;
-            height: 250px;
-            margin: 30px auto;
-            animation: hatchReveal 1.5s ease-out;
-        }
+.hatch-creature-reveal {
+    width: 80%;        /* responsive width */
+    max-width: 250px;  /* keep original max */
+    height: auto;      /* scale proportionally */
+    max-height: 40vh;  /* responsive max height */
+    margin: 30px auto;
+    animation: hatchReveal 1.5s ease-out;
+}
+
 
         @keyframes hatchReveal {
             0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
