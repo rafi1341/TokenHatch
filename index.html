@@ -423,15 +423,23 @@
 
 .float-text {
     position: fixed;
-    color: rgba(255, 255, 255, 0.95); /* 👈 white, not pure */
-    font-weight: 700;
-    font-size: 20px;
+
+    font-size: 22px;          /* slightly bigger */
+    font-weight: 900;         /* force heavy */
+    letter-spacing: -0.2px;   /* tighter = thicker */
+    
+    color: #ffffff;
+    opacity: 1;
+
+    text-shadow:
+        0 2px 6px rgba(0,0,0,0.6),
+        0 0 1px rgba(0,0,0,0.8); /* micro-outline */
+
     pointer-events: none;
     animation: floatUp 700ms ease-out forwards;
     z-index: 1000;
-
-    text-shadow: 0 2px 6px rgba(0,0,0,0.4); /* readability */
 }
+
 
         @keyframes floatUp {
             0% { transform: translateY(0); opacity: 1; }
