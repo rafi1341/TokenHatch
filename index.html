@@ -446,17 +446,15 @@
 
 .detail-screen {
     position: fixed;
-    bottom: 70px;       /* height of bottom-nav */
+    top: 0;
     left: 0;
     right: 0;
-
-    background: inherit;
-    z-index: 900;       /* BELOW bottom-nav (1000), ABOVE screens */
-
+    bottom: 60px; /* leave space for bottom nav */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 100;
     display: none;
     flex-direction: column;
-
-    overflow: hidden;   /* important */
+    animation: slideIn 0.3s;
 }
 
 .detail-screen.active {
@@ -504,9 +502,9 @@
         }
 
         .detail-content {
-            flex: 1;
+             flex: 1;
             overflow-y: auto;
-             -webkit-overflow-scrolling: touch;
+            padding: 20px;
             
         }
 
