@@ -444,20 +444,18 @@
             100% { transform: translateY(-100px); opacity: 0; }
         }
 
-        .detail-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            animation: slideIn 0.3s;
-            padding-bottom: 70px;
-            pointer-events: auto;
-        }
+.detail-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 60px; /* leave space for bottom nav */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    animation: slideIn 0.3s;
+}
 
         .detail-screen.active {
             display: flex;
