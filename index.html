@@ -445,17 +445,13 @@
         }
 
 .detail-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 60px; /* leave space for bottom nav */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    z-index: 100;
     display: none;
-    flex-direction: column;
-    animation: slideIn 0.3s;
+    position: fixed;
+    inset: 0;
+    z-index: 200; /* higher than tabs, lower than modals if any */
+    background: inherit;
 }
+
 
         .detail-screen.active {
             display: flex;
@@ -1022,21 +1018,39 @@ function loadGameState() {
     }
 
     function switchTab(t) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const detail = document.getElementById('creature-detail');
+        if (detail) detail.style.display = 'none';
+
+        document.querySelectorAll('.screen').forEach(s =>
+            s.classList.remove('active')
+        );
+
+        document.querySelectorAll('.nav-btn').forEach(b =>
+            b.classList.remove('active')
+        );
+    
         const screen = document.getElementById(t + '-screen');
         if (screen) screen.classList.add('active');
+
         document.querySelectorAll('.nav-btn').forEach(btn => {
             const label = btn.querySelector('.nav-label');
-            if (label) {
-                const lt = label.textContent.toLowerCase();
-                if ((t === 'home' && lt === 'home') || (t === 'hatch' && lt === 'hatch') ||
-                    (t === 'tasks' && lt === 'tasks') || (t === 'airdrop' && lt === 'airdrop') ||
-                    (t === 'profile' && lt === 'me')) btn.classList.add('active');
+            if (!label) return;
+
+            const lt = label.textContent.toLowerCase();
+            if (
+                (t === 'home' && lt === 'home') ||
+                (t === 'hatch' && lt === 'hatch') ||
+                (t === 'tasks' && lt === 'tasks') ||
+                (t === 'airdrop' && lt === 'airdrop') ||
+                (t === 'profile' && lt === 'me')
+            ) {
+                btn.classList.add('active');
             }
         });
+    
         if (t === 'hatch') renderCreaturesGrid();
     }
+
 const eggEl = document.getElementById('main-egg');
 // offscreen canvas used for alpha hit testing
 const hitCanvas = document.createElement('canvas');
@@ -1256,8 +1270,12 @@ function tapEgg(e) {
             upgradeBtn.textContent = 'UPGRADE NOW';
             document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
         }
-        document.getElementById('creature-detail').classList.add('active');
+            document.getElementById('creature-detail').style.display = 'block';
     }
+
+     function closeCreatureDetail() {
+            document.getElementById('creature-detail').style.display = 'none';
+        }
 
     function syncBalanceDisplays() {
         const mb = document.getElementById('hatch-balance').textContent;
