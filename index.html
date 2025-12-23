@@ -55,7 +55,7 @@
 #tasks-screen,
 #airdrop-screen,
 #profile-screen {
-    padding-top: 30px; /* adjust this value as needed */
+    padding-top: 40px; /* adjust this value as needed */
 }
 
 
@@ -74,6 +74,7 @@
     right: 0;
     bottom: 0;
     padding: 20px;       /* optional */
+    padding-bottom: calc(var(--bottom-nav-h) + 16px);
     overflow-y: auto;
 }
 .screen.active {
@@ -366,17 +367,27 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-        }
+:root {
+    --bottom-nav-h: 68px;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: var(--bottom-nav-h);
+    padding: 10px 0;
+
+    display: flex;
+    justify-content: space-around;
+
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
 
         .nav-btn {
             background: none;
