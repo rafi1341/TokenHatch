@@ -455,6 +455,7 @@
 
         .detail-screen.active {
             display: flex;
+            display: block;
         }
 
         @keyframes slideIn {
@@ -1018,8 +1019,6 @@ function loadGameState() {
     }
 
     function switchTab(t) {
-        const detail = document.getElementById('creature-detail');
-        if (detail) detail.style.display = 'none';
 
         document.querySelectorAll('.screen').forEach(s =>
             s.classList.remove('active')
@@ -1270,11 +1269,13 @@ function tapEgg(e) {
             upgradeBtn.textContent = 'UPGRADE NOW';
             document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
         }
-            document.getElementById('creature-detail').style.display = 'block';
+        document.getElementById('creature-detail').classList.add('active');
     }
 
-     function closeCreatureDetail() {
-            document.getElementById('creature-detail').style.display = 'none';
+    function closeCreatureDetail() {
+    document.getElementById('creature-detail').classList.remove('active');
+}
+
         }
 
     function syncBalanceDisplays() {
