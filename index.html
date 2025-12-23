@@ -445,17 +445,28 @@
         }
 
 .detail-screen {
-    display: none;
     position: fixed;
-    inset: 0;
-    z-index: 200; /* higher than tabs, lower than modals if any */
+    top: 80px;          /* height of top-bar */
+    bottom: 70px;       /* height of bottom-nav */
+    left: 0;
+    right: 0;
+
     background: inherit;
+    z-index: 900;       /* BELOW bottom-nav (1000), ABOVE screens */
+
+    display: none;
+    flex-direction: column;
+
+    overflow: hidden;   /* important */
+}
+
+.detail-screen.active {
+    display: flex;
 }
 
 
         .detail-screen.active {
             display: flex;
-            display: block;
         }
 
         @keyframes slideIn {
@@ -497,6 +508,8 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            -webkit-overflow-scrolling: touch;
+            
         }
 
         .detail-creature-display {
