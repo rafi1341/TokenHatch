@@ -50,22 +50,27 @@
             font-size: 14px;
         }
 
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 80px;
-        }
+.content {
+    flex: 1;
+    overflow-y: hidden; /* only inner screens scroll */
+    padding-top: 0;     /* remove any extra padding */
+    position: relative; /* for absolute positioning of screens if needed */
+}
 
-        .screen {
-            display: none;
-            padding: 20px;
-            overflow-y: auto;                  /* make screen scrollable */
-            animation: fadeIn 0.3s;
-        }
+.screen {
+    display: none;
+    position: absolute;  /* fill the container */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;       /* optional */
+    overflow-y: auto;
+}
+.screen.active {
+    display: block;
+}
 
-        .screen.active {
-            display: block;
-        }
 
 
 
@@ -624,28 +629,28 @@
     </div>
 
     <div class="content">
-<div id="home-screen" class="screen active">
+        <div id="home-screen" class="screen active">
 
-    <div class="passive-income-display">
-        📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
-    </div>
-
-    <div class="egg-display">
-
-        <!-- ONE unified card -->
-        <div class="egg-card">
-
-            <div class="egg-name">
-                <span id="egg-name">Chick Egg</span>
+            <div class="passive-income-display">
+                📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
             </div>
+    
+            <div class="egg-display">
 
-             <div class="egg-description">
-                <span id="egg-description">Description</span>
-            </div>
+                <!-- ONE unified card -->
+                <div class="egg-card">
 
-            <div class="egg-container">
-                <div class="egg-glow"></div>
-                <img
+                <div class="egg-name">
+                    <span id="egg-name">Chick Egg</span>
+                </div>
+
+                 <div class="egg-description">
+                    <span id="egg-description">Description</span>
+                </div>
+
+                <div class="egg-container">
+                    <div class="egg-glow"></div>
+                    <img
                     src="assets/eggs/egg_chick.png"
                     class="egg-image"
                     id="main-egg"
