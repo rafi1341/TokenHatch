@@ -872,7 +872,12 @@
     const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
 
     // Get Telegram user ID
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString();
+
+        if (!userId) {
+  alert("Telegram user ID not found. Please open the app from Telegram.");
+  throw new Error("Missing Telegram user ID");
+    }
     console.log("User ID:", userId);
 
 
