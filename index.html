@@ -1080,22 +1080,28 @@
     }
 
     // hatchEgg now uses CREATURES_CONFIG to create the creature object
-    function hatchEgg() {
-        const id = currentEgg.id;
-        const level = 1;
-        creatures[id] = {
-            id,
-            name: currentEgg.name,
-            image: currentEgg.creatureImg,
-            currentLevel: level,
-            maxLevel: 5,
-            currentIncome: getIncome(id, level),
-            nextLevelIncome: getIncome(id, level + 1),
-            upgradeCost: getUpgradeCost(id, level),
-            totalEarned: 0
-        };
-        showHatchAnimation(currentEgg);
-    }
+function hatchEgg() {
+    if (!currentEgg) return;
+
+    const id = currentEgg.id;
+    const level = 1; // start at level 1
+    creatures[id] = {
+        id,
+        name: currentEgg.name,
+        image: currentEgg.creatureImg,
+        currentLevel: level,
+        maxLevel: CREATURES_CONFIG[id].levels.length,
+        currentIncome: getIncome(id, level),
+        nextLevelIncome: getIncome(id, level + 1),
+        upgradeCost: getUpgradeCost(id, level),
+        totalEarned: 0
+    };
+
+    selectedCreature = creatures[id]; // set as selected for detail view
+    showHatchAnimation(currentEgg);
+    updateHatchScreen(); // update UI in Hatch tab
+}
+
 
     function showHatchAnimation(egg) {
         const overlay = document.getElementById('hatch-overlay');
@@ -1261,41 +1267,43 @@
 
     // Upgrade logic: use CREATURES_CONFIG values (no multipliers)
    function upgradeCreature() {
-    const detailDisplay = document.querySelector('.detail-creature-display');
-    const creatureId = detailDisplay.dataset.creatureId;
-    if (!creatureId) return;
+    if (!selectedCreature) return;
 
-    const creature = creatures[creatureId];
-    if (!creature) return;
+    const id = selectedCreature.id;
+    const currentLevel = selectedCreature.currentLevel;
+    const maxLevel = selectedCreature.maxLevel;
 
-    const currentCost = creature.currentLevel < creature.maxLevel ? getUpgradeCost(creature.id, creature.currentLevel) : null;
+    // Get upgrade cost
+    const currentCost = currentLevel < maxLevel ? getUpgradeCost(id, currentLevel) : null;
     if (currentCost === null) return;
 
-    const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+    // Check balance
+    const balEl = document.getElementById('hatch-balance');
+    const bal = parseInt(balEl.textContent.replace(/,/g, ''));
     if (bal < currentCost) {
-        alert('❌ Not enough $HATCH!\n\nNeed: ' + currentCost.toLocaleString() + '\nHave: ' + bal.toLocaleString());
+        alert(`❌ Not enough $HATCH!\n\nNeed: ${currentCost.toLocaleString()}\nHave: ${bal.toLocaleString()}`);
         return;
     }
 
-    // Deduct balance
-    document.getElementById('hatch-balance').textContent = (bal - currentCost).toLocaleString();
+    // Deduct currency
+    balEl.textContent = (bal - currentCost).toLocaleString();
     syncBalanceDisplays();
     sendBatchToBackend(-currentCost);
 
-    // Apply upgrade
-    creature.currentLevel++;
-    const lvl = creature.currentLevel;
-    creature.currentIncome = getIncome(creature.id, lvl);
-    creature.nextLevelIncome = lvl < creature.maxLevel ? getIncome(creature.id, lvl + 1) : creature.currentIncome;
-    creature.upgradeCost = lvl < creature.maxLevel ? getUpgradeCost(creature.id, lvl) : null;
+    // Upgrade creature
+    selectedCreature.currentLevel++;
+    const lvl = selectedCreature.currentLevel;
+    selectedCreature.currentIncome = getIncome(id, lvl);
+    selectedCreature.nextLevelIncome = lvl < maxLevel ? getIncome(id, lvl + 1) : selectedCreature.currentIncome;
+    selectedCreature.upgradeCost = lvl < maxLevel ? getUpgradeCost(id, lvl) : null;
 
     saveGameState();
     updatePassiveIncome();
     showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
 
-    // Refresh detail panel
-    setTimeout(() => openCreatureDetail(creature.id), 500);
+    setTimeout(() => openCreatureDetail(id), 500);
 }
+
 
 
     // init
