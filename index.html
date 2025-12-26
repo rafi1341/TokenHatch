@@ -1304,6 +1304,134 @@ function hatchEgg() {
     setTimeout(() => openCreatureDetail(id), 500);
 }
 
+    /* ------------------- MISSING HELPERS (paste after getUpgradeCost) ------------------- */
+
+function updateHatchScreen() {
+    // Refresh UI when hatch/upgrade happens
+    renderCreaturesGrid();
+    updatePassiveIncome();
+    // update collected and passive displays too
+    const totalInc = Object.values(creatures).reduce((s, c) => s + (c.currentIncome || 0), 0);
+    document.getElementById('passive-income').textContent = totalInc;
+    document.getElementById('total-income').textContent = totalInc;
+}
+
+/* Minimal egg click / image setup (keeps things simple & robust).
+   If you want the alpha hit-testing you had before, we can re-add it later. */
+let eggLoaded = false;
+function setupEggImage() {
+    const eggEl = document.getElementById('main-egg');
+    if (!eggEl) return;
+    eggLoaded = true; // simple flag
+
+    // prevent multiple listeners
+    eggEl.onclick = (e) => {
+        try { tapEgg(e); } catch (err) { console.error('tapEgg error', err); }
+    };
+}
+
+/* Basic tap logic that mirrors the old behavior:
+   - increases egg HP
+   - adds hpPerTap to balance
+   - batches pendingTokens to backend
+   - shows floating text and simple tap animation
+*/
+function tapEgg(e) {
+    if (!currentEgg) return;
+    const hpGain = currentEgg.hpPerTap || 1;
+    currentEgg.currentHP = (currentEgg.currentHP || 0) + hpGain;
+
+    // update local balance display and batching
+    const balEl = document.getElementById('hatch-balance');
+    const bal = parseInt(balEl.textContent.replace(/,/g, '')) || 0;
+    balEl.textContent = (bal + hpGain).toLocaleString();
+    syncBalanceDisplays();
+
+    // batch tokens to send later
+    pendingTokens = (parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0) + hpGain;
+    localStorage.setItem(`unsaved_${userId}`, pendingTokens);
+
+    // visual feedback
+    showFloatingText('+' + hpGain, e.clientX || (window.innerWidth/2), e.clientY || (window.innerHeight/2));
+    const egg = document.getElementById('main-egg');
+    if (egg) {
+        egg.style.transform = 'scale(0.95) rotate(-4deg)';
+        setTimeout(()=> egg.style.transform = 'scale(1) rotate(0deg)', 120);
+    }
+
+    // save & batch send after short delay
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        if (pendingTokens > 0) {
+            // sendBatchToBackend is already defined in your file
+            sendBatchToBackend(pendingTokens).catch(()=>{/* ignore */});
+            pendingTokens = 0;
+            localStorage.removeItem(`unsaved_${userId}`);
+        }
+    }, 2000);
+
+    // progress UI and hatch trigger
+    updateProgress();
+    if (currentEgg.currentHP >= currentEgg.requiredHP) {
+        // ensure we don't double-hatch
+        currentEgg.currentHP = currentEgg.requiredHP;
+        hatchEgg();
+    }
+}
+
+function updateProgress() {
+    if (!currentEgg) return;
+    const pct = Math.min((currentEgg.currentHP || 0) / (currentEgg.requiredHP || 1) * 100, 100);
+    const bar = document.getElementById('progress-bar');
+    if (bar) bar.style.width = pct + '%';
+    const pctText = document.getElementById('progress-percentage');
+    if (pctText) pctText.textContent = Math.floor(pct) + '%';
+    const cur = document.getElementById('current-hp');
+    const req = document.getElementById('required-hp');
+    if (cur) cur.textContent = (currentEgg.currentHP || 0).toLocaleString();
+    if (req) req.textContent = (currentEgg.requiredHP || 0).toLocaleString();
+}
+
+/* small confetti fallback so showHatchAnimation won't fail */
+function createConfetti() {
+    try {
+        const overlay = document.getElementById('hatch-overlay');
+        if (!overlay) return;
+        const colors = ['#FFD700','#FF69B4','#00D68F','#667eea','#FF6347'];
+        for (let i=0;i<20;i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = (5 + Math.random()*90) + '%';
+            c.style.top = (-10 - Math.random()*20) + 'px';
+            c.style.background = colors[Math.floor(Math.random()*colors.length)];
+            c.style.opacity = '0.95';
+            overlay.appendChild(c);
+            setTimeout(()=> c.remove(), 3000);
+        }
+    } catch (e) { console.error(e); }
+}
+
+/* ---------------------------------------------------------------------------------- */
+
+/* minimal switchTab - toggles screens + bottom nav active state */
+function switchTab(name) {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`${name}-screen`);
+    if (target) target.classList.add('active');
+
+    // bottom nav active style
+    document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => btn.classList.remove('active'));
+    const btnMap = {
+        home: 0, hatch: 1, tasks: 2, airdrop: 3, profile: 4
+    };
+    const idx = btnMap[name];
+    if (idx !== undefined) {
+        const btn = document.querySelectorAll('.bottom-nav .nav-btn')[idx];
+        if (btn) btn.classList.add('active');
+    }
+}
+
 
 
     // init
