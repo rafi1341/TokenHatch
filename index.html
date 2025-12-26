@@ -1432,10 +1432,48 @@ function switchTab(name) {
     }
 }
 
+     function populateHatchScreen() {
+    const grid = document.getElementById('creatures-grid');
+    grid.innerHTML = ''; // clear old content
+    
+    allEggs.forEach((egg, index) => {
+        const level = (creatures[egg.id]?.level) || 0; // 0 = locked
+        const isLocked = level === 0;
+        
+        const card = document.createElement('div');
+        card.className = `creature-card ${isLocked ? 'locked' : ''}`;
+        card.dataset.id = egg.id;
+        
+        card.innerHTML = `
+            <img src="${egg.creatureImg}" class="creature-image" alt="${egg.name}">
+            <div class="name">${egg.name}</div>
+            <div class="level">${isLocked ? 'Locked' : 'Level ' + level}</div>
+            <div class="income">${isLocked ? '' : '+' + getIncome(egg.id, level) + ' $HATCH/hr'}</div>
+            ${isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
+        `;
+        
+        card.addEventListener('click', () => {
+            if (!isLocked) showCreatureDetail(egg.id);
+        });
+        
+        grid.appendChild(card);
+    });
+
+    // Update progress stats
+    const unlockedCount = allEggs.filter(e => creatures[e.id]?.level > 0).length;
+    document.getElementById('unlocked-count').textContent = unlockedCount;
+    document.getElementById('unlock-percentage').textContent = Math.floor(unlockedCount / allEggs.length * 100);
+    
+    const totalIncome = allEggs.reduce((sum, e) => sum + (getIncome(e.id, creatures[e.id]?.level || 0)), 0);
+    document.getElementById('total-income').textContent = totalIncome;
+}
+
+
 
 
     // init
     loadGameState();
+    populateHatchScreen();
     loadBalanceFromBackend();
     document.getElementById('egg-name').textContent =  currentEgg.name + ' Egg';
     document.getElementById('egg-description').textContent = currentEgg.description;
