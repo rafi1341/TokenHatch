@@ -835,7 +835,7 @@
             </div>
         </div>
         <div class="detail-content">
-            <div class="detail-creature-display">
+            <div class="detail-creature-display" data-creature-id="">
                 <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
                 <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Creature</div>
                 <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 1/5</div>
@@ -865,130 +865,182 @@
         <button class="nav-btn" onclick="switchTab('profile')">👤<span class="nav-label">Me</span></button>
     </div>
 
-    <script>
-        // Configuration
-        const BOT_API = "https://telegrambot-or4r.onrender.com";
-        const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
+ <script>
+    // Configuration
+    const BOT_API = "https://telegrambot-or4r.onrender.com";
+    const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
 
-        // Get Telegram user ID
-     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
+    // Get Telegram user ID
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "test_user_123";
     console.log("User ID:", userId);
 
-        // Username generator function
-function generateUsername() {
-    const adjectives = ['Swift', 'Brave', 'Mighty', 'Silent', 'Fierce'];
-    const nouns = ['eagle', 'pegasus', 'Dragon', 'griffin', 'Phoenix'];
-    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit
-    return `${randomAdj}${randomNoun}#${randomNumber}`;
-}
+    // username generator (unchanged)
+    function generateUsername() {
+        const adjectives = ['Swift', 'Brave', 'Mighty', 'Silent', 'Fierce'];
+        const nouns = ['eagle', 'pegasus', 'Dragon', 'griffin', 'Phoenix'];
+        const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+        const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit
+        return `${randomAdj}${randomNoun}#${randomNumber}`;
+    }
 
-// Generate username for this user
+    let generatedUsername = generateUsername();
+    document.getElementById('home-username').textContent = '@' + generatedUsername;
 
-let generatedUsername = generateUsername();
+    const saved = localStorage.getItem(`gameState_${userId}`);
+    if (saved) {
+        const state = JSON.parse(saved);
+        if (state.username) generatedUsername = state.username;
+    } else {
+        generatedUsername = generateUsername();
+    }
+    document.querySelector('.logo').textContent = generatedUsername;
+    document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + generatedUsername;
 
-// Display in the UI
-document.getElementById('home-username').textContent = '@' + generatedUsername;
+    // Batching variables (unchanged)
+    let pendingTokens = 0;
+    let saveTimeout = null;
 
-const saved = localStorage.getItem(`gameState_${userId}`);
-if (saved) {
-    const state = JSON.parse(saved);
-    if (state.username) generatedUsername = state.username;  // <- restore saved username
-} else {
-    generatedUsername = generateUsername();  // only generate if no saved state
-}
-        
-// Update top-left logo or profile UI
-document.querySelector('.logo').textContent = generatedUsername;
-document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + generatedUsername;
+    // allEggs (unchanged)...
+    const allEggs = [
+        { id: 1, name: 'Chick',  eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: 'Soft warmth seeps through the fragile shell' },
+        { id: 2, name: 'Turtle', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: 'Heavy and calm, built to endure time' },
+        { id: 3, name: 'Lizard', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: 'A faint pulse hints at swift movement inside' },
+        { id: 4, name: 'Snake',  eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: 'Cold and silent, yet watching' },
+        { id: 5, name: 'Eagle',  eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: 'Light as air, humming with skybound energy' },
+        { id: 6, name: 'Dino', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: 'Ancient power sleeps beneath its surface' },
+        { id: 7, name: 'Dragon', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: 'Intense heat radiates from within' },
+        { id: 8, name: 'Unicorn',  eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description: 'A gentle glow of pure magic surrounds it' },
+        { id: 9, name: 'Phoenix', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 40000, hpPerTap: 10, description: 'Warmth rises and falls like a heartbeat' },
+        { id: 10, name: 'Griffin', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 55000, hpPerTap: 10, description: 'Strength and pride rest within' },
+        { id: 11, name: 'Pegasus',  eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 75000, hpPerTap: 10, description: 'It feels lighter than it should' },
+        { id: 12, name: 'Golem', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', requiredHP: 100000, hpPerTap: 10, description: 'Solid and unmoving, yet alive' },
+        { id: 13, name: 'Fairy',  eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', requiredHP: 150000, hpPerTap: 10, description: 'A soft hum fills the air around it' },
+        { id: 14, name: 'Hydra',  eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', requiredHP: 200000, hpPerTap: 10, description: 'Danger lingers beneath its shell' },
+        { id: 15, name: 'Cerberus', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', requiredHP: 300000, hpPerTap: 10, description: 'Dark energy coils within' },
+        { id: 16, name: 'Kraken', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', requiredHP: 500000, hpPerTap: 10, description: 'It vibrates with deep ocean force' },
+        { id: 17, name: 'Minotaur', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', requiredHP: 750000, hpPerTap: 10, description: 'Raw power presses against the shell' },
+        { id: 18, name: 'Sphinx', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', requiredHP: 1000000, hpPerTap: 10, description: 'Ancient wisdom watches silently' },
+        { id: 19, name: 'Chimera',  eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', requiredHP: 1500000, hpPerTap: 10, description: 'Chaos stirs in unpredictable patterns' },
+        { id: 20, name: 'Elemental',  eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', requiredHP: 2000000, hpPerTap: 10, description: 'Conflicting forces remain perfectly balanced' }
+    ];
 
-
-        // Batching variables
-        let pendingTokens = 0;
-        let saveTimeout = null;
-
-        // All 20 eggs database
-        const allEggs = [
-            { id: 1, name: 'Chick',  eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: 'Soft warmth seeps through the fragile shell' },
-            { id: 2, name: 'Turtle', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: 'Heavy and calm, built to endure time' },
-            { id: 3, name: 'Lizard', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: 'A faint pulse hints at swift movement inside' },
-            { id: 4, name: 'Snake',  eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: 'Cold and silent, yet watching' },
-            { id: 5, name: 'Eagle',  eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: 'Light as air, humming with skybound energy' },
-            { id: 6, name: 'Dino', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: 'Ancient power sleeps beneath its surface' },
-            { id: 7, name: 'Dragon', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: 'Intense heat radiates from within' },
-            { id: 8, name: 'Unicorn',  eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description: 'A gentle glow of pure magic surrounds it' },
-            { id: 9, name: 'Phoenix', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 40000, hpPerTap: 10, description: 'Warmth rises and falls like a heartbeat' },
-            { id: 10, name: 'Griffin', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 55000, hpPerTap: 10, description: 'Strength and pride rest within' },
-            { id: 11, name: 'Pegasus',  eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 75000, hpPerTap: 10, description: 'It feels lighter than it should' },
-            { id: 12, name: 'Golem', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', requiredHP: 100000, hpPerTap: 10, description: 'Solid and unmoving, yet alive' },
-            { id: 13, name: 'Fairy',  eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', requiredHP: 150000, hpPerTap: 10, description: 'A soft hum fills the air around it' },
-            { id: 14, name: 'Hydra',  eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', requiredHP: 200000, hpPerTap: 10, description: 'Danger lingers beneath its shell' },
-            { id: 15, name: 'Cerberus', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', requiredHP: 300000, hpPerTap: 10, description: 'Dark energy coils within' },
-            { id: 16, name: 'Kraken', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', requiredHP: 500000, hpPerTap: 10, description: 'It vibrates with deep ocean force' },
-            { id: 17, name: 'Minotaur', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', requiredHP: 750000, hpPerTap: 10, description: 'Raw power presses against the shell' },
-            { id: 18, name: 'Sphinx', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', requiredHP: 1000000, hpPerTap: 10, description: 'Ancient wisdom watches silently' },
-            { id: 19, name: 'Chimera',  eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', requiredHP: 1500000, hpPerTap: 10, description: 'Chaos stirs in unpredictable patterns' },
-            { id: 20, name: 'Elemental',  eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', requiredHP: 2000000, hpPerTap: 10, description: 'Conflicting forces remain perfectly balanced' }
-        ];
-
-        // Creatures that have been hatched
-  const creatures = {};
+    // Creatures that have been hatched (persistent object)
+    const creatures = {};
     let currentEgg = null;
     let currentEggIndex = 0;
     let selectedCreature = null;
 
-function loadGameState() {
-    const key = `gameState_${userId}`;
-    const s = localStorage.getItem(key);
+    // YOUR manual per-level config (you already provided - keep as-is)
+    const CREATURES_CONFIG = {
+      1: { levels: [{ income: 30, upgradeCost: 1000 }, { income: 50, upgradeCost: 2500 }, { income: 100, upgradeCost: 6000 }, { income: 160, upgradeCost: 10000 }, { income: 250, upgradeCost: null }] },
+      2: { levels: [{ income: 40, upgradeCost: 2000 }, { income: 70, upgradeCost: 5000 }, { income: 150, upgradeCost: 13000 }, { income: 300, upgradeCost: 24000 }, { income: 700, upgradeCost: null }] },
+      3: { levels: [{ income: 60, upgradeCost: 5000 }, { income: 160, upgradeCost: 12000 }, { income: 330, upgradeCost: 28000 }, { income: 900, upgradeCost: 50000 }, { income: 1500, upgradeCost: null }] },
+      4: { levels: [{ income: 90, upgradeCost: 7000 }, { income: 180, upgradeCost: 15000 }, { income: 320, upgradeCost: 35000 }, { income: 600, upgradeCost: 70000 }, { income: 1200, upgradeCost: null }] },
+      5: { levels: [{ income: 130, upgradeCost: 12000 }, { income: 250, upgradeCost: 28000 }, { income: 500, upgradeCost: 60000 }, { income: 900, upgradeCost: 120000 }, { income: 1800, upgradeCost: null }] },
+      6: { levels: [{ income: 180, upgradeCost: 18000 }, { income: 360, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 180000 }, { income: 2800, upgradeCost: null }] },
+      7: { levels: [{ income: 250, upgradeCost: 26000 }, { income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 120000 }, { income: 2000, upgradeCost: 240000 }, { income: 4000, upgradeCost: null }] },
+      8: { levels: [{ income: 350, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1500, upgradeCost: 180000 }, { income: 3000, upgradeCost: 360000 }, { income: 6000, upgradeCost: null }] },
+      9: { levels: [{ income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 280000 }, { income: 4000, upgradeCost: 560000 }, { income: 8000, upgradeCost: null }] },
+      10: { levels: [{ income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 220000 }, { income: 2800, upgradeCost: 440000 }, { income: 5600, upgradeCost: 880000 }, { income: 11200, upgradeCost: null }] },
+      11: { levels: [{ income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 300000 }, { income: 4000, upgradeCost: 600000 }, { income: 8000, upgradeCost: 1200000 }, { income: 16000, upgradeCost: null }] },
+      12: { levels: [{ income: 1500, upgradeCost: 220000 }, { income: 3000, upgradeCost: 450000 }, { income: 6000, upgradeCost: 900000 }, { income: 12000, upgradeCost: 1800000 }, { income: 24000, upgradeCost: null }] },
+      13: { levels: [{ income: 2200, upgradeCost: 350000 }, { income: 4400, upgradeCost: 700000 }, { income: 8800, upgradeCost: 1400000 }, { income: 17600, upgradeCost: 2800000 }, { income: 35200, upgradeCost: null }] },
+      14: { levels: [{ income: 3200, upgradeCost: 550000 }, { income: 6400, upgradeCost: 1100000 }, { income: 12800, upgradeCost: 2200000 }, { income: 25600, upgradeCost: 4400000 }, { income: 51200, upgradeCost: null }] },
+      15: { levels: [{ income: 4500, upgradeCost: 850000 }, { income: 9000, upgradeCost: 1700000 }, { income: 18000, upgradeCost: 3400000 }, { income: 36000, upgradeCost: 6800000 }, { income: 72000, upgradeCost: null }] },
+      16: { levels: [{ income: 6500, upgradeCost: 1300000 }, { income: 13000, upgradeCost: 2600000 }, { income: 26000, upgradeCost: 5200000 }, { income: 52000, upgradeCost: 10400000 }, { income: 104000, upgradeCost: null }] },
+      17: { levels: [{ income: 9000, upgradeCost: 2000000 }, { income: 18000, upgradeCost: 4000000 }, { income: 36000, upgradeCost: 8000000 }, { income: 72000, upgradeCost: 16000000 }, { income: 144000, upgradeCost: null }] },
+      18: { levels: [{ income: 13000, upgradeCost: 3000000 }, { income: 26000, upgradeCost: 6000000 }, { income: 52000, upgradeCost: 12000000 }, { income: 104000, upgradeCost: 24000000 }, { income: 208000, upgradeCost: null }] },
+      19: { levels: [{ income: 18000, upgradeCost: 4500000 }, { income: 36000, upgradeCost: 9000000 }, { income: 72000, upgradeCost: 18000000 }, { income: 144000, upgradeCost: 36000000 }, { income: 288000, upgradeCost: null }] },
+      20: { levels: [{ income: 25000, upgradeCost: 6500000 }, { income: 50000, upgradeCost: 13000000 }, { income: 100000, upgradeCost: 26000000 }, { income: 200000, upgradeCost: 52000000 }, { income: 400000, upgradeCost: null }] }
+    };
 
-    if (s) {
-        try {
-            const state = JSON.parse(s);
+    // Helper accessors
+    function getLevelData(id, level) {
+        const cfg = CREATURES_CONFIG[id];
+        if (!cfg) return { income: 0, upgradeCost: null };
+        const idx = Math.max(0, Math.min(cfg.levels.length - 1, level - 1));
+        return cfg.levels[idx];
+    }
+    function getIncome(id, level) {
+        return getLevelData(id, level).income || 0;
+    }
+    function getUpgradeCost(id, level) {
+        return getLevelData(id, level).upgradeCost ?? null;
+    }
 
-            // Merge saved creatures
-            if (state.creatures && typeof state.creatures === 'object') {
-                Object.assign(creatures, state.creatures);
+    // Load game state and normalize creatures to config
+    function loadGameState() {
+        const key = `gameState_${userId}`;
+        const s = localStorage.getItem(key);
+
+        if (s) {
+            try {
+                const state = JSON.parse(s);
+
+                // Merge saved creatures
+                if (state.creatures && typeof state.creatures === 'object') {
+                    Object.assign(creatures, state.creatures);
+                }
+
+                // Normalize each saved creature to current CREATURES_CONFIG
+                for (const idStr of Object.keys(creatures)) {
+                    const id = Number(idStr);
+                    const c = creatures[idStr];
+                    // keep totalEarned if present, otherwise 0
+                    c.totalEarned = c.totalEarned || 0;
+                    c.currentLevel = c.currentLevel || 1;
+                    c.maxLevel = 5;
+                    c.id = id;
+                    // populate image and name from allEggs
+                    const egg = allEggs.find(e => e.id === id);
+                    if (egg) {
+                        c.image = egg.creatureImg;
+                        c.name = egg.name;
+                    }
+                    // derive income and upgrade cost from config (single source of truth)
+                    c.currentIncome = getIncome(id, c.currentLevel);
+                    c.nextLevelIncome = c.currentLevel < c.maxLevel ? getIncome(id, c.currentLevel + 1) : c.currentIncome;
+                    c.upgradeCost = c.currentLevel < c.maxLevel ? getUpgradeCost(id, c.currentLevel) : null;
+                }
+
+                // Find the first unhatched egg
+                currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
+                if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
+
+                currentEgg = allEggs[currentEggIndex];
+                currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
+
+            } catch (err) {
+                console.error("Failed to parse saved game state, resetting to first egg.", err);
+                currentEggIndex = 0;
+                currentEgg = allEggs[0];
+                currentEgg.currentHP = 0;
             }
-
-            // Find the first unhatched egg
-            currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
-
-            // If all eggs hatched, start at the last one
-            if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
-
-            currentEgg = allEggs[currentEggIndex];
-            currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
-
-        } catch (err) {
-            console.error("Failed to parse saved game state, resetting to first egg.", err);
+        } else {
             currentEggIndex = 0;
             currentEgg = allEggs[0];
             currentEgg.currentHP = 0;
         }
-    } else {
-        // No saved state – new user
-        currentEggIndex = 0;
-        currentEgg = allEggs[0];
-        currentEgg.currentHP = 0;
+
+        // Update UI immediately
+        document.getElementById('main-egg').src = currentEgg.eggImg;
+        document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
+        document.getElementById('egg-description').textContent = currentEgg.description;
+        updateProgress();
+        setupEggImage();
     }
-
-    // Update UI immediately
-    document.getElementById('main-egg').src = currentEgg.eggImg;
-    document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
-    document.getElementById('egg-description').textContent = currentEgg.description;
-    updateProgress();
-    setupEggImage();
-}
-
-
 
     function saveGameState() {
         localStorage.setItem(`gameState_${userId}`, JSON.stringify({
-            currentEggIndex, currentHP: currentEgg.currentHP, creatures, username: generatedUsername
+            currentEggIndex,
+            currentHP: currentEgg.currentHP,
+            creatures,
+            username: generatedUsername
         }));
     }
 
+    // load balance from backend (unchanged)
     async function loadBalanceFromBackend() {
         const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
         if (unsaved > 0) {
@@ -1027,111 +1079,20 @@ function loadGameState() {
         } catch (e) { console.error(e); }
     }
 
-    function switchTab(t) {
-
-        document.querySelectorAll('.screen').forEach(s =>
-            s.classList.remove('active')
-        );
-
-        document.querySelectorAll('.nav-btn').forEach(b =>
-            b.classList.remove('active')
-        );
-    
-        const screen = document.getElementById(t + '-screen');
-        if (screen) screen.classList.add('active');
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const label = btn.querySelector('.nav-label');
-            if (!label) return;
-
-            const lt = label.textContent.toLowerCase();
-            if (
-                (t === 'home' && lt === 'home') ||
-                (t === 'hatch' && lt === 'hatch') ||
-                (t === 'tasks' && lt === 'tasks') ||
-                (t === 'airdrop' && lt === 'airdrop') ||
-                (t === 'profile' && lt === 'me')
-            ) {
-                btn.classList.add('active');
-            }
-        });
-    
-        if (t === 'hatch') renderCreaturesGrid();
-    }
-
-const eggEl = document.getElementById('main-egg');
-// offscreen canvas used for alpha hit testing
-const hitCanvas = document.createElement('canvas');
-const hitCtx = hitCanvas.getContext('2d');
-let eggLoaded = false;
-
-function setupEggImage() {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = currentEgg.eggImg;
-img.onload = () => {
-lastDrawnImage = img; // Use devicePixelRatio so mapping is crisp on high-DPI screens 
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    hitCanvas.width = Math.round(img.naturalWidth * dpr); 
-    hitCanvas.height = Math.round(img.naturalHeight * dpr); // reset transform and draw image scaled by dpr 
-    hitCtx.setTransform(dpr, 0, 0, dpr, 0, 0); hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
-    hitCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-    eggLoaded = true;
-};
-
-    img.onerror = () => {
-        eggLoaded = false;
-    };
-}
-function tapEgg(e) { 
-    currentEgg.currentHP += currentEgg.hpPerTap; 
-    const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); 
-    document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString(); 
-    syncBalanceDisplays(); pendingTokens += currentEgg.hpPerTap; localStorage.setItem(`unsaved_${userId}`, pendingTokens);
-    showFloatingText('+' + currentEgg.hpPerTap, e.clientX, e.clientY); updateProgress(); saveGameState(); 
-    const egg = document.getElementById('main-egg'); egg.style.transform = 'scale(0.9) rotate(-5deg)'; 
-    setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100); 
-    clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); 
-    pendingTokens = 0; } }, 2000); if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg(); } 
-        
-        eggEl.addEventListener('click', (e) => { if (!eggLoaded) { tapEgg(e); return; } 
-        const rect = eggEl.getBoundingClientRect(); 
-        const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width)); 
-        const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height)); 
-        if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return; 
-        const pixel = hitCtx.getImageData(x, y, 1, 1).data; 
-        if (pixel[3] > 20) tapEgg(e); });
-
-
-    window.addEventListener('beforeunload', () => {
-        if (pendingTokens > 0) {
-            navigator.sendBeacon(`${BOT_API}/update_tokens`, new Blob([JSON.stringify({
-                user_id: userId, tokens: pendingTokens, api_secret: API_SECRET
-            })], { type: 'application/json' }));
-        }
-    });
-
-    window.addEventListener('blur', () => {
-        if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
-    });
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden && pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
-    });
-
-    function updateProgress() {
-        const pct = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
-        document.getElementById('progress-bar').style.width = pct + '%';
-        document.getElementById('progress-percentage').textContent = Math.floor(pct) + '%';
-        document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
-        document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
-    }
-
+    // hatchEgg now uses CREATURES_CONFIG to create the creature object
     function hatchEgg() {
-        creatures[currentEgg.id] = {
-            id: currentEgg.id, name: currentEgg.name,
-            image: currentEgg.creatureImg, currentLevel: 1, maxLevel: 5,
-            currentIncome: 25, nextLevelIncome: 50, upgradeCost: 1000, totalEarned: 0
+        const id = currentEgg.id;
+        const level = 1;
+        creatures[id] = {
+            id,
+            name: currentEgg.name,
+            image: currentEgg.creatureImg,
+            currentLevel: level,
+            maxLevel: 5,
+            currentIncome: getIncome(id, level),
+            nextLevelIncome: getIncome(id, level + 1),
+            upgradeCost: getUpgradeCost(id, level),
+            totalEarned: 0
         };
         showHatchAnimation(currentEgg);
     }
@@ -1141,8 +1102,9 @@ function tapEgg(e) {
         document.getElementById('hatch-creature-img').src = egg.creatureImg;
         document.getElementById('hatch-title').textContent = `🎉 ${egg.name.toUpperCase()} HATCHED! 🎉`;
         document.getElementById('hatch-message').textContent = `${egg.name} has joined your collection!`;
+        const c = creatures[egg.id];
         document.getElementById('hatch-stat-name').textContent = egg.name;
-        document.getElementById('hatch-stat-income').textContent = '+25 $HATCH/hr';
+        document.getElementById('hatch-stat-income').textContent = `+${c.currentIncome} $HATCH/hr`;
         createConfetti();
         overlay.classList.add('active');
         setTimeout(() => {
@@ -1157,33 +1119,18 @@ function tapEgg(e) {
                 document.getElementById('egg-description').textContent = currentEgg.description;
                 updateProgress();
                 setupEggImage();
-            } else showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
+            } else {
+                showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
+            }
             saveGameState();
             updatePassiveIncome();
             switchTab('hatch');
         }, 3500);
     }
 
-    function createConfetti() {
-        const colors = ['#FFD700', '#FF69B4', '#00D68F', '#667eea', '#FF6347'];
-        const overlay = document.getElementById('hatch-overlay');
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const c = document.createElement('div');
-                c.className = 'confetti';
-                c.style.left = Math.random() * 100 + '%';
-                c.style.top = '-10px';
-                c.style.background = colors[Math.floor(Math.random() * colors.length)];
-                c.style.animationDelay = Math.random() * 0.5 + 's';
-                overlay.appendChild(c);
-                setTimeout(() => c.remove(), 3000);
-            }, i * 50);
-        }
-    }
-
     function updatePassiveIncome() {
         let total = 0;
-        Object.values(creatures).forEach(c => total += c.currentIncome);
+        Object.values(creatures).forEach(c => total += (c.currentIncome || 0));
         document.getElementById('passive-income').textContent = total;
     }
 
@@ -1210,7 +1157,7 @@ function tapEgg(e) {
         document.getElementById('unlocked-count').textContent = unlocked;
         document.getElementById('unlock-percentage').textContent = Math.floor((unlocked / 20) * 100);
         let totalInc = 0;
-        Object.values(creatures).forEach(c => totalInc += c.currentIncome);
+        Object.values(creatures).forEach(c => totalInc += (c.currentIncome || 0));
         document.getElementById('total-income').textContent = totalInc;
     }
 
@@ -1258,16 +1205,27 @@ function tapEgg(e) {
     function openCreatureDetail(id) {
         selectedCreature = creatures[id];
         if (!selectedCreature) return;
+
+        // Set the dataset for upgrade function reference
+        document.querySelector('.detail-creature-display').dataset.creatureId = id;
+        
         syncBalanceDisplays();
         document.getElementById('detail-creature-name').textContent =  selectedCreature.name;
         document.getElementById('detail-creature-title').textContent = selectedCreature.name;
         document.getElementById('detail-creature-img').src = selectedCreature.image;
         document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
         document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
-        document.getElementById('detail-total-earned').textContent = `${selectedCreature.totalEarned.toLocaleString()} $HATCH`;
-        document.getElementById('detail-upgrade-cost').textContent = `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`;
+        document.getElementById('detail-total-earned').textContent = `${(selectedCreature.totalEarned || 0).toLocaleString()} $HATCH`;
         document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
-        document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`;
+
+        // After upgrade production (the income of the level you would own after upgrading)
+        const nextLevel = Math.min(selectedCreature.currentLevel + 1, selectedCreature.maxLevel);
+        const nextIncome = getIncome(selectedCreature.id, nextLevel);
+        document.getElementById('detail-next-prod').textContent = `+${nextIncome} $HATCH/hr 📈`;
+
+        const upgradeCost = selectedCreature.currentLevel < selectedCreature.maxLevel ? getUpgradeCost(selectedCreature.id, selectedCreature.currentLevel) : null;
+        document.getElementById('detail-upgrade-cost').textContent = upgradeCost === null ? '—' : `${upgradeCost.toLocaleString()} $HATCH`;
+
         const upgradeBtn = document.querySelector('.upgrade-btn');
         if (selectedCreature.currentLevel >= selectedCreature.maxLevel) {
             upgradeBtn.disabled = true;
@@ -1301,26 +1259,46 @@ function tapEgg(e) {
         selectedCreature = null;
     }
 
-    function upgradeCreature() {
-        if (!selectedCreature) return;
-        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-        if (bal >= selectedCreature.upgradeCost) {
-            document.getElementById('hatch-balance').textContent = (bal - selectedCreature.upgradeCost).toLocaleString();
-            syncBalanceDisplays();
-            sendBatchToBackend(-selectedCreature.upgradeCost);
-            selectedCreature.currentLevel++;
-            selectedCreature.currentIncome = selectedCreature.nextLevelIncome;
-            selectedCreature.upgradeCost = Math.floor(selectedCreature.upgradeCost * 2.5);
-            selectedCreature.nextLevelIncome = Math.floor(selectedCreature.nextLevelIncome * 2);
-            saveGameState();
-            updatePassiveIncome();
-            showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
-            setTimeout(() => openCreatureDetail(selectedCreature.id), 500);
-        } else {
-            alert('❌ Not enough $HATCH!\n\nNeed: ' + selectedCreature.upgradeCost.toLocaleString() + '\nHave: ' + bal.toLocaleString());
-        }
+    // Upgrade logic: use CREATURES_CONFIG values (no multipliers)
+   function upgradeCreature() {
+    const detailDisplay = document.querySelector('.detail-creature-display');
+    const creatureId = detailDisplay.dataset.creatureId;
+    if (!creatureId) return;
+
+    const creature = creatures[creatureId];
+    if (!creature) return;
+
+    const currentCost = creature.currentLevel < creature.maxLevel ? getUpgradeCost(creature.id, creature.currentLevel) : null;
+    if (currentCost === null) return;
+
+    const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+    if (bal < currentCost) {
+        alert('❌ Not enough $HATCH!\n\nNeed: ' + currentCost.toLocaleString() + '\nHave: ' + bal.toLocaleString());
+        return;
     }
 
+    // Deduct balance
+    document.getElementById('hatch-balance').textContent = (bal - currentCost).toLocaleString();
+    syncBalanceDisplays();
+    sendBatchToBackend(-currentCost);
+
+    // Apply upgrade
+    creature.currentLevel++;
+    const lvl = creature.currentLevel;
+    creature.currentIncome = getIncome(creature.id, lvl);
+    creature.nextLevelIncome = lvl < creature.maxLevel ? getIncome(creature.id, lvl + 1) : creature.currentIncome;
+    creature.upgradeCost = lvl < creature.maxLevel ? getUpgradeCost(creature.id, lvl) : null;
+
+    saveGameState();
+    updatePassiveIncome();
+    showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
+
+    // Refresh detail panel
+    setTimeout(() => openCreatureDetail(creature.id), 500);
+}
+
+
+    // init
     loadGameState();
     loadBalanceFromBackend();
     document.getElementById('egg-name').textContent =  currentEgg.name + ' Egg';
@@ -1330,6 +1308,7 @@ function tapEgg(e) {
     updatePassiveIncome();
     setupEggImage();
 
+    // collected-amount filling is unchanged (keeps previous behaviour)
     setInterval(() => {
         const curr = parseInt(document.getElementById('collected-amount').textContent);
         const passiveInc = parseInt(document.getElementById('passive-income').textContent);
@@ -1337,6 +1316,6 @@ function tapEgg(e) {
             document.getElementById('collected-amount').textContent = curr + Math.max(1, Math.floor(passiveInc / 100));
         }
     }, 3000);
-    </script>
+</script>
 </body>
 </html>
