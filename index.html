@@ -835,7 +835,7 @@
             </div>
         </div>
         <div class="detail-content">
-            <div class="detail-creature-display" data-creature-id="">
+            <div class="detail-creature-display">
                 <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
                 <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Creature</div>
                 <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 1/5</div>
@@ -932,557 +932,340 @@
     let selectedCreature = null;
 
     // YOUR manual per-level config (you already provided - keep as-is)
-    const CREATURES_CONFIG = {
-      1: { levels: [{ income: 30, upgradeCost: 1000 }, { income: 50, upgradeCost: 2500 }, { income: 100, upgradeCost: 6000 }, { income: 160, upgradeCost: 10000 }, { income: 250, upgradeCost: null }] },
-      2: { levels: [{ income: 40, upgradeCost: 2000 }, { income: 70, upgradeCost: 5000 }, { income: 150, upgradeCost: 13000 }, { income: 300, upgradeCost: 24000 }, { income: 700, upgradeCost: null }] },
-      3: { levels: [{ income: 60, upgradeCost: 5000 }, { income: 160, upgradeCost: 12000 }, { income: 330, upgradeCost: 28000 }, { income: 900, upgradeCost: 50000 }, { income: 1500, upgradeCost: null }] },
-      4: { levels: [{ income: 90, upgradeCost: 7000 }, { income: 180, upgradeCost: 15000 }, { income: 320, upgradeCost: 35000 }, { income: 600, upgradeCost: 70000 }, { income: 1200, upgradeCost: null }] },
-      5: { levels: [{ income: 130, upgradeCost: 12000 }, { income: 250, upgradeCost: 28000 }, { income: 500, upgradeCost: 60000 }, { income: 900, upgradeCost: 120000 }, { income: 1800, upgradeCost: null }] },
-      6: { levels: [{ income: 180, upgradeCost: 18000 }, { income: 360, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 180000 }, { income: 2800, upgradeCost: null }] },
-      7: { levels: [{ income: 250, upgradeCost: 26000 }, { income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 120000 }, { income: 2000, upgradeCost: 240000 }, { income: 4000, upgradeCost: null }] },
-      8: { levels: [{ income: 350, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1500, upgradeCost: 180000 }, { income: 3000, upgradeCost: 360000 }, { income: 6000, upgradeCost: null }] },
-      9: { levels: [{ income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 280000 }, { income: 4000, upgradeCost: 560000 }, { income: 8000, upgradeCost: null }] },
-      10: { levels: [{ income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 220000 }, { income: 2800, upgradeCost: 440000 }, { income: 5600, upgradeCost: 880000 }, { income: 11200, upgradeCost: null }] },
-      11: { levels: [{ income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 300000 }, { income: 4000, upgradeCost: 600000 }, { income: 8000, upgradeCost: 1200000 }, { income: 16000, upgradeCost: null }] },
-      12: { levels: [{ income: 1500, upgradeCost: 220000 }, { income: 3000, upgradeCost: 450000 }, { income: 6000, upgradeCost: 900000 }, { income: 12000, upgradeCost: 1800000 }, { income: 24000, upgradeCost: null }] },
-      13: { levels: [{ income: 2200, upgradeCost: 350000 }, { income: 4400, upgradeCost: 700000 }, { income: 8800, upgradeCost: 1400000 }, { income: 17600, upgradeCost: 2800000 }, { income: 35200, upgradeCost: null }] },
-      14: { levels: [{ income: 3200, upgradeCost: 550000 }, { income: 6400, upgradeCost: 1100000 }, { income: 12800, upgradeCost: 2200000 }, { income: 25600, upgradeCost: 4400000 }, { income: 51200, upgradeCost: null }] },
-      15: { levels: [{ income: 4500, upgradeCost: 850000 }, { income: 9000, upgradeCost: 1700000 }, { income: 18000, upgradeCost: 3400000 }, { income: 36000, upgradeCost: 6800000 }, { income: 72000, upgradeCost: null }] },
-      16: { levels: [{ income: 6500, upgradeCost: 1300000 }, { income: 13000, upgradeCost: 2600000 }, { income: 26000, upgradeCost: 5200000 }, { income: 52000, upgradeCost: 10400000 }, { income: 104000, upgradeCost: null }] },
-      17: { levels: [{ income: 9000, upgradeCost: 2000000 }, { income: 18000, upgradeCost: 4000000 }, { income: 36000, upgradeCost: 8000000 }, { income: 72000, upgradeCost: 16000000 }, { income: 144000, upgradeCost: null }] },
-      18: { levels: [{ income: 13000, upgradeCost: 3000000 }, { income: 26000, upgradeCost: 6000000 }, { income: 52000, upgradeCost: 12000000 }, { income: 104000, upgradeCost: 24000000 }, { income: 208000, upgradeCost: null }] },
-      19: { levels: [{ income: 18000, upgradeCost: 4500000 }, { income: 36000, upgradeCost: 9000000 }, { income: 72000, upgradeCost: 18000000 }, { income: 144000, upgradeCost: 36000000 }, { income: 288000, upgradeCost: null }] },
-      20: { levels: [{ income: 25000, upgradeCost: 6500000 }, { income: 50000, upgradeCost: 13000000 }, { income: 100000, upgradeCost: 26000000 }, { income: 200000, upgradeCost: 52000000 }, { income: 400000, upgradeCost: null }] }
+    //const CREATURES_CONFIG = {
+     // 1: { levels: [{ income: 30, upgradeCost: 1000 }, { income: 50, upgradeCost: 2500 }, { income: 100, upgradeCost: 6000 }, { income: 160, upgradeCost: 10000 }, { income: 250, upgradeCost: null }] },
+     // 2: { levels: [{ income: 40, upgradeCost: 2000 }, { income: 70, upgradeCost: 5000 }, { income: 150, upgradeCost: 13000 }, { income: 300, upgradeCost: 24000 }, { income: 700, upgradeCost: null }] },
+     // 3: { levels: [{ income: 60, upgradeCost: 5000 }, { income: 160, upgradeCost: 12000 }, { income: 330, upgradeCost: 28000 }, { income: 900, upgradeCost: 50000 }, { income: 1500, upgradeCost: null }] },
+     // 4: { levels: [{ income: 90, upgradeCost: 7000 }, { income: 180, upgradeCost: 15000 }, { income: 320, upgradeCost: 35000 }, { income: 600, upgradeCost: 70000 }, { income: 1200, upgradeCost: null }] },
+    //  5: { levels: [{ income: 130, upgradeCost: 12000 }, { income: 250, upgradeCost: 28000 }, { income: 500, upgradeCost: 60000 }, { income: 900, upgradeCost: 120000 }, { income: 1800, upgradeCost: null }] },
+    //  6: { levels: [{ income: 180, upgradeCost: 18000 }, { income: 360, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 180000 }, { income: 2800, upgradeCost: null }] },
+     // 7: { levels: [{ income: 250, upgradeCost: 26000 }, { income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 120000 }, { income: 2000, upgradeCost: 240000 }, { income: 4000, upgradeCost: null }] },
+     // 8: { levels: [{ income: 350, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1500, upgradeCost: 180000 }, { income: 3000, upgradeCost: 360000 }, { income: 6000, upgradeCost: null }] },
+     // 9: { levels: [{ income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 280000 }, { income: 4000, upgradeCost: 560000 }, { income: 8000, upgradeCost: null }] },
+     // 10: { levels: [{ income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 220000 }, { income: 2800, upgradeCost: 440000 }, { income: 5600, upgradeCost: 880000 }, { income: 11200, upgradeCost: null }] },
+    //  11: { levels: [{ income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 300000 }, { income: 4000, upgradeCost: 600000 }, { income: 8000, upgradeCost: 1200000 }, { income: 16000, upgradeCost: null }] },
+   //   12: { levels: [{ income: 1500, upgradeCost: 220000 }, { income: 3000, upgradeCost: 450000 }, { income: 6000, upgradeCost: 900000 }, { income: 12000, upgradeCost: 1800000 }, { income: 24000, upgradeCost: null }] },
+   //   13: { levels: [{ income: 2200, upgradeCost: 350000 }, { income: 4400, upgradeCost: 700000 }, { income: 8800, upgradeCost: 1400000 }, { income: 17600, upgradeCost: 2800000 }, { income: 35200, upgradeCost: null }] },
+   //   14: { levels: [{ income: 3200, upgradeCost: 550000 }, { income: 6400, upgradeCost: 1100000 }, { income: 12800, upgradeCost: 2200000 }, { income: 25600, upgradeCost: 4400000 }, { income: 51200, upgradeCost: null }] },
+   //   15: { levels: [{ income: 4500, upgradeCost: 850000 }, { income: 9000, upgradeCost: 1700000 }, { income: 18000, upgradeCost: 3400000 }, { income: 36000, upgradeCost: 6800000 }, { income: 72000, upgradeCost: null }] },
+   //   16: { levels: [{ income: 6500, upgradeCost: 1300000 }, { income: 13000, upgradeCost: 2600000 }, { income: 26000, upgradeCost: 5200000 }, { income: 52000, upgradeCost: 10400000 }, { income: 104000, upgradeCost: null }] },
+    //  17: { levels: [{ income: 9000, upgradeCost: 2000000 }, { income: 18000, upgradeCost: 4000000 }, { income: 36000, upgradeCost: 8000000 }, { income: 72000, upgradeCost: 16000000 }, { income: 144000, upgradeCost: null }] },
+    //  18: { levels: [{ income: 13000, upgradeCost: 3000000 }, { income: 26000, upgradeCost: 6000000 }, { income: 52000, upgradeCost: 12000000 }, { income: 104000, upgradeCost: 24000000 }, { income: 208000, upgradeCost: null }] },
+   //   19: { levels: [{ income: 18000, upgradeCost: 4500000 }, { income: 36000, upgradeCost: 9000000 }, { income: 72000, upgradeCost: 18000000 }, { income: 144000, upgradeCost: 36000000 }, { income: 288000, upgradeCost: null }] },
+    //  20: { levels: [{ income: 25000, upgradeCost: 6500000 }, { income: 50000, upgradeCost: 13000000 }, { income: 100000, upgradeCost: 26000000 }, { income: 200000, upgradeCost: 52000000 }, { income: 400000, upgradeCost: null }] }
     };
+     
 
-    // Helper accessors
-    function getLevelData(id, level) {
-        const cfg = CREATURES_CONFIG[id];
-        if (!cfg) return { income: 0, upgradeCost: null };
-        const idx = Math.max(0, Math.min(cfg.levels.length - 1, level - 1));
-        return cfg.levels[idx];
-    }
-    function getIncome(id, level) {
-        return getLevelData(id, level).income || 0;
-    }
-    function getUpgradeCost(id, level) {
-        return getLevelData(id, level).upgradeCost ?? null;
-    }
+function loadGameState() {
+    const key = `gameState_${userId}`;
+    const s = localStorage.getItem(key);
+    if (s) {
+        try {
+            const state = JSON.parse(s);
 
-    // Load game state and normalize creatures to config
-    function loadGameState() {
-        const key = `gameState_${userId}`;
-        const s = localStorage.getItem(key);
 
-        if (s) {
-            try {
-                const state = JSON.parse(s);
-
-                // Merge saved creatures
-                if (state.creatures && typeof state.creatures === 'object') {
-                    Object.assign(creatures, state.creatures);
-                }
-
-                // Normalize each saved creature to current CREATURES_CONFIG
-                for (const idStr of Object.keys(creatures)) {
-                    const id = Number(idStr);
-                    const c = creatures[idStr];
-                    // keep totalEarned if present, otherwise 0
-                    c.totalEarned = c.totalEarned || 0;
-                    c.currentLevel = c.currentLevel || 1;
-                    c.maxLevel = 5;
-                    c.id = id;
-                    // populate image and name from allEggs
-                    const egg = allEggs.find(e => e.id === id);
-                    if (egg) {
-                        c.image = egg.creatureImg;
-                        c.name = egg.name;
-                    }
-                    // derive income and upgrade cost from config (single source of truth)
-                    c.currentIncome = getIncome(id, c.currentLevel);
-                    c.nextLevelIncome = c.currentLevel < c.maxLevel ? getIncome(id, c.currentLevel + 1) : c.currentIncome;
-                    c.upgradeCost = c.currentLevel < c.maxLevel ? getUpgradeCost(id, c.currentLevel) : null;
-                }
-
-                // Find the first unhatched egg
-                currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
-                if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
-
-                currentEgg = allEggs[currentEggIndex];
-                currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
-
-            } catch (err) {
-                console.error("Failed to parse saved game state, resetting to first egg.", err);
-                currentEggIndex = 0;
-                currentEgg = allEggs[0];
-                currentEgg.currentHP = 0;
+            // Merge saved creatures
+            if (state.creatures && typeof state.creatures === 'object') {
+                Object.assign(creatures, state.creatures);
             }
-        } else {
-            currentEggIndex = 0;
+                        // Find the first unhatched egg
+            currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
+                        // If all eggs hatched, start at the last one
+            if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
+
+
+            currentEgg = allEggs[currentEggIndex];
+            currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
+
+        } catch (err) {
+            console.error("Failed to parse saved game state, resetting to first egg.", err);
+                     currentEggIndex = 0;
             currentEgg = allEggs[0];
             currentEgg.currentHP = 0;
         }
-
-        // Update UI immediately
-        document.getElementById('main-egg').src = currentEgg.eggImg;
-        document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
-        document.getElementById('egg-description').textContent = currentEgg.description;
-        updateProgress();
-        setupEggImage();
+    } else {
+        // No saved state – new user
+        currentEggIndex = 0;
+        currentEgg = allEggs[0];
+        currentEgg.currentHP = 0;
     }
 
-    function saveGameState() {
-        localStorage.setItem(`gameState_${userId}`, JSON.stringify({
-            currentEggIndex,
-            currentHP: currentEgg.currentHP,
-            creatures,
-            username: generatedUsername
-        }));
-    }
-
-    // load balance from backend (unchanged)
-    async function loadBalanceFromBackend() {
-        const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
-        if (unsaved > 0) {
-            await sendBatchToBackend(unsaved);
-            localStorage.removeItem(`unsaved_${userId}`);
-        }
-        try {
-            const res = await fetch(`${BOT_API}/get_balance`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: userId, api_secret: API_SECRET })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                document.getElementById('hatch-balance').textContent = (data.balance || 0).toLocaleString();
-                syncBalanceDisplays();
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function sendBatchToBackend(amount) {
-        try {
-            const res = await fetch(`${BOT_API}/update_tokens`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: userId, tokens: amount, api_secret: API_SECRET })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.new_balance !== undefined) {
-                    document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString();
-                    syncBalanceDisplays();
-                }
-                localStorage.removeItem(`unsaved_${userId}`);
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    // hatchEgg now uses CREATURES_CONFIG to create the creature object
-function hatchEgg() {
-    if (!currentEgg) return;
-
-    const id = currentEgg.id;
-    const level = 1; // start at level 1
-    creatures[id] = {
-        id,
-        name: currentEgg.name,
-        image: currentEgg.creatureImg,
-        currentLevel: level,
-        maxLevel: CREATURES_CONFIG[id].levels.length,
-        currentIncome: getIncome(id, level),
-        nextLevelIncome: getIncome(id, level + 1),
-        upgradeCost: getUpgradeCost(id, level),
-        totalEarned: 0
-    };
-
-    selectedCreature = creatures[id]; // set as selected for detail view
-    showHatchAnimation(currentEgg);
-    updateHatchScreen(); // update UI in Hatch tab
+    // Update UI immediately
+    document.getElementById('main-egg').src = currentEgg.eggImg;
+    document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
+    document.getElementById('egg-description').textContent = currentEgg.description;
+    updateProgress();
+    setupEggImage();
 }
 
+   function saveGameState() {
+        localStorage.setItem(`gameState_${userId}`, JSON.stringify({
+            currentEggIndex, currentHP: currentEgg.currentHP, creatures, username: generatedUsername
 
-    function showHatchAnimation(egg) {
-        const overlay = document.getElementById('hatch-overlay');
+
+
+        }));
+    }
+ async function loadBalanceFromBackend() {
+        const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
+        if (unsaved > 0) {
+@@ -1027,111 +1079,20 @@
+        } catch (e) { console.error(e); }
+    }
+
+    function switchTab(t) {
+
+        document.querySelectorAll('.screen').forEach(s =>
+            s.classList.remove('active')
+        );
+
+        document.querySelectorAll('.nav-btn').forEach(b =>
+            b.classList.remove('active')
+        );
+    
+        const screen = document.getElementById(t + '-screen');
+        if (screen) screen.classList.add('active');
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const label = btn.querySelector('.nav-label');
+            if (!label) return;
+
+            const lt = label.textContent.toLowerCase();
+            if (
+                (t === 'home' && lt === 'home') ||
+                (t === 'hatch' && lt === 'hatch') ||
+                (t === 'tasks' && lt === 'tasks') ||
+                (t === 'airdrop' && lt === 'airdrop') ||
+                (t === 'profile' && lt === 'me')
+            ) {
+                btn.classList.add('active');
+            }
+        });
+    
+        if (t === 'hatch') renderCreaturesGrid();
+    }
+
+const eggEl = document.getElementById('main-egg');
+// offscreen canvas used for alpha hit testing
+const hitCanvas = document.createElement('canvas');
+const hitCtx = hitCanvas.getContext('2d');
+let eggLoaded = false;
+
+function setupEggImage() {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = currentEgg.eggImg;
+img.onload = () => {
+lastDrawnImage = img; // Use devicePixelRatio so mapping is crisp on high-DPI screens 
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    hitCanvas.width = Math.round(img.naturalWidth * dpr); 
+    hitCanvas.height = Math.round(img.naturalHeight * dpr); // reset transform and draw image scaled by dpr 
+    hitCtx.setTransform(dpr, 0, 0, dpr, 0, 0); hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
+    hitCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+    eggLoaded = true;
+};
+
+    img.onerror = () => {
+        eggLoaded = false;
+    };
+}
+function tapEgg(e) { 
+    currentEgg.currentHP += currentEgg.hpPerTap; 
+    const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); 
+    document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString(); 
+    syncBalanceDisplays(); pendingTokens += currentEgg.hpPerTap; localStorage.setItem(`unsaved_${userId}`, pendingTokens);
+    showFloatingText('+' + currentEgg.hpPerTap, e.clientX, e.clientY); updateProgress(); saveGameState(); 
+    const egg = document.getElementById('main-egg'); egg.style.transform = 'scale(0.9) rotate(-5deg)'; 
+    setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100); 
+    clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); 
+    pendingTokens = 0; } }, 2000); if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg(); } 
+        
+        eggEl.addEventListener('click', (e) => { if (!eggLoaded) { tapEgg(e); return; } 
+        const rect = eggEl.getBoundingClientRect(); 
+        const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width)); 
+        const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height)); 
+        if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return; 
+        const pixel = hitCtx.getImageData(x, y, 1, 1).data; 
+        if (pixel[3] > 20) tapEgg(e); });
+
+
+    window.addEventListener('beforeunload', () => {
+        if (pendingTokens > 0) {
+            navigator.sendBeacon(`${BOT_API}/update_tokens`, new Blob([JSON.stringify({
+                user_id: userId, tokens: pendingTokens, api_secret: API_SECRET
+            })], { type: 'application/json' }));
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); }
+    });
+
+    function updateProgress() {
+        const pct = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-percentage').textContent = Math.floor(pct) + '%';
+        document.getElementById('current-hp').textContent = currentEgg.currentHP.toLocaleString();
+        document.getElementById('required-hp').textContent = currentEgg.requiredHP.toLocaleString();
+    }
+
+    function hatchEgg() {
+        creatures[currentEgg.id] = {
+            id: currentEgg.id, name: currentEgg.name,
+            image: currentEgg.creatureImg, currentLevel: 1, maxLevel: 5,
+            currentIncome: 25, nextLevelIncome: 50, upgradeCost: 1000, totalEarned: 0
+
+
+
+
+
+
+
+
+        };
+        showHatchAnimation(currentEgg);
+    }
+@@ -1141,8 +1102,9 @@
         document.getElementById('hatch-creature-img').src = egg.creatureImg;
         document.getElementById('hatch-title').textContent = `🎉 ${egg.name.toUpperCase()} HATCHED! 🎉`;
         document.getElementById('hatch-message').textContent = `${egg.name} has joined your collection!`;
-        const c = creatures[egg.id];
+
         document.getElementById('hatch-stat-name').textContent = egg.name;
-        document.getElementById('hatch-stat-income').textContent = `+${c.currentIncome} $HATCH/hr`;
+        document.getElementById('hatch-stat-income').textContent = '+25 $HATCH/hr';
         createConfetti();
         overlay.classList.add('active');
         setTimeout(() => {
-            overlay.classList.remove('active');
-            currentEggIndex++;
-            if (currentEggIndex < allEggs.length) {
-                currentEgg = allEggs[currentEggIndex];
-                currentEgg.currentHP = 0;
-                const eggElement = document.getElementById('main-egg');
-                eggElement.src = currentEgg.eggImg;
-                document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
+@@ -1157,33 +1119,18 @@
                 document.getElementById('egg-description').textContent = currentEgg.description;
                 updateProgress();
                 setupEggImage();
-            } else {
-                showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
-            }
+            } else showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
+
+
             saveGameState();
             updatePassiveIncome();
             switchTab('hatch');
         }, 3500);
     }
 
+    function createConfetti() {
+        const colors = ['#FFD700', '#FF69B4', '#00D68F', '#667eea', '#FF6347'];
+        const overlay = document.getElementById('hatch-overlay');
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + '%';
+                c.style.top = '-10px';
+                c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDelay = Math.random() * 0.5 + 's';
+                overlay.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }, i * 50);
+        }
+    }
+
     function updatePassiveIncome() {
         let total = 0;
-        Object.values(creatures).forEach(c => total += (c.currentIncome || 0));
+        Object.values(creatures).forEach(c => total += c.currentIncome);
         document.getElementById('passive-income').textContent = total;
     }
 
-    function renderCreaturesGrid() {
-        const grid = document.getElementById('creatures-grid');
-        grid.innerHTML = '';
-        let unlocked = Object.keys(creatures).length;
-        allEggs.forEach((egg, i) => {
-            const card = document.createElement('div');
-            if (creatures[egg.id]) {
-                const c = creatures[egg.id];
-                card.className = 'creature-card';
-                card.onclick = () => openCreatureDetail(egg.id);
-                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name"> ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
-            } else if (i === currentEggIndex) {
-                card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${currentEgg.currentHP.toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
-            } else {
-                card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 Locked</div><div class="income">0/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
-            }
-            grid.appendChild(card);
-        });
+@@ -1210,7 +1157,7 @@
         document.getElementById('unlocked-count').textContent = unlocked;
         document.getElementById('unlock-percentage').textContent = Math.floor((unlocked / 20) * 100);
         let totalInc = 0;
-        Object.values(creatures).forEach(c => totalInc += (c.currentIncome || 0));
+        Object.values(creatures).forEach(c => totalInc += c.currentIncome);
         document.getElementById('total-income').textContent = totalInc;
     }
 
-    function showFloatingText(txt, x, y) {
-        const ft = document.createElement('div');
-        ft.className = 'float-text';
-        ft.textContent = txt;
-        ft.style.left = x + 'px';
-        ft.style.top = y + 'px';
-        document.body.appendChild(ft);
-        setTimeout(() => ft.remove(), 1000);
-    }
-
-    function collectIncome(btn) {
-        const amt = parseInt(document.getElementById('collected-amount').textContent);
-        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-        document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString();
-        syncBalanceDisplays();
-        document.getElementById('collected-amount').textContent = '0';
-        sendBatchToBackend(amt);
-        showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3);
-        const orig = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Collected! ✅';
-        btn.style.background = '#00d68f';
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = orig;
-            btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        }, 2000);
-    }
-
-    function showBonus() {
-        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-        document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString();
-        syncBalanceDisplays();
-        sendBatchToBackend(500);
-        showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3);
-    }
-
-    function showReferral() {
-        alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!');
-    }
-
+@@ -1258,16 +1205,27 @@
     function openCreatureDetail(id) {
         selectedCreature = creatures[id];
         if (!selectedCreature) return;
 
-        // Set the dataset for upgrade function reference
-        document.querySelector('.detail-creature-display').dataset.creatureId = id;
-        
+
+
+
         syncBalanceDisplays();
         document.getElementById('detail-creature-name').textContent =  selectedCreature.name;
         document.getElementById('detail-creature-title').textContent = selectedCreature.name;
         document.getElementById('detail-creature-img').src = selectedCreature.image;
         document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`;
         document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
-        document.getElementById('detail-total-earned').textContent = `${(selectedCreature.totalEarned || 0).toLocaleString()} $HATCH`;
+        document.getElementById('detail-total-earned').textContent = `${selectedCreature.totalEarned.toLocaleString()} $HATCH`;
+        document.getElementById('detail-upgrade-cost').textContent = `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`;
         document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`;
+        document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`;
 
-        // After upgrade production (the income of the level you would own after upgrading)
-        const nextLevel = Math.min(selectedCreature.currentLevel + 1, selectedCreature.maxLevel);
-        const nextIncome = getIncome(selectedCreature.id, nextLevel);
-        document.getElementById('detail-next-prod').textContent = `+${nextIncome} $HATCH/hr 📈`;
 
-        const upgradeCost = selectedCreature.currentLevel < selectedCreature.maxLevel ? getUpgradeCost(selectedCreature.id, selectedCreature.currentLevel) : null;
-        document.getElementById('detail-upgrade-cost').textContent = upgradeCost === null ? '—' : `${upgradeCost.toLocaleString()} $HATCH`;
+
+
+
+
+
 
         const upgradeBtn = document.querySelector('.upgrade-btn');
         if (selectedCreature.currentLevel >= selectedCreature.maxLevel) {
             upgradeBtn.disabled = true;
-            upgradeBtn.textContent = 'MAX LEVEL REACHED';
-            document.querySelector('.upgrade-header').textContent = '⭐ Maximum Level';
-        } else {
-            upgradeBtn.disabled = false;
-            upgradeBtn.textContent = 'UPGRADE NOW';
-            document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`;
-        }
-        document.getElementById('creature-detail').classList.add('active');
-    }
-
-    function syncBalanceDisplays() {
-        const mb = document.getElementById('hatch-balance').textContent;
-        const mp = document.getElementById('points-balance').textContent;
-        const db = document.getElementById('hatch-balance-detail');
-        const dp = document.getElementById('points-balance-detail');
-        const ph = document.getElementById('profile-hatch');
-        const pp = document.getElementById('profile-points');
-        const pc = document.getElementById('profile-creatures');
-        if (db) db.textContent = mb;
-        if (dp) dp.textContent = mp;
-        if (ph) ph.textContent = mb;
-        if (pp) pp.textContent = mp;
-        if (pc) pc.textContent = `${Object.keys(creatures).length}/20`;
-    }
-
-    function closeCreatureDetail() {
-        document.getElementById('creature-detail').classList.remove('active');
+@@ -1301,26 +1259,46 @@
         selectedCreature = null;
     }
 
-    // Upgrade logic: use CREATURES_CONFIG values (no multipliers)
-   function upgradeCreature() {
-    if (!selectedCreature) return;
-
-    const id = selectedCreature.id;
-    const currentLevel = selectedCreature.currentLevel;
-    const maxLevel = selectedCreature.maxLevel;
-
-    // Get upgrade cost
-    const currentCost = currentLevel < maxLevel ? getUpgradeCost(id, currentLevel) : null;
-    if (currentCost === null) return;
-
-    // Check balance
-    const balEl = document.getElementById('hatch-balance');
-    const bal = parseInt(balEl.textContent.replace(/,/g, ''));
-    if (bal < currentCost) {
-        alert(`❌ Not enough $HATCH!\n\nNeed: ${currentCost.toLocaleString()}\nHave: ${bal.toLocaleString()}`);
-        return;
-    }
-
-    // Deduct currency
-    balEl.textContent = (bal - currentCost).toLocaleString();
-    syncBalanceDisplays();
-    sendBatchToBackend(-currentCost);
-
-    // Upgrade creature
-    selectedCreature.currentLevel++;
-    const lvl = selectedCreature.currentLevel;
-    selectedCreature.currentIncome = getIncome(id, lvl);
-    selectedCreature.nextLevelIncome = lvl < maxLevel ? getIncome(id, lvl + 1) : selectedCreature.currentIncome;
-    selectedCreature.upgradeCost = lvl < maxLevel ? getUpgradeCost(id, lvl) : null;
-
-    saveGameState();
-    updatePassiveIncome();
-    showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
-
-    setTimeout(() => openCreatureDetail(id), 500);
-}
-
-    /* ------------------- MISSING HELPERS (paste after getUpgradeCost) ------------------- */
-
-function updateHatchScreen() {
-    // Refresh UI when hatch/upgrade happens
-    renderCreaturesGrid();
-    updatePassiveIncome();
-    // update collected and passive displays too
-    const totalInc = Object.values(creatures).reduce((s, c) => s + (c.currentIncome || 0), 0);
-    document.getElementById('passive-income').textContent = totalInc;
-    document.getElementById('total-income').textContent = totalInc;
-}
-
-/* Minimal egg click / image setup (keeps things simple & robust).
-   If you want the alpha hit-testing you had before, we can re-add it later. */
-let eggLoaded = false;
-function setupEggImage() {
-    const eggEl = document.getElementById('main-egg');
-    if (!eggEl) return;
-    eggLoaded = true; // simple flag
-
-    // prevent multiple listeners
-    eggEl.onclick = (e) => {
-        try { tapEgg(e); } catch (err) { console.error('tapEgg error', err); }
-    };
-}
-
-/* Basic tap logic that mirrors the old behavior:
-   - increases egg HP
-   - adds hpPerTap to balance
-   - batches pendingTokens to backend
-   - shows floating text and simple tap animation
-*/
-function tapEgg(e) {
-    if (!currentEgg) return;
-    const hpGain = currentEgg.hpPerTap || 1;
-    currentEgg.currentHP = (currentEgg.currentHP || 0) + hpGain;
-
-    // update local balance display and batching
-    const balEl = document.getElementById('hatch-balance');
-    const bal = parseInt(balEl.textContent.replace(/,/g, '')) || 0;
-    balEl.textContent = (bal + hpGain).toLocaleString();
-    syncBalanceDisplays();
-
-    // batch tokens to send later
-    pendingTokens = (parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0) + hpGain;
-    localStorage.setItem(`unsaved_${userId}`, pendingTokens);
-
-    // visual feedback
-    showFloatingText('+' + hpGain, e.clientX || (window.innerWidth/2), e.clientY || (window.innerHeight/2));
-    const egg = document.getElementById('main-egg');
-    if (egg) {
-        egg.style.transform = 'scale(0.95) rotate(-4deg)';
-        setTimeout(()=> egg.style.transform = 'scale(1) rotate(0deg)', 120);
-    }
-
-    // save & batch send after short delay
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-        if (pendingTokens > 0) {
-            // sendBatchToBackend is already defined in your file
-            sendBatchToBackend(pendingTokens).catch(()=>{/* ignore */});
-            pendingTokens = 0;
-            localStorage.removeItem(`unsaved_${userId}`);
+    function upgradeCreature() {
+        if (!selectedCreature) return;
+        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
+        if (bal >= selectedCreature.upgradeCost) {
+            document.getElementById('hatch-balance').textContent = (bal - selectedCreature.upgradeCost).toLocaleString();
+            syncBalanceDisplays();
+            sendBatchToBackend(-selectedCreature.upgradeCost);
+            selectedCreature.currentLevel++;
+            selectedCreature.currentIncome = selectedCreature.nextLevelIncome;
+            selectedCreature.upgradeCost = Math.floor(selectedCreature.upgradeCost * 2.5);
+            selectedCreature.nextLevelIncome = Math.floor(selectedCreature.nextLevelIncome * 2);
+            saveGameState();
+            updatePassiveIncome();
+            showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
+            setTimeout(() => openCreatureDetail(selectedCreature.id), 500);
+        } else {
+            alert('❌ Not enough $HATCH!\n\nNeed: ' + selectedCreature.upgradeCost.toLocaleString() + '\nHave: ' + bal.toLocaleString());
         }
-    }, 2000);
-
-    // progress UI and hatch trigger
-    updateProgress();
-    if (currentEgg.currentHP >= currentEgg.requiredHP) {
-        // ensure we don't double-hatch
-        currentEgg.currentHP = currentEgg.requiredHP;
-        hatchEgg();
     }
-}
-
-function updateProgress() {
-    if (!currentEgg) return;
-    const pct = Math.min((currentEgg.currentHP || 0) / (currentEgg.requiredHP || 1) * 100, 100);
-    const bar = document.getElementById('progress-bar');
-    if (bar) bar.style.width = pct + '%';
-    const pctText = document.getElementById('progress-percentage');
-    if (pctText) pctText.textContent = Math.floor(pct) + '%';
-    const cur = document.getElementById('current-hp');
-    const req = document.getElementById('required-hp');
-    if (cur) cur.textContent = (currentEgg.currentHP || 0).toLocaleString();
-    if (req) req.textContent = (currentEgg.requiredHP || 0).toLocaleString();
-}
-
-/* small confetti fallback so showHatchAnimation won't fail */
-function createConfetti() {
-    try {
-        const overlay = document.getElementById('hatch-overlay');
-        if (!overlay) return;
-        const colors = ['#FFD700','#FF69B4','#00D68F','#667eea','#FF6347'];
-        for (let i=0;i<20;i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = (5 + Math.random()*90) + '%';
-            c.style.top = (-10 - Math.random()*20) + 'px';
-            c.style.background = colors[Math.floor(Math.random()*colors.length)];
-            c.style.opacity = '0.95';
-            overlay.appendChild(c);
-            setTimeout(()=> c.remove(), 3000);
-        }
-    } catch (e) { console.error(e); }
-}
-
-/* ---------------------------------------------------------------------------------- */
-
-/* minimal switchTab - toggles screens + bottom nav active state */
-function switchTab(name) {
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(`${name}-screen`);
-    if (target) target.classList.add('active');
-
-    // bottom nav active style
-    document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => btn.classList.remove('active'));
-    const btnMap = {
-        home: 0, hatch: 1, tasks: 2, airdrop: 3, profile: 4
-    };
-    const idx = btnMap[name];
-    if (idx !== undefined) {
-        const btn = document.querySelectorAll('.bottom-nav .nav-btn')[idx];
-        if (btn) btn.classList.add('active');
-    }
-}
-
-     function populateHatchScreen() {
-    const grid = document.getElementById('creatures-grid');
-    grid.innerHTML = ''; // clear old content
-    
-    allEggs.forEach((egg, index) => {
-        const level = (creatures[egg.id]?.level) || 0; // 0 = locked
-        const isLocked = level === 0;
-        
-        const card = document.createElement('div');
-        card.className = `creature-card ${isLocked ? 'locked' : ''}`;
-        card.dataset.id = egg.id;
-        
-        card.innerHTML = `
-            <img src="${egg.creatureImg}" class="creature-image" alt="${egg.name}">
-            <div class="name">${egg.name}</div>
-            <div class="level">${isLocked ? 'Locked' : 'Level ' + level}</div>
-            <div class="income">${isLocked ? '' : '+' + getIncome(egg.id, level) + ' $HATCH/hr'}</div>
-            ${isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
-        `;
-        
-        card.addEventListener('click', () => {
-            if (!isLocked) showCreatureDetail(egg.id);
-        });
-        
-        grid.appendChild(card);
-    });
-
-    // Update progress stats
-    const unlockedCount = allEggs.filter(e => creatures[e.id]?.level > 0).length;
-    document.getElementById('unlocked-count').textContent = unlockedCount;
-    document.getElementById('unlock-percentage').textContent = Math.floor(unlockedCount / allEggs.length * 100);
-    
-    const totalIncome = allEggs.reduce((sum, e) => sum + (getIncome(e.id, creatures[e.id]?.level || 0)), 0);
-    document.getElementById('total-income').textContent = totalIncome;
-}
 
 
 
 
-    // init
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     loadGameState();
-    populateHatchScreen();
     loadBalanceFromBackend();
     document.getElementById('egg-name').textContent =  currentEgg.name + ' Egg';
-    document.getElementById('egg-description').textContent = currentEgg.description;
-    document.getElementById('main-egg').src = currentEgg.eggImg;
-    updateProgress();
+@@ -1330,13 +1308,14 @@
     updatePassiveIncome();
     setupEggImage();
 
-    // collected-amount filling is unchanged (keeps previous behaviour)
+
     setInterval(() => {
         const curr = parseInt(document.getElementById('collected-amount').textContent);
         const passiveInc = parseInt(document.getElementById('passive-income').textContent);
@@ -1490,6 +1273,6 @@ function switchTab(name) {
             document.getElementById('collected-amount').textContent = curr + Math.max(1, Math.floor(passiveInc / 100));
         }
     }, 3000);
-</script>
+    </script>
 </body>
 </html>
