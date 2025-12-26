@@ -305,8 +305,9 @@
         }
 
         .creature-image {
-            width: 80px;
-            height: 80px;
+             width: 100%;   /* takes 50% of the parent container width */
+             height: auto; /* keeps aspect ratio */
+             max-width: 350px;
             margin-bottom: 10px;
         }
 
