@@ -873,6 +873,7 @@
 
     // Get Telegram user ID
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString();
+    const isTelegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user?.id !== undefined;
     console.log("User ID:", userId);
 
 
@@ -990,6 +991,11 @@
     }
 
     async function loadBalanceFromBackend() {
+        if (!isTelegramUser) {
+    const savedBalance = localStorage.getItem(`balance_${userId}`) || '0';
+    document.getElementById('hatch-balance').textContent = parseInt(savedBalance).toLocaleString();
+    return;
+}
         const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
         if (unsaved > 0) {
             await sendBatchToBackend(unsaved);
@@ -999,18 +1005,29 @@
             const res = await fetch(`${BOT_API}/get_balance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: userId, api_secret: API_SECRET }) });
             if (res.ok) {
                 const data = await res.json();
+                const balance = data.balance || 0;
                 document.getElementById('hatch-balance').textContent = (data.balance || 0).toLocaleString();
+                localStorage.setItem(`balance_${userId}`, balance.toString());
                 syncBalanceDisplays();
             }
         } catch (e) { console.error(e); }
     }
 
     async function sendBatchToBackend(amount) {
+        if (!isTelegramUser) {
+        console.log("Demo mode - saving to localStorage only");
+        // Update localStorage balance
+        const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')) || 0;
+        localStorage.setItem(`balance_${userId}`, currentBalance.toString());
+        return;
+    }
         try {
             const res = await fetch(`${BOT_API}/update_tokens`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: userId, tokens: amount, api_secret: API_SECRET }) });
             if (res.ok) {
                 const data = await res.json();
-                if (data.new_balance !== undefined) { document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString(); syncBalanceDisplays(); }
+                if (data.new_balance !== undefined) { document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString(); 
+                localStorage.setItem(`balance_${userId}`, data.new_balance.toString());                                  
+                syncBalanceDisplays(); }
                 localStorage.removeItem(`unsaved_${userId}`);
             }
         } catch (e) { console.error(e); }
