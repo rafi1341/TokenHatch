@@ -1250,10 +1250,6 @@
     document.getElementById('next-timer').textContent = 
         remaining > 0 ? `${hours}h ${mins}m` : 'Full!';
 }
-// Track when the interval started
-let intervalStartTime = Date.now();
-let intervalStartAmount = parseInt(document.getElementById('collected-amount').textContent) || 0;
-
 setInterval(() => {
     const passiveInc = parseInt(document.getElementById('passive-income').textContent) || 0;
     if (passiveInc === 0) return;
@@ -1325,7 +1321,11 @@ loadBalanceFromBackend();
 updateProgress();
 updatePassiveIncome();
 setupEggImage();
-
+        
+// Track when the interval started
+let intervalStartTime = Date.now();
+let intervalStartAmount = parseInt(document.getElementById('collected-amount').textContent) || 0;
+        
 setInterval(updateCollectionTimer, 60000);
 updateCollectionTimer();
         
