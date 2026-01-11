@@ -1227,10 +1227,12 @@
     function showFloatingText(txt, x, y) { const ft = document.createElement('div'); ft.className = 'float-text'; ft.textContent = txt; ft.style.left = x + 'px'; ft.style.top = y + 'px'; document.body.appendChild(ft); setTimeout(() => ft.remove(), 1000); }
 
     function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; sendBatchToBackend(amt); // Reset collection timer
-const state = JSON.parse(localStorage.getItem(`gameState_${userId}`) || '{}');
-state.collectionStartTime = Date.now();
-state.collectedAmount = 0;
-localStorage.setItem(`gameState_${userId}`, JSON.stringify(state)); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
+   
+    const state = JSON.parse(localStorage.getItem(`gameState_${userId}`) || '{}');
+    state.collectionStartTime = Date.now();
+    state.collectedAmount = 0;
+    localStorage.setItem(`gameState_${userId}`, JSON.stringify(state)); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
+
     function updateCollectionTimer() {
     const saved = localStorage.getItem(`gameState_${userId}`);
     if (!saved) return;
@@ -1247,6 +1249,21 @@ localStorage.setItem(`gameState_${userId}`, JSON.stringify(state)); showFloating
     document.getElementById('next-timer').textContent = 
         remaining > 0 ? `${hours}h ${mins}m` : 'Full!';
 }
+        setInterval(() => {
+    const passiveInc = parseInt(document.getElementById('passive-income').textContent) || 0;
+    if (passiveInc === 0) return; // No income, nothing to collect
+    
+    const curr = parseInt(document.getElementById('collected-amount').textContent) || 0;
+    const maxCollectionHours = 8;
+    const collectionCap = passiveInc * maxCollectionHours;
+    
+    // Only increment if we haven't reached the 8-hour cap
+    if (curr < collectionCap) {
+        const incrementAmount = Math.max(1, Math.floor(passiveInc / 3600)); // Per second income
+        const newAmount = Math.min(curr + incrementAmount, collectionCap);
+        document.getElementById('collected-amount').textContent = newAmount;
+    }
+}, 1000); // Update every second
         
     function showBonus() { const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString(); syncBalanceDisplays(); sendBatchToBackend(500); showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3); }
 
