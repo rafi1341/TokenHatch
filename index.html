@@ -984,19 +984,18 @@
         document.getElementById('egg-description').textContent = currentEgg.description;
 
         // In loadGameState(), after loading state but before updateProgress()
-    if (state.lastActiveTime) {
+    // In loadGameState(), after loading state but before updateProgress()
+    if (s && state.lastActiveTime) {
         const now = Date.now();
         const offlineMs = now - state.lastActiveTime;
         const offlineHours = offlineMs / (1000 * 60 * 60);
-        const passiveIncome = calculateTotalPassiveIncome(); // create this helper
+        const passiveIncome = calculateTotalPassiveIncome();
         const earnedWhileAway = Math.floor(offlineHours * passiveIncome);
-    
-    if (earnedWhileAway > 0) {
-        // Add to collected amount instead of balance directly
-        const currentCollected = parseInt(document.getElementById('collected-amount').textContent);
-        document.getElementById('collected-amount').textContent = currentCollected + earnedWhileAway;
-            }
-        }
+        const maxCollectionHours = 8;
+        const collectionCap = passiveIncome * maxCollectionHours;
+        const potentialEarned = Math.min(earnedWhileAway, collectionCap);
+        document.getElementById('collected-amount').textContent = potentialEarned;
+    }
 
         const maxCollectionHours = 8;
        const collectionCap = passiveIncome * maxCollectionHours;
@@ -1007,10 +1006,18 @@
         
         updateProgress();
         setupEggImage();
+        updatePassiveIncome();
     }
 
     function saveGameState() {
-        localStorage.setItem(`gameState_${userId}`, JSON.stringify({ currentEggIndex, currentHP: currentEgg.currentHP, creatures, username: generatedUsername }));
+    localStorage.setItem(`gameState_${userId}`, JSON.stringify({ 
+        currentEggIndex, 
+        currentHP: currentEgg.currentHP, 
+        creatures, 
+        username: generatedUsername,
+        lastActiveTime: Date.now(),
+        collectionStartTime: Date.now()
+    }));
     }
 
     async function loadBalanceFromBackend() {
@@ -1179,7 +1186,6 @@
                 setupEggImage();
             } else showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
             saveGameState();
-            updatePassiveIncome();
             switchTab('hatch');
         }, 3500);
     }
