@@ -1226,7 +1226,8 @@
 
     function showFloatingText(txt, x, y) { const ft = document.createElement('div'); ft.className = 'float-text'; ft.textContent = txt; ft.style.left = x + 'px'; ft.style.top = y + 'px'; document.body.appendChild(ft); setTimeout(() => ft.remove(), 1000); }
 
-    function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; sendBatchToBackend(amt); // Reset collection timer
+    function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; intervalStartTime = Date.now();
+    intervalStartAmount = 0; sendBatchToBackend(amt); // Reset collection timer
    
     const state = JSON.parse(localStorage.getItem(`gameState_${userId}`) || '{}');
     state.collectionStartTime = Date.now();
@@ -1249,20 +1250,31 @@
     document.getElementById('next-timer').textContent = 
         remaining > 0 ? `${hours}h ${mins}m` : 'Full!';
 }
-        setInterval(() => {
+// Track when the interval started
+let intervalStartTime = Date.now();
+let intervalStartAmount = parseInt(document.getElementById('collected-amount').textContent) || 0;
+
+setInterval(() => {
     const passiveInc = parseInt(document.getElementById('passive-income').textContent) || 0;
-    if (passiveInc === 0) return; // No income, nothing to collect
+    if (passiveInc === 0) return;
     
-    const curr = parseInt(document.getElementById('collected-amount').textContent) || 0;
     const maxCollectionHours = 8;
     const collectionCap = passiveInc * maxCollectionHours;
     
-    // Only increment if we haven't reached the 8-hour cap
-    if (curr < collectionCap) {
-        const incrementAmount = Math.max(1, Math.floor(passiveInc / 3600)); // Per second income
-        const newAmount = Math.min(curr + incrementAmount, collectionCap);
-        document.getElementById('collected-amount').textContent = newAmount;
-    }
+    // Calculate how much time has passed since interval started (in hours)
+    const elapsedMs = Date.now() - intervalStartTime;
+    const elapsedHours = elapsedMs / (1000 * 60 * 60);
+    
+    // Calculate earned amount during this session
+    const earnedThisSession = Math.floor(elapsedHours * passiveInc);
+    
+    // Add to starting amount (which includes offline earnings)
+    const totalAmount = intervalStartAmount + earnedThisSession;
+    
+    // Cap at maximum
+    const cappedAmount = Math.min(totalAmount, collectionCap);
+    
+    document.getElementById('collected-amount').textContent = cappedAmount;
 }, 1000); // Update every second
         
     function showBonus() { const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString(); syncBalanceDisplays(); sendBatchToBackend(500); showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3); }
