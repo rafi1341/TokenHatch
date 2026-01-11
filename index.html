@@ -732,7 +732,7 @@
                 <div class="collection-label">Ready to Collect</div>
                 <div class="collection-amount">💰 <span id="collected-amount">0</span> $HATCH</div>
                 <button class="collect-btn" onclick="collectIncome(this)">Tap to Collect</button>
-                <div class="next-collection">Next: <span id="next-timer">2h 15m</span></div> 
+                <<div class="next-collection">Fills in: <span id="next-timer">8h 0m</span></div> 
             </div>
 
             <div class="section-title">Quick Actions</div>
@@ -982,6 +982,29 @@
         document.getElementById('main-egg').src = currentEgg.eggImg;
         document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
         document.getElementById('egg-description').textContent = currentEgg.description;
+
+        // In loadGameState(), after loading state but before updateProgress()
+    if (state.lastActiveTime) {
+        const now = Date.now();
+        const offlineMs = now - state.lastActiveTime;
+        const offlineHours = offlineMs / (1000 * 60 * 60);
+        const passiveIncome = calculateTotalPassiveIncome(); // create this helper
+        const earnedWhileAway = Math.floor(offlineHours * passiveIncome);
+    
+    if (earnedWhileAway > 0) {
+        // Add to collected amount instead of balance directly
+        const currentCollected = parseInt(document.getElementById('collected-amount').textContent);
+        document.getElementById('collected-amount').textContent = currentCollected + earnedWhileAway;
+            }
+        }
+
+        const maxCollectionHours = 8;
+       const collectionCap = passiveIncome * maxCollectionHours;
+       const potentialEarned = Math.min(earnedWhileAway, collectionCap);
+   
+   // Update collected amount (capped at 8 hours)
+       document.getElementById('collected-amount').textContent = potentialEarned;
+        
         updateProgress();
         setupEggImage();
     }
@@ -1172,6 +1195,11 @@
         Object.values(creatures).forEach(c => total += (c.currentIncome || 0)); 
         document.getElementById('passive-income').textContent = total;
     }
+    function calculateTotalPassiveIncome() {
+        let total = 0;
+        Object.values(creatures).forEach(c => total += (c.currentIncome || 0));
+        return total;
+    }
 
     function renderCreaturesGrid() {
         const grid = document.getElementById('creatures-grid'); grid.innerHTML = '';
@@ -1200,7 +1228,23 @@
     function showFloatingText(txt, x, y) { const ft = document.createElement('div'); ft.className = 'float-text'; ft.textContent = txt; ft.style.left = x + 'px'; ft.style.top = y + 'px'; document.body.appendChild(ft); setTimeout(() => ft.remove(), 1000); }
 
     function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; sendBatchToBackend(amt); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
-
+    function updateCollectionTimer() {
+    const saved = localStorage.getItem(`gameState_${userId}`);
+    if (!saved) return;
+    
+    const state = JSON.parse(saved);
+    const startTime = state.collectionStartTime || Date.now();
+    const maxMs = 8 * 60 * 60 * 1000;
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, maxMs - elapsed);
+    
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    
+    document.getElementById('next-timer').textContent = 
+        remaining > 0 ? `${hours}h ${mins}m` : 'Full!';
+}
+        
     function showBonus() { const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString(); syncBalanceDisplays(); sendBatchToBackend(500); showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3); }
 
     function showReferral() { alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!'); }
@@ -1250,13 +1294,9 @@ updateProgress();
 updatePassiveIncome();
 setupEggImage();
 
-setInterval(() => {
-    const curr = parseInt(document.getElementById('collected-amount').textContent);
-    const passiveInc = parseInt(document.getElementById('passive-income').textContent);
-    if (curr < passiveInc * 2) {
-        document.getElementById('collected-amount').textContent = curr + Math.max(1, Math.floor(passiveInc / 100));
-    }
-}, 3000);
+setInterval(updateCollectionTimer, 60000);
+updateCollectionTimer();
+        
     </script>
 </body>
 </html>
