@@ -960,9 +960,10 @@
     function loadGameState() {
         const key = `gameState_${userId}`;
         const s = localStorage.getItem(key);
+        let state = null;
         if (s) {
             try {
-                const state = JSON.parse(s);
+                state = JSON.parse(s);
                 if (state.creatures && typeof state.creatures === 'object') Object.assign(creatures, state.creatures);
                 currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
                 if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
@@ -996,14 +997,6 @@
         const potentialEarned = Math.min(earnedWhileAway, collectionCap);
         document.getElementById('collected-amount').textContent = potentialEarned;
     }
-
-        const maxCollectionHours = 8;
-       const collectionCap = passiveIncome * maxCollectionHours;
-       const potentialEarned = Math.min(earnedWhileAway, collectionCap);
-   
-   // Update collected amount (capped at 8 hours)
-       document.getElementById('collected-amount').textContent = potentialEarned;
-        
         updateProgress();
         setupEggImage();
         updatePassiveIncome();
@@ -1233,7 +1226,11 @@
 
     function showFloatingText(txt, x, y) { const ft = document.createElement('div'); ft.className = 'float-text'; ft.textContent = txt; ft.style.left = x + 'px'; ft.style.top = y + 'px'; document.body.appendChild(ft); setTimeout(() => ft.remove(), 1000); }
 
-    function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; sendBatchToBackend(amt); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
+    function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; sendBatchToBackend(amt); // Reset collection timer
+const state = JSON.parse(localStorage.getItem(`gameState_${userId}`) || '{}');
+state.collectionStartTime = Date.now();
+state.collectedAmount = 0;
+localStorage.setItem(`gameState_${userId}`, JSON.stringify(state)); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
     function updateCollectionTimer() {
     const saved = localStorage.getItem(`gameState_${userId}`);
     if (!saved) return;
