@@ -338,7 +338,7 @@
     </div>
 
     <!-- DETAIL OVERLAY -->
-    <div class="detail-screen" id="creature-detail">
+    <detail-screen id="creature-detail"> <!-- Fixed tag name -->
         <div class="detail-header">
             <button class="back-btn" onclick="closeCreatureDetail()">←</button>
             <span style="font-weight:bold; font-size:18px;" id="detail-creature-name">Creature</span>
@@ -363,7 +363,7 @@
                 <button class="upgrade-btn" id="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
             </div>
         </div>
-    </div>
+    </detail-screen> <!-- Fixed closing tag -->
 
     <!-- HATCH ANIMATION OVERLAY -->
     <div class="hatch-overlay" id="hatch-overlay">
@@ -440,7 +440,7 @@
         ];
 
         // ==========================================
-        // STATE MANAGEMENT (FIXED)
+        // STATE MANAGEMENT
         // ==========================================
         let state = {
             username: 'Player',
@@ -457,21 +457,21 @@
         let pendingTokens = 0;
 
         function loadState() {
-            const saved = localStorage.getItem(`eggGame_v3_${userId}`); // Changed key to v3 to force clean load if old was corrupt
+            const saved = localStorage.getItem(`eggGame_v4_${userId}`);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    // Merge saved data with default structure (safe update)
                     state.username = parsed.username || state.username;
                     state.balance = Number(parsed.balance) || 0;
                     state.points = Number(parsed.points) || 0;
                     state.currentEggIndex = Number(parsed.currentEggIndex) || 0;
                     state.currentEggHP = Number(parsed.currentEggHP) || 0;
                     state.creatures = parsed.creatures || {};
+                    
+                    // CRITICAL: Handle timestamps correctly for offline progress
                     state.lastCollectionTime = Number(parsed.lastCollectionTime) || Date.now();
                     state.lastDailyClaim = Number(parsed.lastDailyClaim) || 0;
 
-                    // Safety: ensure egg index is valid
                     if (state.currentEggIndex >= allEggs.length) state.currentEggIndex = allEggs.length - 1;
 
                     console.log("State loaded successfully");
@@ -490,7 +490,7 @@
         function saveState() {
             try {
                 state.lastSaveTime = Date.now();
-                localStorage.setItem(`eggGame_v3_${userId}`, JSON.stringify(state));
+                localStorage.setItem(`eggGame_v4_${userId}`, JSON.stringify(state));
             } catch (e) {
                 console.error("Save failed (Quota exceeded?)", e);
             }
@@ -498,7 +498,7 @@
 
         function resetGame() {
             if(confirm("Are you sure? This will delete all progress!")) {
-                localStorage.removeItem(`eggGame_v3_${userId}`);
+                localStorage.removeItem(`eggGame_v4_${userId}`);
                 location.reload();
             }
         }
@@ -512,22 +512,18 @@
             // 1 Second Game Loop
             setInterval(() => {
                 updatePassiveIncome();
-                // Note: We don't save here to avoid spamming storage, 
-                // we rely on event-based saves + a periodic backup
             }, 1000);
 
             // Auto-save backup every 15s
             setInterval(saveState, 15000);
 
-            // CRITICAL FIX: Save immediately when user leaves tab/app
+            // Save immediately when user leaves tab/app
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
-                    console.log("App hidden, saving state...");
                     saveState();
                 }
             });
 
-            // CRITICAL FIX: Save before unloading (Desktop mostly)
             window.addEventListener('beforeunload', () => {
                 saveState();
             });
@@ -552,12 +548,10 @@
             state.balance += tapValue;
             pendingTokens += tapValue;
 
-            // Visuals
             showFloatingText(`+${tapValue}`, e.clientX, e.clientY);
             
-            // Logic & IMMEDIATE SAVE
             updateUI();
-            saveState(); // Save on every click to be safe
+            saveState();
 
             if (state.currentEggHP >= egg.hp) {
                 hatchEgg();
@@ -592,25 +586,36 @@
                 state.currentEggIndex = allEggs.length - 1;
             }
             
-            saveState(); // Save after hatch
+            saveState();
             updateUI();
             switchTab('hatch');
         }
 
+        // ==========================================
+        // OFFLINE PASSIVE INCOME (FIXED)
+        // ==========================================
         function updatePassiveIncome() {
             const incomePerHour = calculateTotalIncome();
             const now = Date.now();
             const maxCap = incomePerHour * 8; 
             
+            // 1. Calculate time difference
+            // If lastCollectionTime is in the future (clock adjustment), use 0
             let elapsedMs = now - state.lastCollectionTime;
-            if (elapsedMs < 0) elapsedMs = 0; 
+            if (elapsedMs < 0) elapsedMs = 0;
 
+            // 2. Calculate earned amount based on real time elapsed
             let earned = Math.floor((elapsedMs / (1000 * 60 * 60)) * incomePerHour);
+            
+            // 3. Cap at max
             let displayAmount = Math.min(earned, maxCap);
             if (incomePerHour === 0) displayAmount = 0;
 
+            // 4. Update UI
             document.getElementById('collected-amount').textContent = displayAmount.toLocaleString();
             
+            // 5. Update Timer Text
+            // If earned is already capped, timer is 0. Otherwise, show remaining time to cap.
             let remainingMs = (8 * 60 * 60 * 1000) - elapsedMs;
             if (remainingMs < 0) remainingMs = 0;
             
@@ -625,7 +630,10 @@
         function collectIncome() {
             const incomePerHour = calculateTotalIncome();
             const now = Date.now();
+            
+            // Recalculate exactly what is available right now
             let elapsedMs = now - state.lastCollectionTime;
+            if (elapsedMs < 0) elapsedMs = 0;
             
             let earned = Math.floor((elapsedMs / (1000 * 60 * 60)) * incomePerHour);
             let maxCap = incomePerHour * 8;
@@ -634,10 +642,10 @@
             if (finalAmount > 0) {
                 state.balance += finalAmount;
                 pendingTokens += finalAmount;
-                state.lastCollectionTime = now; // Reset timer
+                state.lastCollectionTime = now; // Reset timer to NOW
                 
                 updateUI();
-                saveState(); // Save immediately on collect
+                saveState();
                 showToast(`Collected ${finalAmount.toLocaleString()} $HATCH`);
                 
                 syncToBackend(); 
@@ -712,7 +720,7 @@
             pendingTokens -= nextStats.cost;
             myCreature.level++;
             
-            saveState(); // Save immediately
+            saveState();
             updateUI();
             openCreatureDetail(id); 
             showToast("Upgrade Successful!");
