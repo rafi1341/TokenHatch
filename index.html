@@ -440,7 +440,7 @@
         ];
 
         // ==========================================
-        // STATE MANAGEMENT
+        // STATE MANAGEMENT (FIXED)
         // ==========================================
         let state = {
             username: 'Player',
@@ -450,27 +450,87 @@
             currentEggHP: 0,
             creatures: {}, // { id: { level: 1, earned: 0 } }
             lastCollectionTime: Date.now(), // Timestamp for 8h timer
-            lastSaveTime: Date.now() // Timestamp for general save
+            lastDailyClaim: 0,
+            lastSaveTime: Date.now()
         };
 
         let pendingTokens = 0;
-        let saveInterval = null;
+
+        function loadState() {
+            const saved = localStorage.getItem(`eggGame_v3_${userId}`); // Changed key to v3 to force clean load if old was corrupt
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Merge saved data with default structure (safe update)
+                    state.username = parsed.username || state.username;
+                    state.balance = Number(parsed.balance) || 0;
+                    state.points = Number(parsed.points) || 0;
+                    state.currentEggIndex = Number(parsed.currentEggIndex) || 0;
+                    state.currentEggHP = Number(parsed.currentEggHP) || 0;
+                    state.creatures = parsed.creatures || {};
+                    state.lastCollectionTime = Number(parsed.lastCollectionTime) || Date.now();
+                    state.lastDailyClaim = Number(parsed.lastDailyClaim) || 0;
+
+                    // Safety: ensure egg index is valid
+                    if (state.currentEggIndex >= allEggs.length) state.currentEggIndex = allEggs.length - 1;
+
+                    console.log("State loaded successfully");
+                } catch (e) { 
+                    console.error("Save file corrupted, resetting.", e); 
+                }
+            } else {
+                // New User
+                state.username = "Hero" + Math.floor(Math.random() * 9999);
+                state.lastCollectionTime = Date.now();
+                console.log("New user created");
+            }
+            updateUI();
+        }
+
+        function saveState() {
+            try {
+                state.lastSaveTime = Date.now();
+                localStorage.setItem(`eggGame_v3_${userId}`, JSON.stringify(state));
+            } catch (e) {
+                console.error("Save failed (Quota exceeded?)", e);
+            }
+        }
+
+        function resetGame() {
+            if(confirm("Are you sure? This will delete all progress!")) {
+                localStorage.removeItem(`eggGame_v3_${userId}`);
+                location.reload();
+            }
+        }
 
         // ==========================================
         // INITIALIZATION
         // ==========================================
         function initGame() {
             loadState();
-            updateUI();
             
-            // 1 Second Game Loop (Passive Income & Save)
+            // 1 Second Game Loop
             setInterval(() => {
                 updatePassiveIncome();
-                if(pendingTokens > 0) syncToBackend();
+                // Note: We don't save here to avoid spamming storage, 
+                // we rely on event-based saves + a periodic backup
             }, 1000);
 
-            // Auto-save every 10s
-            setInterval(saveState, 10000);
+            // Auto-save backup every 15s
+            setInterval(saveState, 15000);
+
+            // CRITICAL FIX: Save immediately when user leaves tab/app
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    console.log("App hidden, saving state...");
+                    saveState();
+                }
+            });
+
+            // CRITICAL FIX: Save before unloading (Desktop mostly)
+            window.addEventListener('beforeunload', () => {
+                saveState();
+            });
 
             // Setup Image Fallbacks
             document.querySelectorAll('img').forEach(img => {
@@ -480,42 +540,10 @@
             });
         }
 
-        function loadState() {
-            const saved = localStorage.getItem(`eggGame_${userId}`);
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                    
-                    // Safety Check: Ensure currentEggIndex isn't out of bounds
-                    if (state.currentEggIndex >= allEggs.length) state.currentEggIndex = allEggs.length - 1;
-                } catch (e) { console.error("Save file corrupted, resetting."); }
-            } else {
-                // New User
-                state.username = "Hero" + Math.floor(Math.random() * 9999);
-            }
-            
-            // Try to get balance from backend if available
-            syncFromBackend();
-        }
-
-        function saveState() {
-            state.lastSaveTime = Date.now();
-            localStorage.setItem(`eggGame_${userId}`, JSON.stringify(state));
-        }
-
-        function resetGame() {
-            if(confirm("Are you sure? This will delete all progress!")) {
-                localStorage.removeItem(`eggGame_${userId}`);
-                location.reload();
-            }
-        }
-
         // ==========================================
         // CORE GAMEPLAY
         // ==========================================
         
-        // 1. Clicking the Egg
         function tapEgg(e) {
             const egg = allEggs[state.currentEggIndex];
             const tapValue = 10; 
@@ -527,26 +555,23 @@
             // Visuals
             showFloatingText(`+${tapValue}`, e.clientX, e.clientY);
             
-            // Logic
+            // Logic & IMMEDIATE SAVE
             updateUI();
-            saveState();
+            saveState(); // Save on every click to be safe
 
             if (state.currentEggHP >= egg.hp) {
                 hatchEgg();
             }
         }
 
-        // 2. Hatching Logic
         function hatchEgg() {
             const egg = allEggs[state.currentEggIndex];
             
-            // Add to collection
             state.creatures[egg.id] = {
                 level: 1,
                 earned: 0
             };
 
-            // Show Overlay
             const overlay = document.getElementById('hatch-overlay');
             document.getElementById('hatch-creature-img').src = egg.creatureImg;
             document.getElementById('hatch-stat-name').textContent = egg.name;
@@ -555,49 +580,37 @@
             document.getElementById('hatch-stat-income').textContent = `+${baseInc}/hr`;
             
             overlay.classList.add('active');
-
-            // Pause game logic while showing overlay
         }
 
         function finishHatching() {
             document.getElementById('hatch-overlay').classList.remove('active');
-            
-            // Move to next egg
             state.currentEggIndex++;
             state.currentEggHP = 0;
             
-            // Check if finished all eggs
             if (state.currentEggIndex >= allEggs.length) {
-                showToast("🎉 All Creatures Hatched! Keep farming for upgrades.");
-                state.currentEggIndex = allEggs.length - 1; // Stay on last one
+                showToast("🎉 All Creatures Hatched!");
+                state.currentEggIndex = allEggs.length - 1;
             }
             
+            saveState(); // Save after hatch
             updateUI();
-            saveState();
             switchTab('hatch');
         }
 
-        // 3. Passive Income (The 8h Cap Logic)
         function updatePassiveIncome() {
             const incomePerHour = calculateTotalIncome();
             const now = Date.now();
-            const maxCap = incomePerHour * 8; // 8 hours max storage
+            const maxCap = incomePerHour * 8; 
             
-            // Calculate time passed since last collection
             let elapsedMs = now - state.lastCollectionTime;
-            if (elapsedMs < 0) elapsedMs = 0; // Clock check fix
+            if (elapsedMs < 0) elapsedMs = 0; 
 
-            // Calculate earned amount
             let earned = Math.floor((elapsedMs / (1000 * 60 * 60)) * incomePerHour);
-            
-            // Cap it
             let displayAmount = Math.min(earned, maxCap);
             if (incomePerHour === 0) displayAmount = 0;
 
-            // Update UI
             document.getElementById('collected-amount').textContent = displayAmount.toLocaleString();
             
-            // Update Timer Text
             let remainingMs = (8 * 60 * 60 * 1000) - elapsedMs;
             if (remainingMs < 0) remainingMs = 0;
             
@@ -605,7 +618,6 @@
             const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
             document.getElementById('next-timer').textContent = (remainingMs > 0) ? `${hours}h ${mins}m` : "FULL";
 
-            // Enable/Disable Button
             const btn = document.getElementById('collect-btn');
             btn.disabled = displayAmount <= 0;
         }
@@ -622,13 +634,12 @@
             if (finalAmount > 0) {
                 state.balance += finalAmount;
                 pendingTokens += finalAmount;
-                state.lastCollectionTime = now;
+                state.lastCollectionTime = now; // Reset timer
                 
                 updateUI();
-                saveState();
+                saveState(); // Save immediately on collect
                 showToast(`Collected ${finalAmount.toLocaleString()} $HATCH`);
                 
-                // Trigger visual sync
                 syncToBackend(); 
             }
         }
@@ -660,7 +671,6 @@
             const currentStats = config.levels[currentLvlIdx];
             const nextStats = config.levels[currentLvlIdx + 1];
 
-            // Populate UI
             document.getElementById('detail-creature-img').src = egg.creatureImg;
             document.getElementById('detail-creature-name').textContent = egg.name;
             document.getElementById('detail-creature-title').textContent = egg.name;
@@ -675,7 +685,6 @@
                 document.getElementById('detail-next-prod').textContent = `+${nextStats.inc}/hr`;
                 document.getElementById('detail-upgrade-cost').textContent = `${nextStats.cost.toLocaleString()} $HATCH`;
                 btn.disabled = state.balance < nextStats.cost;
-                btn.textContent = "UPGRADE NOW";
                 btn.onclick = () => upgradeCreature(id);
             } else {
                 document.getElementById('detail-next-prod').textContent = "MAX LEVEL";
@@ -699,16 +708,13 @@
                 return;
             }
 
-            // Pay
             state.balance -= nextStats.cost;
             pendingTokens -= nextStats.cost;
-            
-            // Upgrade
             myCreature.level++;
             
-            saveState();
+            saveState(); // Save immediately
             updateUI();
-            openCreatureDetail(id); // Refresh detail view
+            openCreatureDetail(id); 
             showToast("Upgrade Successful!");
         }
 
@@ -720,7 +726,6 @@
                 const card = document.createElement('div');
                 
                 if (state.creatures[egg.id]) {
-                    // Owned
                     const lvl = state.creatures[egg.id].level;
                     const inc = CREATURES_CONFIG[egg.id].levels[lvl-1].inc;
                     card.className = 'creature-card';
@@ -732,7 +737,6 @@
                     `;
                     card.onclick = () => openCreatureDetail(egg.id);
                 } else if (idx === state.currentEggIndex) {
-                    // Current Egg
                     card.className = 'creature-card locked';
                     card.innerHTML = `
                         <img src="${egg.eggImg}" class="creature-image">
@@ -741,7 +745,6 @@
                         <div style="font-size:11px; margin-top:4px;">${(state.currentEggHP||0).toLocaleString()}/${egg.hp.toLocaleString()}</div>
                     `;
                 } else {
-                    // Future Egg
                     card.className = 'creature-card locked';
                     card.innerHTML = `
                         <img src="${egg.eggImg}" class="creature-image">
@@ -753,7 +756,6 @@
                 grid.appendChild(card);
             });
 
-            // Update Header Stats
             document.getElementById('unlocked-count').textContent = Object.keys(state.creatures).length;
             document.getElementById('total-income').textContent = calculateTotalIncome().toLocaleString();
         }
@@ -786,7 +788,6 @@
             document.getElementById('profile-points').textContent = state.points.toLocaleString();
             document.getElementById('profile-creatures').textContent = `${Object.keys(state.creatures).length}/20`;
 
-            // Hatch Screen (if active)
             if (document.getElementById('hatch-screen').classList.contains('active')) {
                 renderCreaturesGrid();
             }
@@ -798,7 +799,6 @@
             
             document.getElementById(`${tabName}-screen`).classList.add('active');
             
-            // Highlight nav
             const navMap = { 'home':0, 'hatch':1, 'tasks':2, 'profile':3 };
             const navBtns = document.querySelectorAll('.nav-btn');
             if (navBtns[navMap[tabName]]) navBtns[navMap[tabName]].classList.add('active');
@@ -811,18 +811,16 @@
             updateUI();
         }
 
-        // Floating Text Animation
         function showFloatingText(text, x, y) {
             const el = document.createElement('div');
             el.className = 'float-text';
             el.textContent = text;
-            el.style.left = (x - 20) + 'px'; // Center roughly
+            el.style.left = (x - 20) + 'px'; 
             el.style.top = (y - 20) + 'px';
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
-        // Toast Notification System
         function showToast(msg, type='info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -837,7 +835,6 @@
             }, 2500);
         }
 
-        // Quick Actions
         function claimDailyBonus() {
             const now = Date.now();
             const lastClaim = state.lastDailyClaim || 0;
@@ -857,38 +854,15 @@
         }
         
         function showReferral() {
-            showToast("Referral link copied to clipboard!");
+            showToast("Referral link copied!");
         }
 
-        // ==========================================
-        // BACKEND SYNC (Safe Mode)
-        // ==========================================
-        async function syncToBackend() {
-            if (pendingTokens === 0) return;
-            
-            // In a real app, this sends data to your Render bot
-            // For this standalone, we simulate a sync attempt
-            try {
-                // const res = await fetch(`${BOT_API}/update_tokens`, { ... });
-                // if (res.ok) pendingTokens = 0;
-                
-                // Offline Safety: If fetch fails, we just keep pendingTokens
-                // and maybe save to localStorage again.
-            } catch (e) {
-                // Silent fail - game continues offline
-                console.log("Backend sync failed, working offline.");
-            }
-        }
-        
-        async function syncFromBackend() {
-            // Placeholder to load initial balance from server if needed
-            // Currently we rely on state loaded from localStorage
+        function syncToBackend() {
+            // Placeholder for backend logic
         }
 
-        // Start Game
         window.onload = initGame;
         
-        // Bind Click Event for Egg (Delegation)
         document.getElementById('main-egg').addEventListener('pointerdown', (e) => {
             tapEgg(e);
         });
