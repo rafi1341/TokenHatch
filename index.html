@@ -2,20 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Egg Clicker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Egg Clicker Mini App</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
+        /* --- RESET & BASE STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #111; }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -24,1312 +16,883 @@
             flex-direction: column;
         }
 
-        #app-container {
-            flex: 1;              /* fill remaining space */
-            position: relative;    /* for absolute-positioned screens */
-            overflow: hidden;      /* optional */
-        }
-
+        /* --- LAYOUT --- */
+        #app-container { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Top Bar */
         .top-bar {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px 20px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(10px);
+            z-index: 50;
+            flex-shrink: 0;
+            height: 50px;
         }
 
-        .logo {
-            font-size: 15px;
-            font-weight: bold;
-        }
+        .logo { font-size: 14px; font-weight: 700; opacity: 0.9; }
+        .balance-display { display: flex; gap: 12px; font-size: 12px; font-weight: 600; }
 
-        .balance-display {
-            display: flex;
-            gap: 15px;
-            font-size: 14px;
-        }
-
-        /* Add top margin/padding for non-home screens */
-#hatch-screen,
-#tasks-screen,
-#airdrop-screen,
-#profile-screen {
-    padding-top: 40px; /* adjust this value as needed */
-}
-
-
-.content {
-    flex: 1;
-    overflow-y: hidden; /* only inner screens scroll */
-    padding-top: 0;     /* remove any extra padding */
-    position: relative; /* for absolute positioning of screens if needed */
-}
-
-.screen {
-    display: none;
-    position: absolute;  /* fill the container */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 20px;       /* optional */
-    padding-bottom: calc(var(--bottom-nav-h) + 16px);
-    overflow-y: auto;
-}
-.screen.active {
-    display: block;
-}
-
-
-
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .passive-income-display {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 15px;
-        }
-
-        .egg-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .egg-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .egg-description {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 0px;
-            
-            line-height: 1.4;
-        }
-
-        .egg-container {
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto; /* Scrollable area */
             position: relative;
-            display: inline-block;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            scroll-behavior: smooth;
+            padding-bottom: 80px; /* Space for nav */
         }
 
-        .egg-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            pointer-events: none;
+        /* Screens */
+        .screen {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
-        }
-
-.egg-image {
-    width: 90%;   /* takes 50% of the parent container width */
-    height: auto; /* keeps aspect ratio */
-    max-width: 350px; /* optional: limit max size */
-    position: relative;
-    z-index: 2;
-    cursor: pointer;
-    transition: transform 0.1s;
-    user-select: none;
-    background: transparent; 
-    will-change: transform; 
-    -webkit-tap-highlight-color: transparent;
-}
+        /* --- COMPONENTS --- */
         
+        /* Egg Card */
         .egg-card {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 24px;
-    padding: 24px;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.35),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-
-        .progress-bar-container {
-            width: 100%;
-            height: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 0px 0;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
         }
 
+        .egg-name { font-size: 20px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .egg-description { font-size: 13px; opacity: 0.7; margin-bottom: 15px; line-height: 1.4; min-height: 40px; }
+
+        .egg-container { position: relative; display: inline-block; margin: 10px auto; }
+        .egg-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
+        }
+        
+        .egg-image {
+            width: 200px; height: 200px;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.05s;
+            user-select: none;
+            position: relative; z-index: 2;
+        }
+        .egg-image:active { transform: scale(0.95); }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%; height: 26px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 13px;
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+        }
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #00d68f 0%, #00b8a9 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: width 0.3s;
+            width: 0%;
+            transition: width 0.2s ease-out;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
+        .progress-text { font-size: 12px; margin-top: 5px; opacity: 0.8; }
 
-        .progress-text {
-            text-align: center;
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 15px;
-        }
-
+        /* Collection Box */
         .collection-box {
             background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 25px;
+            padding: 15px; border-radius: 18px;
+            text-align: center; margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .collection-label {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-bottom: 8px;
-        }
-
-        .collection-amount {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
+        .collection-label { font-size: 12px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .collection-amount { font-size: 28px; font-weight: 800; margin: 10px 0; color: #ffd700; }
         .collect-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+            border: none; color: white;
+            padding: 12px 30px; border-radius: 50px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.4);
+            transition: transform 0.1s;
         }
+        .collect-btn:active { transform: scale(0.95); }
+        .collect-btn:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
+        .next-collection { font-size: 11px; opacity: 0.5; margin-top: 8px; }
 
-        .next-collection {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 10px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 25px 0 15px 0;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: white;
-            padding: 15px 10px;
-            border-radius: 15px;
-            font-size: 28px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .action-label {
-            font-size: 12px;
-        }
-
-        .daily-streak {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-        }
-
+        /* Grids */
         .creatures-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
         }
-
         .creature-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 15px;
+            text-align: center; position: relative;
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
+        .creature-card:not(.locked):hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255,255,255,0.2); }
+        .creature-card.locked { opacity: 0.5; filter: grayscale(0.8); }
+        
+        .creature-image { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; }
+        .c-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+        .c-level { font-size: 11px; opacity: 0.7; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; }
+        .c-income { font-size: 12px; color: #00d68f; margin-top: 5px; font-weight: 600; }
 
-        .creature-card:not(.locked):hover {
-            transform: scale(1.05);
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1); border: none; color: white;
+            padding: 12px 5px; border-radius: 12px; font-size: 20px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
+        .action-label { font-size: 10px; font-weight: bold; opacity: 0.7; }
 
-        .creature-card.locked {
-            opacity: 0.6;
-            cursor: not-allowed;
+        /* Bottom Nav */
+        :root { --bottom-nav-h: 70px; }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: var(--bottom-nav-h);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(15px);
+            display: flex; justify-content: space-around;
+            align-items: center; z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
-
-        .lock-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 40px;
-            pointer-events: none;
-        }
-
-        .creature-image {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 10px;
-        }
-
-        .creature-card .name {
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        .creature-card .level {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .creature-card .income {
-            font-size: 14px;
-            color: #00d68f;
-            margin-top: 5px;
-        }
-
-        .task-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .task-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .task-reward {
-            font-size: 13px;
-            color: #00d68f;
-        }
-
-        .task-btn {
-            background: #667eea;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .creature-display {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .upgrade-section {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-:root {
-    --bottom-nav-h: 68px;
-}
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-nav-h);
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
-    background: rgba(0,0,0,.5);
-    backdrop-filter: blur(10px);
-    z-index: 150;
-    pointer-events: auto;
-}
-
-
         .nav-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 15px;
+            background: none; border: none; color: rgba(255,255,255,0.5);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 20px; cursor: pointer; padding: 10px; transition: color 0.2s;
         }
+        .nav-btn.active { color: #fff; }
+        .nav-label { font-size: 10px; font-weight: 600; }
 
-        .nav-btn.active {
-            color: white;
+        /* Detail Overlay */
+        .detail-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 200; display: none; flex-direction: column;
+            padding-bottom: var(--bottom-nav-h);
         }
-
-        .nav-label {
-            font-size: 11px;
-        }
-
-.float-text {
-    position: fixed;
-
-    font-size: 22px;          /* slightly bigger */
-    font-weight: 900;         /* force heavy */
-    letter-spacing: -0.2px;   /* tighter = thicker */
-    
-    color: #ffffff;
-    opacity: 1;
-
-    text-shadow:
-        0 2px 6px rgba(0,0,0,0.6),
-        0 0 1px rgba(0,0,0,0.8); /* micro-outline */
-
-    pointer-events: none;
-    animation: floatUp 700ms ease-out forwards;
-    z-index: 1000;
-}
-
-
-        @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
-        }
-
-.detail-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 60px; /* leave space for bottom nav */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    z-index: 100;
-    display: none;
-    flex-direction: column;
-    animation: slideIn 0.3s;
-}
-
-.detail-screen.active {
-    display: flex;
-}
-
-
-        .detail-screen.active {
-            display: flex;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
+        .detail-screen.active { display: flex; animation: slideIn 0.3s forwards; }
+        @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .detail-header {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0,0,0,0.2);
         }
+        .back-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .detail-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .upgrade-section { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; margin-top: 20px; }
+        .upgrade-btn { width: 100%; background: #00d68f; border: none; color: #004d40; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 15px; cursor: pointer; }
+        .upgrade-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
 
-        .detail-header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        /* Hatch Overlay */
+        .hatch-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92); z-index: 300;
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column; padding: 20px; text-align: center;
         }
+        .hatch-overlay.active { display: flex; animation: fadeIn 0.5s; }
+        
+        .hatch-creature-reveal { width: 200px; height: 200px; object-fit: contain; animation: bounceIn 1s; margin: 20px auto; }
+        @keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        .back-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
+        /* --- EFFECTS & UTILS --- */
+        .float-text {
+            position: fixed; pointer-events: none;
+            font-size: 24px; font-weight: 900;
+            color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            animation: floatUp 800ms ease-out forwards; z-index: 500;
         }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(1.2); opacity: 0; } }
 
-        .detail-title {
-            font-size: 20px;
-            font-weight: bold;
+        /* Toast Notification */
+        .toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px; }
+        .toast {
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            color: white; padding: 12px 20px; border-radius: 12px;
+            font-size: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease-out forwards;
         }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .detail-content {
-             flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            
-        }
+        /* Stats Row */
+        .stats-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        .stats-row:last-child { border-bottom: none; }
 
-        .detail-creature-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .detail-creature-image {
-            width: 150px;
-            height: 150px;
-        }
-
-        .detail-stats {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-
-        .upgrade-header {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .upgrade-arrow {
-            text-align: center;
-            font-size: 30px;
-            margin: 15px 0;
-        }
-
-        .cost-badge {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .upgrade-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            bottom: 10px;   
-        }
-
-        .upgrade-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-.hatch-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 200;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    overflow-y: auto; /* allow scrolling if content is taller than viewport */
-}
-
-.hatch-overlay.active {
-    display: flex;
-    animation: fadeIn 0.5s;
-}
-
-.hatch-animation-content {
-    text-align: center;
-    max-width: 90vw;   /* never exceed viewport width */
-    max-height: 90vh;  /* never exceed viewport height */
-    padding: 20px;
-    overflow-y: auto;  /* scroll if content too tall */
-}
-
-.hatch-creature-reveal {
-    width: 80%;        /* responsive width */
-    max-width: 250px;  /* keep original max */
-    height: auto;      /* scale proportionally */
-    max-height: 40vh;  /* responsive max height */
-    margin: 30px auto;
-    animation: hatchReveal 1.5s ease-out;
-}
-
-
-        @keyframes hatchReveal {
-            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
-            50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .hatch-title {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            animation: slideDown 0.8s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .hatch-message {
-            font-size: 18px;
-            opacity: 0.9;
-            margin-bottom: 30px;
-            animation: fadeIn 1s ease-out 0.5s both;
-        }
-
-        .hatch-stats {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px auto;
-            max-width: 300px;
-            animation: fadeIn 1s ease-out 1s both;
-        }
-
-        .hatch-stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .hatch-stat-item:last-child {
-            border-bottom: none;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ffd700;
-            animation: confettiFall 3s linear;
-        }
-
-        @keyframes confettiFall {
-            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
     </style>
 </head>
 <body>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Header -->
     <div class="top-bar">
-        <div class="logo">
-    <span id="home-username"></span>
-</div>
+        <div class="logo">@<span id="home-username">Loading...</span></div>
         <div class="balance-display">
-            <div>💰 <span id="hatch-balance">0</span> $HATCH</div>
-            <div>💎 <span id="points-balance">0</span> Points</div>
+            <div>💰 <span id="hatch-balance">0</span></div>
+            <div>💎 <span id="points-balance">0</span></div>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="content">
+        
+        <!-- HOME SCREEN -->
         <div id="home-screen" class="screen active">
-
-            <div class="passive-income-display">
-                📈 Passive Income: +<span id="passive-income">0</span> $HATCH/hr
-            </div>
-    
-            <div class="egg-display">
-
-                <!-- ONE unified card -->
-                <div class="egg-card">
-
-                <div class="egg-name">
-                    <span id="egg-name">Chick Egg</span>
-                </div>
-
-                 <div class="egg-description">
-                    <span id="egg-description">Description</span>
-                </div>
-
+            <div class="egg-card">
+                <div class="egg-name" id="egg-name">Egg</div>
+                <div class="egg-description" id="egg-description">Description</div>
+                
                 <div class="egg-container">
                     <div class="egg-glow"></div>
-                    <img
-                    src="assets/eggs/egg_chick.png"
-                    class="egg-image"
-                    id="main-egg"
-                    alt="Egg"
-                    draggable="false"
-                >
-            </div>
+                    <img src="" class="egg-image" id="main-egg" alt="Egg">
+                </div>
 
-
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar" style="width: 0%;">
-                    <span id="progress-percentage">0%</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"><span id="progress-percentage">0%</span></div>
+                </div>
+                <div class="progress-text">
+                    <span id="current-hp">0</span> / <span id="required-hp">1000</span> HP
                 </div>
             </div>
 
-            <div class="progress-text">
-                <span id="current-hp">0</span> /
-                <span id="required-hp">1000</span> HP
+            <div class="collection-box">
+                <div class="collection-label">Farm Income</div>
+                <div class="collection-amount">💰 <span id="collected-amount">0</span></div>
+                <button class="collect-btn" id="collect-btn" onclick="collectIncome()">Collect</button>
+                <div class="next-collection">Max capacity in: <span id="next-timer">8h 0m</span></div>
             </div>
 
-                </div>
-            </div>
-
-          <div class="collection-box">
-                <div class="collection-label">Ready to Collect</div>
-                <div class="collection-amount">💰 <span id="collected-amount">0</span> $HATCH</div>
-                <button class="collect-btn" onclick="collectIncome(this)">Tap to Collect</button>
-                <<div class="next-collection">Fills in: <span id="next-timer">8h 0m</span></div> 
-            </div>
-
-            <div class="section-title">Quick Actions</div>
+            <div class="section-title" style="font-size: 14px; opacity:0.7; margin-bottom:10px; text-transform: uppercase;">Quick Actions</div>
             <div class="quick-actions">
                 <button class="action-btn" onclick="switchTab('tasks')">🎯<div class="action-label">Tasks</div></button>
-                <button class="action-btn" onclick="showBonus()">🎁<div class="action-label">Bonus</div></button>
+                <button class="action-btn" onclick="claimDailyBonus()">🎁<div class="action-label">Bonus</div></button>
                 <button class="action-btn" onclick="showReferral()">👥<div class="action-label">Refer</div></button>
                 <button class="action-btn" onclick="switchTab('hatch')">🥚<div class="action-label">Hatch</div></button>
             </div>
+        </div>
 
-            <div class="daily-streak">🏆 Daily Streak: <strong>1 day</strong> 🔥</div>
-        </div>   
-            
-     </div>
-           
-
+        <!-- HATCH SCREEN -->
         <div id="hatch-screen" class="screen">
-            <div class="section-title">🥚 Your Collection</div>
-            <div style="opacity: 0.8; margin-bottom: 20px; font-size: 13px;">
-                Progress: <strong><span id="unlocked-count">0</span>/20</strong> Unlocked (<span id="unlock-percentage">0</span>%)<br>
-                Total Income: <strong>+<span id="total-income">0</span> $HATCH/hr</strong>
+            <div style="text-align:center; margin-bottom:20px;">
+                <h2 style="font-size: 22px;">🥚 Collection</h2>
+                <div style="font-size:13px; opacity:0.7;">
+                    Unlocked: <strong><span id="unlocked-count">0</span>/20</strong> &bull; 
+                    Income: <strong style="color:#00d68f;">+<span id="total-income">0</span>/hr</strong>
+                </div>
             </div>
             <div class="creatures-grid" id="creatures-grid"></div>
         </div>
 
+        <!-- TASKS SCREEN -->
         <div id="tasks-screen" class="screen">
-            <div class="section-title">📋 Earn More</div>
-            <div style="opacity: 0.8; margin-bottom: 20px;">Available Tasks: <strong>24</strong></div>
-            <div class="task-card" style="background: rgba(255, 107, 107, 0.2);">
-                <div class="task-info">
-                    <div class="task-title">🔥 FEATURED: Complete Survey</div>
-                    <div class="task-reward">Reward: 50 Points 💎</div>
-                    <div style="font-size: 12px; opacity: 0.7;">Time: ~5 minutes</div>
+            <h2 style="margin-bottom:20px;">📋 Tasks</h2>
+            <div class="task-card" style="background:rgba(255,255,255,0.1); padding:15px; border-radius:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:bold;">🔥 Featured Survey</div>
+                    <div style="font-size:12px; color:#00d68f;">+50 Points</div>
                 </div>
-                <button class="task-btn">START →</button>
+                <button class="action-btn" style="width:auto; padding:10px 20px; border-radius:10px; font-size:14px;" onclick="showToast('Feature coming soon!')">START</button>
             </div>
-            <div class="section-title" style="font-size: 16px; margin-top: 30px;">Quick Tasks (1-2 min)</div>
-            <div class="task-card">
-                <div class="task-info">
-                    <div class="task-title">📱 Follow on Twitter</div>
-                    <div class="task-reward">+50 $HATCH 🥚</div>
+            
+            <div style="font-size:14px; margin:20px 0 10px; opacity:0.7;">Social Tasks</div>
+            <div class="task-card" style="background:rgba(255,255,255,0.1); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:bold;">🐦 Follow Twitter</div>
+                    <div style="font-size:12px; color:#00d68f;">+50 $HATCH</div>
                 </div>
-                <button class="task-btn">DO IT</button>
-            </div>
-            <div class="task-card">
-                <div class="task-info">
-                    <div class="task-title">💬 Join Telegram Group</div>
-                    <div class="task-reward">+100 $HATCH 🥚</div>
-                </div>
-                <button class="task-btn">DO IT</button>
+                <button class="action-btn" style="width:auto; padding:10px 20px; border-radius:10px; font-size:14px;" onclick="showToast('Link opening...')">DO IT</button>
             </div>
         </div>
 
-        <div id="airdrop-screen" class="screen">
-            <div class="section-title">🎁 Airdrop Allocation</div>
-            <div class="creature-display">
-                <div style="opacity: 0.8;">🗓️ Airdrop Date: June 1, 2026</div>
-                <div style="font-size: 14px; opacity: 0.6; margin-bottom: 20px;">⏳ Time remaining: 168 days</div>
-                <div class="collection-amount" style="margin: 20px 0;">Estimated: 0 $HATCH</div>
-                <div style="font-size: 18px;">Your Rank: <strong>#-</strong></div>
-            </div>
-        </div>
-
+        <!-- PROFILE SCREEN -->
         <div id="profile-screen" class="screen">
-            <div class="section-title">👤 Profile</div>
-            <div class="creature-display">
-                <div style="font-size: 60px; margin: 20px 0;">👤</div>
-                <div style="font-size: 20px; font-weight: bold;">@username</div>
-                <div style="opacity: 0.6; margin-top: 5px;">Member since: Dec 2024</div>
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="width:80px; height:80px; background:rgba(255,255,255,0.2); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:40px;">👤</div>
+                <h2 id="profile-username">@username</h2>
+                <div style="font-size:12px; opacity:0.6;">Member since: <span id="join-date">Dec 2024</span></div>
             </div>
+            
             <div class="upgrade-section">
-                <div class="stats-row"><span>💰 $HATCH Balance:</span><span id="profile-hatch">0</span></div>
+                <div class="stats-row"><span>💰 Balance:</span><span id="profile-hatch">0</span></div>
                 <div class="stats-row"><span>💎 Points:</span><span id="profile-points">0</span></div>
-                <div class="stats-row" style="border-bottom: none;">
-                <span>🥚 Creatures Owned:</span>
-                <span id="profile-creatures">0/20</span>
-                </div> 
+                <div class="stats-row" style="border:none;"><span>🥚 Creatures:</span><span id="profile-creatures">0/20</span></div>
             </div>
+            
+            <button class="collect-btn" style="background:#333; font-size:14px; padding:10px; margin-top:10px;" onclick="resetGame()">⚠️ Reset Progress</button>
         </div>
-     </div>
 
-    <div class="hatch-overlay" id="hatch-overlay">
-        <div class="hatch-animation-content">
-            <div class="hatch-title" id="hatch-title">🎉 HATCHED! 🎉</div>
-            <img src="" class="hatch-creature-reveal" id="hatch-creature-img" alt="Creature">
-            <div class="hatch-message" id="hatch-message">A new creature has joined your collection!</div>
-            <div class="hatch-stats" id="hatch-stats">
-                <div class="hatch-stat-item"><span>Creature:</span><span id="hatch-stat-name">-</span></div>
-                <div class="hatch-stat-item"><span>Income:</span><span id="hatch-stat-income" style="color: #00d68f;">+0 $HATCH/hr</span></div>
-            </div>
-        </div>
     </div>
 
+    <!-- DETAIL OVERLAY -->
     <div class="detail-screen" id="creature-detail">
         <div class="detail-header">
-            <div class="detail-header-left">
-                <button class="back-btn" onclick="closeCreatureDetail()">←</button>
-                <div class="detail-title" id="detail-creature-name">Creature</div>
-            </div>
-            <div class="balance-display">
-                <div>💰 <span id="hatch-balance-detail">0</span> $HATCH</div>
-                <div>💎 <span id="points-balance-detail">0</span> Points</div>
-            </div>
+            <button class="back-btn" onclick="closeCreatureDetail()">←</button>
+            <span style="font-weight:bold; font-size:18px;" id="detail-creature-name">Creature</span>
+            <div style="width:36px;"></div> <!-- spacer -->
         </div>
         <div class="detail-content">
-            <div class="detail-creature-display">
-                <img src="assets/creatures/creature_chick.png" class="detail-creature-image" id="detail-creature-img" alt="Creature">
-                <div style="font-size: 24px; font-weight: bold; margin-top: 15px;" id="detail-creature-title">Creature</div>
-                <div style="font-size: 16px; opacity: 0.8; margin-top: 5px;" id="detail-creature-level">Level 1/5</div>
+            <div style="text-align:center; margin-bottom:20px;">
+                <img src="" class="hatch-creature-reveal" id="detail-creature-img" style="width:150px; height:150px; margin-bottom:15px;">
+                <h2 id="detail-creature-title" style="margin-bottom:5px;">Name</h2>
+                <div id="detail-creature-level" style="opacity:0.7; font-size:14px;">Level 1/5</div>
             </div>
-            <div class="detail-stats">
-                <div class="stat-row"><span>Current Income:</span><span id="detail-current-income">+0 $HATCH/hr</span></div>
-                <div class="stat-row"><span>Total Earned:</span><span id="detail-total-earned">0 $HATCH</span></div>
-            </div>
+            
             <div class="upgrade-section">
-                <div class="upgrade-header">⬆️ Upgrade</div>
-                <div class="stat-row"><span>Current Production:</span><span id="detail-current-prod">+0 $HATCH/hr</span></div>
-                <div class="upgrade-arrow">↓</div>
-                <div class="stat-row"><span>After Upgrade:</span><span style="color: #00d68f;" id="detail-next-prod">+0 $HATCH/hr 📈</span></div>
-                <div style="margin-top: 20px; text-align: center;"><div class="cost-badge">💰 Upgrade Cost: <strong id="detail-upgrade-cost">0 $HATCH</strong></div></div>
-                <button class="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
+                <div class="stats-row"><span>Current Income:</span><span style="color:#00d68f;" id="detail-current-income">+0/hr</span></div>
+                <div class="stats-row"><span>Total Produced:</span><span id="detail-total-earned">0</span></div>
+            </div>
+
+            <div class="upgrade-section">
+                <div style="text-align:center; margin-bottom:10px; font-weight:bold;">⬆️ UPGRADE</div>
+                <div class="stats-row"><span>Next Production:</span><span style="color:#00d68f;" id="detail-next-prod">+0/hr</span></div>
+                <div style="text-align:center; margin:15px 0; font-size:14px; opacity:0.8;">Cost: <strong style="color:#fff;" id="detail-upgrade-cost">0</strong></div>
+                <button class="upgrade-btn" id="upgrade-btn" onclick="upgradeCreature()">UPGRADE NOW</button>
             </div>
         </div>
     </div>
 
+    <!-- HATCH ANIMATION OVERLAY -->
+    <div class="hatch-overlay" id="hatch-overlay">
+        <h1 style="font-size:28px; margin-bottom:10px; color:#ffd700;">🎉 HATCHED! 🎉</h1>
+        <img src="" class="hatch-creature-reveal" id="hatch-creature-img">
+        <div style="font-size:20px; margin-bottom:5px;" id="hatch-stat-name">Name</div>
+        <div style="color:#00d68f; font-weight:bold; margin-bottom:20px;" id="hatch-stat-income">+0/hr</div>
+        <button class="collect-btn" onclick="finishHatching()">AWESOME!</button>
+    </div>
+
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <button class="nav-btn active" onclick="switchTab('home')">🏠<span class="nav-label">Home</span></button>
         <button class="nav-btn" onclick="switchTab('hatch')">🥚<span class="nav-label">Hatch</span></button>
         <button class="nav-btn" onclick="switchTab('tasks')">📋<span class="nav-label">Tasks</span></button>
-        <button class="nav-btn" onclick="switchTab('airdrop')">🎁<span class="nav-label">Airdrop</span></button>
         <button class="nav-btn" onclick="switchTab('profile')">👤<span class="nav-label">Me</span></button>
     </div>
 
     <script>
-    // Configuration
-    const BOT_API = "https://telegrambot-or4r.onrender.com";
-    const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
+        // ==========================================
+        // CONFIG & DATA
+        // ==========================================
+        const BOT_API = "https://telegrambot-or4r.onrender.com";
+        const API_SECRET = "383c5336-101c-4374-9cf9-44dd291db44c";
+        
+        // Simulate Telegram User ID for local testing
+        let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString();
+        if (!userId) userId = "local_user_" + Math.random().toString(36).substr(2, 9);
 
-    // Get Telegram user ID
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString();
-    const isTelegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user?.id !== undefined;
-    console.log("User ID:", userId);
-
-
-    const CREATURES_CONFIG = {
-      1: { levels: [{ income: 30, upgradeCost: 1000 }, { income: 50, upgradeCost: 2500 }, { income: 100, upgradeCost: 6000 }, { income: 160, upgradeCost: 10000 }, { income: 250, upgradeCost: null }] },
-      2: { levels: [{ income: 40, upgradeCost: 2000 }, { income: 70, upgradeCost: 5000 }, { income: 150, upgradeCost: 13000 }, { income: 300, upgradeCost: 24000 }, { income: 700, upgradeCost: null }] },
-      3: { levels: [{ income: 60, upgradeCost: 5000 }, { income: 160, upgradeCost: 12000 }, { income: 330, upgradeCost: 28000 }, { income: 900, upgradeCost: 50000 }, { income: 1500, upgradeCost: null }] },
-      4: { levels: [{ income: 90, upgradeCost: 7000 }, { income: 180, upgradeCost: 15000 }, { income: 320, upgradeCost: 35000 }, { income: 600, upgradeCost: 70000 }, { income: 1200, upgradeCost: null }] },
-      5: { levels: [{ income: 130, upgradeCost: 12000 }, { income: 250, upgradeCost: 28000 }, { income: 500, upgradeCost: 60000 }, { income: 900, upgradeCost: 120000 }, { income: 1800, upgradeCost: null }] },
-      6: { levels: [{ income: 180, upgradeCost: 18000 }, { income: 360, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 180000 }, { income: 2800, upgradeCost: null }] },
-      7: { levels: [{ income: 250, upgradeCost: 26000 }, { income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 120000 }, { income: 2000, upgradeCost: 240000 }, { income: 4000, upgradeCost: null }] },
-      8: { levels: [{ income: 350, upgradeCost: 40000 }, { income: 700, upgradeCost: 90000 }, { income: 1500, upgradeCost: 180000 }, { income: 3000, upgradeCost: 360000 }, { income: 6000, upgradeCost: null }] },
-      9: { levels: [{ income: 500, upgradeCost: 60000 }, { income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 280000 }, { income: 4000, upgradeCost: 560000 }, { income: 8000, upgradeCost: null }] },
-      10: { levels: [{ income: 700, upgradeCost: 90000 }, { income: 1400, upgradeCost: 220000 }, { income: 2800, upgradeCost: 440000 }, { income: 5600, upgradeCost: 880000 }, { income: 11200, upgradeCost: null }] },
-      11: { levels: [{ income: 1000, upgradeCost: 140000 }, { income: 2000, upgradeCost: 300000 }, { income: 4000, upgradeCost: 600000 }, { income: 8000, upgradeCost: 1200000 }, { income: 16000, upgradeCost: null }] },
-      12: { levels: [{ income: 1500, upgradeCost: 220000 }, { income: 3000, upgradeCost: 450000 }, { income: 6000, upgradeCost: 900000 }, { income: 12000, upgradeCost: 1800000 }, { income: 24000, upgradeCost: null }] },
-      13: { levels: [{ income: 2200, upgradeCost: 350000 }, { income: 4400, upgradeCost: 700000 }, { income: 8800, upgradeCost: 1400000 }, { income: 17600, upgradeCost: 2800000 }, { income: 35200, upgradeCost: null }] },
-      14: { levels: [{ income: 3200, upgradeCost: 550000 }, { income: 6400, upgradeCost: 1100000 }, { income: 12800, upgradeCost: 2200000 }, { income: 25600, upgradeCost: 4400000 }, { income: 51200, upgradeCost: null }] },
-      15: { levels: [{ income: 4500, upgradeCost: 850000 }, { income: 9000, upgradeCost: 1700000 }, { income: 18000, upgradeCost: 3400000 }, { income: 36000, upgradeCost: 6800000 }, { income: 72000, upgradeCost: null }] },
-      16: { levels: [{ income: 6500, upgradeCost: 1300000 }, { income: 13000, upgradeCost: 2600000 }, { income: 26000, upgradeCost: 5200000 }, { income: 52000, upgradeCost: 10400000 }, { income: 104000, upgradeCost: null }] },
-      17: { levels: [{ income: 9000, upgradeCost: 2000000 }, { income: 18000, upgradeCost: 4000000 }, { income: 36000, upgradeCost: 8000000 }, { income: 72000, upgradeCost: 16000000 }, { income: 144000, upgradeCost: null }] },
-      18: { levels: [{ income: 13000, upgradeCost: 3000000 }, { income: 26000, upgradeCost: 6000000 }, { income: 52000, upgradeCost: 12000000 }, { income: 104000, upgradeCost: 24000000 }, { income: 208000, upgradeCost: null }] },
-      19: { levels: [{ income: 18000, upgradeCost: 4500000 }, { income: 36000, upgradeCost: 9000000 }, { income: 72000, upgradeCost: 18000000 }, { income: 144000, upgradeCost: 36000000 }, { income: 288000, upgradeCost: null }] },
-      20: { levels: [{ income: 25000, upgradeCost: 6500000 }, { income: 50000, upgradeCost: 13000000 }, { income: 100000, upgradeCost: 26000000 }, { income: 200000, upgradeCost: 52000000 }, { income: 400000, upgradeCost: null }] }
-    };
-
-    // Username generator
-    function generateUsername() {
-        const adjectives = ['Swift', 'Brave', 'Mighty', 'Silent', 'Fierce'];
-        const nouns = ['eagle', 'pegasus', 'Dragon', 'griffin', 'Phoenix'];
-        const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-        const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit
-        return `${randomAdj}${randomNoun}#${randomNumber}`;
-    }
-
-    let generatedUsername = generateUsername();
-    document.getElementById('home-username').textContent = '@' + generatedUsername;
-
-    const saved = localStorage.getItem(`gameState_${userId}`);
-    if (saved) {
-        const state = JSON.parse(saved);
-        if (state.username) generatedUsername = state.username;
-    } else {
-        generatedUsername = generateUsername();
-    }
-    document.querySelector('.logo').textContent = generatedUsername;
-    document.querySelector('#profile-screen .creature-display div:nth-child(2)').textContent = '@' + generatedUsername;
-
-    // Batching variables
-    let pendingTokens = 0;
-    let saveTimeout = null;
-
-    // All 20 eggs database
-    const allEggs = [
-        { id: 1, name: 'Chick', eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', requiredHP: 1000, hpPerTap: 10, description: 'Soft warmth seeps through the fragile shell' },
-        { id: 2, name: 'Turtle', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', requiredHP: 2500, hpPerTap: 10, description: 'Heavy and calm, built to endure time' },
-        { id: 3, name: 'Lizard', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', requiredHP: 5000, hpPerTap: 10, description: 'A faint pulse hints at swift movement inside' },
-        { id: 4, name: 'Snake', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', requiredHP: 7500, hpPerTap: 10, description: 'Cold and silent, yet watching' },
-        { id: 5, name: 'Eagle', eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', requiredHP: 10000, hpPerTap: 10, description: 'Light as air, humming with skybound energy' },
-        { id: 6, name: 'Dino', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', requiredHP: 15000, hpPerTap: 10, description: 'Ancient power sleeps beneath its surface' },
-        { id: 7, name: 'Dragon', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', requiredHP: 20000, hpPerTap: 10, description: 'Intense heat radiates from within' },
-        { id: 8, name: 'Unicorn', eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', requiredHP: 30000, hpPerTap: 10, description: 'A gentle glow of pure magic surrounds it' },
-        { id: 9, name: 'Phoenix', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', requiredHP: 40000, hpPerTap: 10, description: 'Warmth rises and falls like a heartbeat' },
-        { id: 10, name: 'Griffin', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', requiredHP: 55000, hpPerTap: 10, description: 'Strength and pride rest within' },
-        { id: 11, name: 'Pegasus', eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', requiredHP: 75000, hpPerTap: 10, description: 'It feels lighter than it should' },
-        { id: 12, name: 'Golem', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', requiredHP: 100000, hpPerTap: 10, description: 'Solid and unmoving, yet alive' },
-        { id: 13, name: 'Fairy', eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', requiredHP: 150000, hpPerTap: 10, description: 'A soft hum fills the air around it' },
-        { id: 14, name: 'Hydra', eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', requiredHP: 200000, hpPerTap: 10, description: 'Danger lingers beneath its shell' },
-        { id: 15, name: 'Cerberus', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', requiredHP: 300000, hpPerTap: 10, description: 'Dark energy coils within' },
-        { id: 16, name: 'Kraken', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', requiredHP: 500000, hpPerTap: 10, description: 'It vibrates with deep ocean force' },
-        { id: 17, name: 'Minotaur', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', requiredHP: 750000, hpPerTap: 10, description: 'Raw power presses against the shell' },
-        { id: 18, name: 'Sphinx', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', requiredHP: 1000000, hpPerTap: 10, description: 'Ancient wisdom watches silently' },
-        { id: 19, name: 'Chimera', eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', requiredHP: 1500000, hpPerTap: 10, description: 'Chaos stirs in unpredictable patterns' },
-        { id: 20, name: 'Elemental', eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', requiredHP: 2000000, hpPerTap: 10, description: 'Conflicting forces remain perfectly balanced' }
-    ];
-
-    // Creatures that have been hatched
-    const creatures = {};
-    let currentEgg = null;
-    let currentEggIndex = 0;
-    let selectedCreature = null;
-
-    function loadGameState() {
-        const key = `gameState_${userId}`;
-        const s = localStorage.getItem(key);
-        let state = null;
-        if (s) {
-            try {
-                state = JSON.parse(s);
-                if (state.creatures && typeof state.creatures === 'object') Object.assign(creatures, state.creatures);
-                currentEggIndex = allEggs.findIndex(egg => !creatures[egg.id]);
-                if (currentEggIndex === -1) currentEggIndex = allEggs.length - 1;
-                currentEgg = allEggs[currentEggIndex];
-                currentEgg.currentHP = typeof state.currentHP === 'number' ? state.currentHP : 0;
-            } catch (err) {
-                console.error("Failed to parse saved game state, resetting to first egg.", err);
-                currentEggIndex = 0;
-                currentEgg = allEggs[0];
-                currentEgg.currentHP = 0;
-            }
-        } else {
-            currentEggIndex = 0;
-            currentEgg = allEggs[0];
-            currentEgg.currentHP = 0;
-        }
-        document.getElementById('main-egg').src = currentEgg.eggImg;
-        document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
-        document.getElementById('egg-description').textContent = currentEgg.description;
-
-        // In loadGameState(), after loading state but before updateProgress()
-    // In loadGameState(), after loading state but before updateProgress()
-    if (s && state.lastActiveTime) {
-        const now = Date.now();
-        const offlineMs = now - state.lastActiveTime;
-        const offlineHours = offlineMs / (1000 * 60 * 60);
-        const passiveIncome = calculateTotalPassiveIncome();
-        const earnedWhileAway = Math.floor(offlineHours * passiveIncome);
-        const maxCollectionHours = 8;
-        const collectionCap = passiveIncome * maxCollectionHours;
-        const potentialEarned = Math.min(earnedWhileAway, collectionCap);
-        document.getElementById('collected-amount').textContent = potentialEarned;
-    }
-        updateProgress();
-        setupEggImage();
-        updatePassiveIncome();
-    }
-
-    function saveGameState() {
-    localStorage.setItem(`gameState_${userId}`, JSON.stringify({ 
-        currentEggIndex, 
-        currentHP: currentEgg.currentHP, 
-        creatures, 
-        username: generatedUsername,
-        lastActiveTime: Date.now(),
-        collectionStartTime: Date.now()
-    }));
-    }
-
-    async function loadBalanceFromBackend() {
-        if (!isTelegramUser) {
-    const savedBalance = localStorage.getItem(`balance_${userId}`) || '0';
-    document.getElementById('hatch-balance').textContent = parseInt(savedBalance).toLocaleString();
-    return;
-}
-        const unsaved = parseInt(localStorage.getItem(`unsaved_${userId}`)) || 0;
-        if (unsaved > 0) {
-            await sendBatchToBackend(unsaved);
-            localStorage.removeItem(`unsaved_${userId}`);
-        }
-        try {
-            const res = await fetch(`${BOT_API}/get_balance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: userId, api_secret: API_SECRET }) });
-            if (res.ok) {
-                const data = await res.json();
-                const balance = data.balance || 0;
-                document.getElementById('hatch-balance').textContent = (data.balance || 0).toLocaleString();
-                localStorage.setItem(`balance_${userId}`, balance.toString());
-                syncBalanceDisplays();
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function sendBatchToBackend(amount) {
-        if (!isTelegramUser) {
-        console.log("Demo mode - saving to localStorage only");
-        // Update localStorage balance
-        const currentBalance = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')) || 0;
-        localStorage.setItem(`balance_${userId}`, currentBalance.toString());
-        return;
-    }
-        try {
-            const res = await fetch(`${BOT_API}/update_tokens`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: userId, tokens: amount, api_secret: API_SECRET }) });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.new_balance !== undefined) { document.getElementById('hatch-balance').textContent = data.new_balance.toLocaleString(); 
-                localStorage.setItem(`balance_${userId}`, data.new_balance.toString());                                  
-                syncBalanceDisplays(); }
-                localStorage.removeItem(`unsaved_${userId}`);
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    function switchTab(t) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        const screen = document.getElementById(t + '-screen');
-        if (screen) screen.classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const label = btn.querySelector('.nav-label'); if (!label) return; const lt = label.textContent.toLowerCase();
-            if ((t === 'home' && lt === 'home') || (t === 'hatch' && lt === 'hatch') || (t === 'tasks' && lt === 'tasks') || (t === 'airdrop' && lt === 'airdrop') || (t === 'profile' && lt === 'me')) { btn.classList.add('active'); }
-        });
-        if (t === 'hatch') renderCreaturesGrid();
-    }
-
-    const eggEl = document.getElementById('main-egg');
-    const hitCanvas = document.createElement('canvas');
-    const hitCtx = hitCanvas.getContext('2d');
-    let eggLoaded = false;
-
-    function setupEggImage() {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = currentEgg.eggImg;
-        img.onload = () => {
-            const dpr = Math.max(1, window.devicePixelRatio || 1);
-            hitCanvas.width = Math.round(img.naturalWidth * dpr);
-            hitCanvas.height = Math.round(img.naturalHeight * dpr);
-            hitCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            hitCtx.clearRect(0, 0, hitCanvas.width, hitCanvas.height);
-            hitCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-            eggLoaded = true;
+        const CREATURES_CONFIG = {
+            1:  { levels: [{ inc: 30, cost: 1000 }, { inc: 50, cost: 2500 }, { inc: 100, cost: 6000 }, { inc: 160, cost: 10000 }, { inc: 250, cost: null }] },
+            2:  { levels: [{ inc: 40, cost: 2000 }, { inc: 70, cost: 5000 }, { inc: 150, cost: 13000 }, { inc: 300, cost: 24000 }, { inc: 700, cost: null }] },
+            3:  { levels: [{ inc: 60, cost: 5000 }, { inc: 160, cost: 12000 }, { inc: 330, cost: 28000 }, { inc: 900, cost: 50000 }, { inc: 1500, cost: null }] },
+            4:  { levels: [{ inc: 90, cost: 7000 }, { inc: 180, cost: 15000 }, { inc: 320, cost: 35000 }, { inc: 600, cost: 70000 }, { inc: 1200, cost: null }] },
+            5:  { levels: [{ inc: 130, cost: 12000 }, { inc: 250, cost: 28000 }, { inc: 500, cost: 60000 }, { inc: 900, cost: 120000 }, { inc: 1800, cost: null }] },
+            6:  { levels: [{ inc: 180, cost: 18000 }, { inc: 360, cost: 40000 }, { inc: 700, cost: 90000 }, { inc: 1400, cost: 180000 }, { inc: 2800, cost: null }] },
+            7:  { levels: [{ inc: 250, cost: 26000 }, { inc: 500, cost: 60000 }, { inc: 1000, cost: 120000 }, { inc: 2000, cost: 240000 }, { inc: 4000, cost: null }] },
+            8:  { levels: [{ inc: 350, cost: 40000 }, { inc: 700, cost: 90000 }, { inc: 1500, cost: 180000 }, { inc: 3000, cost: 360000 }, { inc: 6000, cost: null }] },
+            9:  { levels: [{ inc: 500, cost: 60000 }, { inc: 1000, cost: 140000 }, { inc: 2000, cost: 280000 }, { inc: 4000, cost: 560000 }, { inc: 8000, cost: null }] },
+            10: { levels: [{ inc: 700, cost: 90000 }, { inc: 1400, cost: 220000 }, { inc: 2800, cost: 440000 }, { inc: 5600, cost: 880000 }, { inc: 11200, cost: null }] },
+            11: { levels: [{ inc: 1000, cost: 140000 }, { inc: 2000, cost: 300000 }, { inc: 4000, cost: 600000 }, { inc: 8000, cost: 1200000 }, { inc: 16000, cost: null }] },
+            12: { levels: [{ inc: 1500, cost: 220000 }, { inc: 3000, cost: 450000 }, { inc: 6000, cost: 900000 }, { inc: 12000, cost: 1800000 }, { inc: 24000, cost: null }] },
+            13: { levels: [{ inc: 2200, cost: 350000 }, { inc: 4400, cost: 700000 }, { inc: 8800, cost: 1400000 }, { inc: 17600, cost: 2800000 }, { inc: 35200, cost: null }] },
+            14: { levels: [{ inc: 3200, cost: 550000 }, { inc: 6400, cost: 1100000 }, { inc: 12800, cost: 2200000 }, { inc: 25600, cost: 4400000 }, { inc: 51200, cost: null }] },
+            15: { levels: [{ inc: 4500, cost: 850000 }, { inc: 9000, cost: 1700000 }, { inc: 18000, cost: 3400000 }, { inc: 36000, cost: 6800000 }, { inc: 72000, cost: null }] },
+            16: { levels: [{ inc: 6500, cost: 1300000 }, { inc: 13000, cost: 2600000 }, { inc: 26000, cost: 5200000 }, { inc: 52000, cost: 10400000 }, { inc: 104000, cost: null }] },
+            17: { levels: [{ inc: 9000, cost: 2000000 }, { inc: 18000, cost: 4000000 }, { inc: 36000, cost: 8000000 }, { inc: 72000, cost: 16000000 }, { inc: 144000, cost: null }] },
+            18: { levels: [{ inc: 13000, cost: 3000000 }, { inc: 26000, cost: 6000000 }, { inc: 52000, cost: 12000000 }, { inc: 104000, cost: 24000000 }, { inc: 208000, cost: null }] },
+            19: { levels: [{ inc: 18000, cost: 4500000 }, { inc: 36000, cost: 9000000 }, { inc: 72000, cost: 18000000 }, { inc: 144000, cost: 36000000 }, { inc: 288000, cost: null }] },
+            20: { levels: [{ inc: 25000, cost: 6500000 }, { inc: 50000, cost: 13000000 }, { inc: 100000, cost: 26000000 }, { inc: 200000, cost: 52000000 }, { inc: 400000, cost: null }] }
         };
-        img.onerror = () => { eggLoaded = false; };
-    }
 
-    function tapEgg(e) {
-        currentEgg.currentHP += currentEgg.hpPerTap;
-        const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')) || 0;
-        document.getElementById('hatch-balance').textContent = (bal + currentEgg.hpPerTap).toLocaleString();
-        syncBalanceDisplays();
-        pendingTokens += currentEgg.hpPerTap;
-        localStorage.setItem(`unsaved_${userId}`, pendingTokens);
-        showFloatingText('+' + currentEgg.hpPerTap, e.clientX || (window.innerWidth/2), e.clientY || (window.innerHeight/2));
-        updateProgress();
-        saveGameState();
-        const egg = document.getElementById('main-egg');
-        egg.style.transform = 'scale(0.9) rotate(-5deg)';
-        setTimeout(() => egg.style.transform = 'scale(1) rotate(0deg)', 100);
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => { if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; } }, 2000);
-        if (currentEgg.currentHP >= currentEgg.requiredHP) hatchEgg();
-    }
+        const allEggs = [
+            { id: 1, name: 'Chick', eggImg: 'assets/eggs/egg_chick.png', creatureImg: 'assets/creatures/creature_chick.png', hp: 1000, desc: 'Soft warmth seeps through the fragile shell.' },
+            { id: 2, name: 'Turtle', eggImg: 'assets/eggs/egg_turtle.png', creatureImg: 'assets/creatures/creature_turtle.png', hp: 2500, desc: 'Heavy and calm, built to endure time.' },
+            { id: 3, name: 'Lizard', eggImg: 'assets/eggs/egg_lizard.png', creatureImg: 'assets/creatures/creature_lizard.png', hp: 5000, desc: 'A faint pulse hints at swift movement inside.' },
+            { id: 4, name: 'Snake', eggImg: 'assets/eggs/egg_snake.png', creatureImg: 'assets/creatures/creature_snake.png', hp: 7500, desc: 'Cold and silent, yet watching.' },
+            { id: 5, name: 'Eagle', eggImg: 'assets/eggs/egg_eagle.png', creatureImg: 'assets/creatures/creature_eagle.png', hp: 10000, desc: 'Light as air, humming with skybound energy.' },
+            { id: 6, name: 'Dino', eggImg: 'assets/eggs/egg_dino.png', creatureImg: 'assets/creatures/creature_dino.png', hp: 15000, desc: 'Ancient power sleeps beneath its surface.' },
+            { id: 7, name: 'Dragon', eggImg: 'assets/eggs/egg_dragon.png', creatureImg: 'assets/creatures/creature_dragon.png', hp: 20000, desc: 'Intense heat radiates from within.' },
+            { id: 8, name: 'Unicorn', eggImg: 'assets/eggs/egg_unicorn.png', creatureImg: 'assets/creatures/creature_unicorn.png', hp: 30000, desc: 'A gentle glow of pure magic surrounds it.' },
+            { id: 9, name: 'Phoenix', eggImg: 'assets/eggs/egg_phoenix.png', creatureImg: 'assets/creatures/creature_phoenix.png', hp: 40000, desc: 'Warmth rises and falls like a heartbeat.' },
+            { id: 10, name: 'Griffin', eggImg: 'assets/eggs/egg_griffin.png', creatureImg: 'assets/creatures/creature_griffin.png', hp: 55000, desc: 'Strength and pride rest within.' },
+            { id: 11, name: 'Pegasus', eggImg: 'assets/eggs/egg_pegasus.png', creatureImg: 'assets/creatures/creature_pegasus.png', hp: 75000, desc: 'It feels lighter than it should.' },
+            { id: 12, name: 'Golem', eggImg: 'assets/eggs/egg_golem.png', creatureImg: 'assets/creatures/creature_golem.png', hp: 100000, desc: 'Solid and unmoving, yet alive.' },
+            { id: 13, name: 'Fairy', eggImg: 'assets/eggs/egg_fairy.png', creatureImg: 'assets/creatures/creature_fairy.png', hp: 150000, desc: 'A soft hum fills the air around it.' },
+            { id: 14, name: 'Hydra', eggImg: 'assets/eggs/egg_hydra.png', creatureImg: 'assets/creatures/creature_hydra.png', hp: 200000, desc: 'Danger lingers beneath its shell.' },
+            { id: 15, name: 'Cerberus', eggImg: 'assets/eggs/egg_cerberus.png', creatureImg: 'assets/creatures/creature_cerberus.png', hp: 300000, desc: 'Dark energy coils within.' },
+            { id: 16, name: 'Kraken', eggImg: 'assets/eggs/egg_kraken.png', creatureImg: 'assets/creatures/creature_kraken.png', hp: 500000, desc: 'It vibrates with deep ocean force.' },
+            { id: 17, name: 'Minotaur', eggImg: 'assets/eggs/egg_minotaur.png', creatureImg: 'assets/creatures/creature_minotaur.png', hp: 750000, desc: 'Raw power presses against the shell.' },
+            { id: 18, name: 'Sphinx', eggImg: 'assets/eggs/egg_sphinx.png', creatureImg: 'assets/creatures/creature_sphinx.png', hp: 1000000, desc: 'Ancient wisdom watches silently.' },
+            { id: 19, name: 'Chimera', eggImg: 'assets/eggs/egg_chimera.png', creatureImg: 'assets/creatures/creature_chimera.png', hp: 1500000, desc: 'Chaos stirs in unpredictable patterns.' },
+            { id: 20, name: 'Elemental', eggImg: 'assets/eggs/egg_elemental.png', creatureImg: 'assets/creatures/creature_elemental.png', hp: 2000000, desc: 'Conflicting forces remain perfectly balanced.' }
+        ];
 
-    eggEl.addEventListener('click', (e) => {
-        if (!eggLoaded) { tapEgg(e); return; }
-        const rect = eggEl.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) * (hitCanvas.width / rect.width));
-        const y = Math.floor((e.clientY - rect.top) * (hitCanvas.height / rect.height));
-        if (x < 0 || x >= hitCanvas.width || y < 0 || y >= hitCanvas.height) return;
-        const pixel = hitCtx.getImageData(x, y, 1, 1).data;
-        if (pixel[3] > 20) tapEgg(e);
-    });
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let state = {
+            username: 'Player',
+            balance: 0,
+            points: 0,
+            currentEggIndex: 0,
+            currentEggHP: 0,
+            creatures: {}, // { id: { level: 1, earned: 0 } }
+            lastCollectionTime: Date.now(), // Timestamp for 8h timer
+            lastSaveTime: Date.now() // Timestamp for general save
+        };
 
-    window.addEventListener('beforeunload', () => {
-        if (pendingTokens > 0) {
-            navigator.sendBeacon(`${BOT_API}/update_tokens`, new Blob([JSON.stringify({ user_id: userId, tokens: pendingTokens, api_secret: API_SECRET })], { type: 'application/json' }));
+        let pendingTokens = 0;
+        let saveInterval = null;
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        function initGame() {
+            loadState();
+            updateUI();
+            
+            // 1 Second Game Loop (Passive Income & Save)
+            setInterval(() => {
+                updatePassiveIncome();
+                if(pendingTokens > 0) syncToBackend();
+            }, 1000);
+
+            // Auto-save every 10s
+            setInterval(saveState, 10000);
+
+            // Setup Image Fallbacks
+            document.querySelectorAll('img').forEach(img => {
+                img.onerror = function() {
+                    this.src = `https://picsum.photos/seed/${this.alt || 'egg'}/200/200`;
+                };
+            });
         }
-    });
 
-    window.addEventListener('blur', () => { if (pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); } });
-    document.addEventListener('visibilitychange', () => { if (document.hidden && pendingTokens > 0) { sendBatchToBackend(pendingTokens); pendingTokens = 0; clearTimeout(saveTimeout); } });
-
-    function updateProgress() {
-        const pct = Math.min((currentEgg.currentHP / currentEgg.requiredHP) * 100, 100);
-        document.getElementById('progress-bar').style.width = pct + '%';
-        document.getElementById('progress-percentage').textContent = Math.floor(pct) + '%';
-        document.getElementById('current-hp').textContent = (currentEgg.currentHP || 0).toLocaleString();
-        document.getElementById('required-hp').textContent = (currentEgg.requiredHP || 0).toLocaleString();
-    }
-
-    function hatchEgg() {
-        const config = CREATURES_CONFIG[currentEgg.id];
-        const level1 = config.levels[0];
-        const level2 = config.levels[1];
-        
-     creatures[currentEgg.id] = { 
-        id: currentEgg.id, 
-        name: currentEgg.name, 
-        image: currentEgg.creatureImg, 
-        currentLevel: 1, 
-        maxLevel: 5, 
-        currentIncome: level1.income,
-        nextLevelIncome: level2.income,
-        upgradeCost: level1.upgradeCost,
-        totalEarned: 0 
-    };
-        showHatchAnimation(currentEgg);
-    }
-
-    function showHatchAnimation(egg) {
-        const overlay = document.getElementById('hatch-overlay');
-        const config = CREATURES_CONFIG[egg.id];
-        const level1Income = config.levels[0].income;
-
-        document.getElementById('hatch-creature-img').src = egg.creatureImg;
-        document.getElementById('hatch-title').textContent = `🎉 ${egg.name.toUpperCase()} HATCHED! 🎉`;
-        document.getElementById('hatch-message').textContent = `${egg.name} has joined your collection!`;
-        document.getElementById('hatch-stat-name').textContent = egg.name;
-        document.getElementById('hatch-stat-income').textContent = `+${level1Income} $HATCH/hr`;
-        createConfetti();
-        overlay.classList.add('active');
-        setTimeout(() => {
-            overlay.classList.remove('active');
-            currentEggIndex++;
-            if (currentEggIndex < allEggs.length) {
-                currentEgg = allEggs[currentEggIndex];
-                currentEgg.currentHP = 0;
-                const eggElement = document.getElementById('main-egg');
-                eggElement.src = currentEgg.eggImg;
-                document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
-                document.getElementById('egg-description').textContent = currentEgg.description;
-                updateProgress();
-                setupEggImage();
-            } else showFloatingText('🎊 All 20 Creatures Hatched! 🎊', window.innerWidth / 2, window.innerHeight / 2);
-            saveGameState();
-            switchTab('hatch');
-        }, 3500);
-    }
-
-    function createConfetti() {
-        const colors = ['#FFD700', '#FF69B4', '#00D68F', '#667eea', '#FF6347'];
-        const overlay = document.getElementById('hatch-overlay');
-        for (let i = 0; i < 50; i++) { setTimeout(() => { const c = document.createElement('div'); c.className = 'confetti'; c.style.left = Math.random() * 100 + '%'; c.style.top = '-10px'; c.style.background = colors[Math.floor(Math.random() * colors.length)]; c.style.animationDelay = Math.random() * 0.5 + 's'; overlay.appendChild(c); setTimeout(() => c.remove(), 3000); }, i * 50); }
-    }
-
-    function updatePassiveIncome() {
-        let total = 0; 
-        Object.values(creatures).forEach(c => total += (c.currentIncome || 0)); 
-        document.getElementById('passive-income').textContent = total;
-    }
-    function calculateTotalPassiveIncome() {
-        let total = 0;
-        Object.values(creatures).forEach(c => total += (c.currentIncome || 0));
-        return total;
-    }
-
-    function renderCreaturesGrid() {
-        const grid = document.getElementById('creatures-grid'); grid.innerHTML = '';
-        let unlocked = Object.keys(creatures).length;
-        allEggs.forEach((egg, i) => {
-            const card = document.createElement('div');
-            if (creatures[egg.id]) {
-                const c = creatures[egg.id];
-                card.className = 'creature-card';
-                card.onclick = () => openCreatureDetail(egg.id);
-                card.innerHTML = `<img src="${c.image}" class="creature-image"><div class="name"> ${c.name}</div><div class="level">Level ${c.currentLevel}/${c.maxLevel}</div><div class="income">+${c.currentIncome}/hr</div>`;
-            } else if (i === currentEggIndex) {
-                card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 In Progress</div><div class="income">${(currentEgg.currentHP||0).toLocaleString()}/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+        function loadState() {
+            const saved = localStorage.getItem(`eggGame_${userId}`);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                    
+                    // Safety Check: Ensure currentEggIndex isn't out of bounds
+                    if (state.currentEggIndex >= allEggs.length) state.currentEggIndex = allEggs.length - 1;
+                } catch (e) { console.error("Save file corrupted, resetting."); }
             } else {
-                card.className = 'creature-card locked';
-                card.innerHTML = `<img src="${egg.eggImg}" class="creature-image"><div class="name"> ${egg.name} Egg</div><div class="level">🔒 Locked</div><div class="income">0/${egg.requiredHP.toLocaleString()} HP</div><div class="lock-overlay">🔒</div>`;
+                // New User
+                state.username = "Hero" + Math.floor(Math.random() * 9999);
             }
-            grid.appendChild(card);
+            
+            // Try to get balance from backend if available
+            syncFromBackend();
+        }
+
+        function saveState() {
+            state.lastSaveTime = Date.now();
+            localStorage.setItem(`eggGame_${userId}`, JSON.stringify(state));
+        }
+
+        function resetGame() {
+            if(confirm("Are you sure? This will delete all progress!")) {
+                localStorage.removeItem(`eggGame_${userId}`);
+                location.reload();
+            }
+        }
+
+        // ==========================================
+        // CORE GAMEPLAY
+        // ==========================================
+        
+        // 1. Clicking the Egg
+        function tapEgg(e) {
+            const egg = allEggs[state.currentEggIndex];
+            const tapValue = 10; 
+            
+            state.currentEggHP += tapValue;
+            state.balance += tapValue;
+            pendingTokens += tapValue;
+
+            // Visuals
+            showFloatingText(`+${tapValue}`, e.clientX, e.clientY);
+            
+            // Logic
+            updateUI();
+            saveState();
+
+            if (state.currentEggHP >= egg.hp) {
+                hatchEgg();
+            }
+        }
+
+        // 2. Hatching Logic
+        function hatchEgg() {
+            const egg = allEggs[state.currentEggIndex];
+            
+            // Add to collection
+            state.creatures[egg.id] = {
+                level: 1,
+                earned: 0
+            };
+
+            // Show Overlay
+            const overlay = document.getElementById('hatch-overlay');
+            document.getElementById('hatch-creature-img').src = egg.creatureImg;
+            document.getElementById('hatch-stat-name').textContent = egg.name;
+            
+            const baseInc = CREATURES_CONFIG[egg.id].levels[0].inc;
+            document.getElementById('hatch-stat-income').textContent = `+${baseInc}/hr`;
+            
+            overlay.classList.add('active');
+
+            // Pause game logic while showing overlay
+        }
+
+        function finishHatching() {
+            document.getElementById('hatch-overlay').classList.remove('active');
+            
+            // Move to next egg
+            state.currentEggIndex++;
+            state.currentEggHP = 0;
+            
+            // Check if finished all eggs
+            if (state.currentEggIndex >= allEggs.length) {
+                showToast("🎉 All Creatures Hatched! Keep farming for upgrades.");
+                state.currentEggIndex = allEggs.length - 1; // Stay on last one
+            }
+            
+            updateUI();
+            saveState();
+            switchTab('hatch');
+        }
+
+        // 3. Passive Income (The 8h Cap Logic)
+        function updatePassiveIncome() {
+            const incomePerHour = calculateTotalIncome();
+            const now = Date.now();
+            const maxCap = incomePerHour * 8; // 8 hours max storage
+            
+            // Calculate time passed since last collection
+            let elapsedMs = now - state.lastCollectionTime;
+            if (elapsedMs < 0) elapsedMs = 0; // Clock check fix
+
+            // Calculate earned amount
+            let earned = Math.floor((elapsedMs / (1000 * 60 * 60)) * incomePerHour);
+            
+            // Cap it
+            let displayAmount = Math.min(earned, maxCap);
+            if (incomePerHour === 0) displayAmount = 0;
+
+            // Update UI
+            document.getElementById('collected-amount').textContent = displayAmount.toLocaleString();
+            
+            // Update Timer Text
+            let remainingMs = (8 * 60 * 60 * 1000) - elapsedMs;
+            if (remainingMs < 0) remainingMs = 0;
+            
+            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+            const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('next-timer').textContent = (remainingMs > 0) ? `${hours}h ${mins}m` : "FULL";
+
+            // Enable/Disable Button
+            const btn = document.getElementById('collect-btn');
+            btn.disabled = displayAmount <= 0;
+        }
+
+        function collectIncome() {
+            const incomePerHour = calculateTotalIncome();
+            const now = Date.now();
+            let elapsedMs = now - state.lastCollectionTime;
+            
+            let earned = Math.floor((elapsedMs / (1000 * 60 * 60)) * incomePerHour);
+            let maxCap = incomePerHour * 8;
+            let finalAmount = Math.min(earned, maxCap);
+
+            if (finalAmount > 0) {
+                state.balance += finalAmount;
+                pendingTokens += finalAmount;
+                state.lastCollectionTime = now;
+                
+                updateUI();
+                saveState();
+                showToast(`Collected ${finalAmount.toLocaleString()} $HATCH`);
+                
+                // Trigger visual sync
+                syncToBackend(); 
+            }
+        }
+
+        // ==========================================
+        // CREATURES & UPGRADES
+        // ==========================================
+        function calculateTotalIncome() {
+            let total = 0;
+            for (let id in state.creatures) {
+                const c = state.creatures[id];
+                const config = CREATURES_CONFIG[id];
+                if (config && config.levels[c.level - 1]) {
+                    total += config.levels[c.level - 1].inc;
+                }
+            }
+            return total;
+        }
+
+        function openCreatureDetail(id) {
+            const overlay = document.getElementById('creature-detail');
+            const egg = allEggs.find(e => e.id === id);
+            const myCreature = state.creatures[id];
+            const config = CREATURES_CONFIG[id];
+
+            if (!egg || !myCreature || !config) return;
+
+            const currentLvlIdx = myCreature.level - 1;
+            const currentStats = config.levels[currentLvlIdx];
+            const nextStats = config.levels[currentLvlIdx + 1];
+
+            // Populate UI
+            document.getElementById('detail-creature-img').src = egg.creatureImg;
+            document.getElementById('detail-creature-name').textContent = egg.name;
+            document.getElementById('detail-creature-title').textContent = egg.name;
+            document.getElementById('detail-creature-level').textContent = `Level ${myCreature.level}/5`;
+            
+            document.getElementById('detail-current-income').textContent = `+${currentStats.inc}/hr`;
+            document.getElementById('detail-total-earned').textContent = myCreature.earned.toLocaleString();
+
+            const btn = document.getElementById('upgrade-btn');
+            
+            if (nextStats) {
+                document.getElementById('detail-next-prod').textContent = `+${nextStats.inc}/hr`;
+                document.getElementById('detail-upgrade-cost').textContent = `${nextStats.cost.toLocaleString()} $HATCH`;
+                btn.disabled = state.balance < nextStats.cost;
+                btn.textContent = "UPGRADE NOW";
+                btn.onclick = () => upgradeCreature(id);
+            } else {
+                document.getElementById('detail-next-prod').textContent = "MAX LEVEL";
+                document.getElementById('detail-upgrade-cost').textContent = "—";
+                btn.disabled = true;
+                btn.textContent = "MAX LEVEL";
+            }
+
+            overlay.classList.add('active');
+        }
+
+        function upgradeCreature(id) {
+            const myCreature = state.creatures[id];
+            const config = CREATURES_CONFIG[id];
+            const currentLvlIdx = myCreature.level - 1;
+            const nextStats = config.levels[currentLvlIdx + 1];
+
+            if (!nextStats) return;
+            if (state.balance < nextStats.cost) {
+                showToast("Not enough funds!", "error");
+                return;
+            }
+
+            // Pay
+            state.balance -= nextStats.cost;
+            pendingTokens -= nextStats.cost;
+            
+            // Upgrade
+            myCreature.level++;
+            
+            saveState();
+            updateUI();
+            openCreatureDetail(id); // Refresh detail view
+            showToast("Upgrade Successful!");
+        }
+
+        function renderCreaturesGrid() {
+            const grid = document.getElementById('creatures-grid');
+            grid.innerHTML = '';
+
+            allEggs.forEach((egg, idx) => {
+                const card = document.createElement('div');
+                
+                if (state.creatures[egg.id]) {
+                    // Owned
+                    const lvl = state.creatures[egg.id].level;
+                    const inc = CREATURES_CONFIG[egg.id].levels[lvl-1].inc;
+                    card.className = 'creature-card';
+                    card.innerHTML = `
+                        <img src="${egg.creatureImg}" class="creature-image">
+                        <div class="c-name">${egg.name}</div>
+                        <div class="c-level">Lvl ${lvl}</div>
+                        <div class="c-income">+${inc}/hr</div>
+                    `;
+                    card.onclick = () => openCreatureDetail(egg.id);
+                } else if (idx === state.currentEggIndex) {
+                    // Current Egg
+                    card.className = 'creature-card locked';
+                    card.innerHTML = `
+                        <img src="${egg.eggImg}" class="creature-image">
+                        <div class="c-name">${egg.name} Egg</div>
+                        <div class="c-level" style="color:#ffd700;">In Progress</div>
+                        <div style="font-size:11px; margin-top:4px;">${(state.currentEggHP||0).toLocaleString()}/${egg.hp.toLocaleString()}</div>
+                    `;
+                } else {
+                    // Future Egg
+                    card.className = 'creature-card locked';
+                    card.innerHTML = `
+                        <img src="${egg.eggImg}" class="creature-image">
+                        <div class="c-name">???</div>
+                        <div class="c-level">Locked</div>
+                        <div style="font-size:11px; margin-top:4px;">HP ${egg.hp.toLocaleString()}</div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+
+            // Update Header Stats
+            document.getElementById('unlocked-count').textContent = Object.keys(state.creatures).length;
+            document.getElementById('total-income').textContent = calculateTotalIncome().toLocaleString();
+        }
+
+        // ==========================================
+        // UI UPDATES & UTILS
+        // ==========================================
+        function updateUI() {
+            const currentEgg = allEggs[state.currentEggIndex];
+            
+            // Home
+            document.getElementById('home-username').textContent = state.username;
+            document.getElementById('hatch-balance').textContent = state.balance.toLocaleString();
+            document.getElementById('points-balance').textContent = state.points.toLocaleString();
+            
+            document.getElementById('egg-name').textContent = currentEgg.name + ' Egg';
+            document.getElementById('egg-description').textContent = currentEgg.desc;
+            document.getElementById('main-egg').src = currentEgg.eggImg;
+
+            // Progress
+            const pct = Math.min((state.currentEggHP / currentEgg.hp) * 100, 100);
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-percentage').textContent = `${Math.floor(pct)}%`;
+            document.getElementById('current-hp').textContent = state.currentEggHP.toLocaleString();
+            document.getElementById('required-hp').textContent = currentEgg.hp.toLocaleString();
+
+            // Profile
+            document.getElementById('profile-username').textContent = '@' + state.username;
+            document.getElementById('profile-hatch').textContent = state.balance.toLocaleString();
+            document.getElementById('profile-points').textContent = state.points.toLocaleString();
+            document.getElementById('profile-creatures').textContent = `${Object.keys(state.creatures).length}/20`;
+
+            // Hatch Screen (if active)
+            if (document.getElementById('hatch-screen').classList.contains('active')) {
+                renderCreaturesGrid();
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`${tabName}-screen`).classList.add('active');
+            
+            // Highlight nav
+            const navMap = { 'home':0, 'hatch':1, 'tasks':2, 'profile':3 };
+            const navBtns = document.querySelectorAll('.nav-btn');
+            if (navBtns[navMap[tabName]]) navBtns[navMap[tabName]].classList.add('active');
+
+            if (tabName === 'hatch') renderCreaturesGrid();
+        }
+
+        function closeCreatureDetail() {
+            document.getElementById('creature-detail').classList.remove('active');
+            updateUI();
+        }
+
+        // Floating Text Animation
+        function showFloatingText(text, x, y) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.textContent = text;
+            el.style.left = (x - 20) + 'px'; // Center roughly
+            el.style.top = (y - 20) + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        // Toast Notification System
+        function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(type==='error') toast.style.border = '1px solid #ff4444';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // Quick Actions
+        function claimDailyBonus() {
+            const now = Date.now();
+            const lastClaim = state.lastDailyClaim || 0;
+            const cooldown = 24 * 60 * 60 * 1000;
+
+            if (now - lastClaim > cooldown) {
+                state.points += 50;
+                state.balance += 500;
+                state.lastDailyClaim = now;
+                saveState();
+                updateUI();
+                showToast("Daily Bonus Claimed! 💎 +50pts");
+            } else {
+                const hoursLeft = Math.ceil((cooldown - (now - lastClaim)) / (1000*60*60));
+                showToast(`Come back in ${hoursLeft} hours`, "error");
+            }
+        }
+        
+        function showReferral() {
+            showToast("Referral link copied to clipboard!");
+        }
+
+        // ==========================================
+        // BACKEND SYNC (Safe Mode)
+        // ==========================================
+        async function syncToBackend() {
+            if (pendingTokens === 0) return;
+            
+            // In a real app, this sends data to your Render bot
+            // For this standalone, we simulate a sync attempt
+            try {
+                // const res = await fetch(`${BOT_API}/update_tokens`, { ... });
+                // if (res.ok) pendingTokens = 0;
+                
+                // Offline Safety: If fetch fails, we just keep pendingTokens
+                // and maybe save to localStorage again.
+            } catch (e) {
+                // Silent fail - game continues offline
+                console.log("Backend sync failed, working offline.");
+            }
+        }
+        
+        async function syncFromBackend() {
+            // Placeholder to load initial balance from server if needed
+            // Currently we rely on state loaded from localStorage
+        }
+
+        // Start Game
+        window.onload = initGame;
+        
+        // Bind Click Event for Egg (Delegation)
+        document.getElementById('main-egg').addEventListener('pointerdown', (e) => {
+            tapEgg(e);
         });
-        document.getElementById('unlocked-count').textContent = unlocked;
-        document.getElementById('unlock-percentage').textContent = Math.floor((unlocked / 20) * 100);
-        let totalInc = 0; Object.values(creatures).forEach(c => totalInc += (c.currentIncome || 0)); document.getElementById('total-income').textContent = totalInc;
-    }
 
-    function showFloatingText(txt, x, y) { const ft = document.createElement('div'); ft.className = 'float-text'; ft.textContent = txt; ft.style.left = x + 'px'; ft.style.top = y + 'px'; document.body.appendChild(ft); setTimeout(() => ft.remove(), 1000); }
-
-    function collectIncome(btn) { const amt = parseInt(document.getElementById('collected-amount').textContent); const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + amt).toLocaleString(); syncBalanceDisplays(); document.getElementById('collected-amount').textContent = '0'; intervalStartTime = Date.now();
-    intervalStartAmount = 0; sendBatchToBackend(amt); // Reset collection timer
-   
-    const state = JSON.parse(localStorage.getItem(`gameState_${userId}`) || '{}');
-    state.collectionStartTime = Date.now();
-    state.collectedAmount = 0;
-    localStorage.setItem(`gameState_${userId}`, JSON.stringify(state)); showFloatingText('+' + amt + ' $HATCH', window.innerWidth / 2, window.innerHeight / 3); const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Collected! ✅'; btn.style.background = '#00d68f'; setTimeout(() => { btn.disabled = false; btn.textContent = orig; btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; }, 2000); }
-
-    function updateCollectionTimer() {
-    const saved = localStorage.getItem(`gameState_${userId}`);
-    if (!saved) return;
-    
-    const state = JSON.parse(saved);
-    const startTime = state.collectionStartTime || Date.now();
-    const maxMs = 8 * 60 * 60 * 1000;
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(0, maxMs - elapsed);
-    
-    const hours = Math.floor(remaining / (1000 * 60 * 60));
-    const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-    
-    document.getElementById('next-timer').textContent = 
-        remaining > 0 ? `${hours}h ${mins}m` : 'Full!';
-}
-setInterval(() => {
-    const passiveInc = parseInt(document.getElementById('passive-income').textContent) || 0;
-    if (passiveInc === 0) return;
-    
-    const maxCollectionHours = 8;
-    const collectionCap = passiveInc * maxCollectionHours;
-    
-    // Calculate how much time has passed since interval started (in hours)
-    const elapsedMs = Date.now() - intervalStartTime;
-    const elapsedHours = elapsedMs / (1000 * 60 * 60);
-    
-    // Calculate earned amount during this session
-    const earnedThisSession = Math.floor(elapsedHours * passiveInc);
-    
-    // Add to starting amount (which includes offline earnings)
-    const totalAmount = intervalStartAmount + earnedThisSession;
-    
-    // Cap at maximum
-    const cappedAmount = Math.min(totalAmount, collectionCap);
-    
-    document.getElementById('collected-amount').textContent = cappedAmount;
-}, 1000); // Update every second
-        
-    function showBonus() { const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, '')); document.getElementById('hatch-balance').textContent = (bal + 500).toLocaleString(); syncBalanceDisplays(); sendBatchToBackend(500); showFloatingText('+500 Daily Bonus!', window.innerWidth / 2, window.innerHeight / 3); }
-
-    function showReferral() { alert('👥 Referral System\n\nInvite friends to earn:\n• 1,000 $HATCH per friend\n• 5 Points per 5 friends\n\nComing soon!'); }
-
-    function openCreatureDetail(id) { selectedCreature = creatures[id]; if (!selectedCreature) return; syncBalanceDisplays(); document.getElementById('detail-creature-name').textContent = selectedCreature.name; document.getElementById('detail-creature-title').textContent = selectedCreature.name; document.getElementById('detail-creature-img').src = selectedCreature.image; document.getElementById('detail-creature-level').textContent = `Level ${selectedCreature.currentLevel}/${selectedCreature.maxLevel}`; document.getElementById('detail-current-income').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`; document.getElementById('detail-total-earned').textContent = `${(selectedCreature.totalEarned||0).toLocaleString()} $HATCH`; document.getElementById('detail-upgrade-cost').textContent = selectedCreature.upgradeCost === null ? '—' : `${selectedCreature.upgradeCost.toLocaleString()} $HATCH`; document.getElementById('detail-current-prod').textContent = `+${selectedCreature.currentIncome} $HATCH/hr`; document.getElementById('detail-next-prod').textContent = `+${selectedCreature.nextLevelIncome} $HATCH/hr 📈`; const upgradeBtn = document.querySelector('.upgrade-btn'); if (selectedCreature.currentLevel >= selectedCreature.maxLevel) { upgradeBtn.disabled = true; upgradeBtn.textContent = 'MAX LEVEL REACHED'; document.querySelector('.upgrade-header').textContent = '⭐ Maximum Level'; } else { upgradeBtn.disabled = false; upgradeBtn.textContent = 'UPGRADE NOW'; document.querySelector('.upgrade-header').textContent = `⬆️ Upgrade to Level ${selectedCreature.currentLevel + 1}`; } document.getElementById('creature-detail').classList.add('active'); }
-
-    function syncBalanceDisplays() { const mb = document.getElementById('hatch-balance').textContent; const mp = document.getElementById('points-balance').textContent; const db = document.getElementById('hatch-balance-detail'); const dp = document.getElementById('points-balance-detail'); const ph = document.getElementById('profile-hatch'); const pp = document.getElementById('profile-points'); const pc = document.getElementById('profile-creatures'); if (db) db.textContent = mb; if (dp) dp.textContent = mp; if (ph) ph.textContent = mb; if (pp) pp.textContent = mp; if (pc) pc.textContent = `${Object.keys(creatures).length}/20`; }
-
-    function closeCreatureDetail() { document.getElementById('creature-detail').classList.remove('active'); selectedCreature = null; }
-
-    function upgradeCreature() {
-    if (!selectedCreature) return;
-    const bal = parseInt(document.getElementById('hatch-balance').textContent.replace(/,/g, ''));
-    if (selectedCreature.upgradeCost === null) return;
-    if (bal < selectedCreature.upgradeCost) {
-        alert(`❌ Not enough $HATCH!\n\nNeed: ${selectedCreature.upgradeCost.toLocaleString()}\nHave: ${bal.toLocaleString()}`);
-        return;
-    }
-    
-    document.getElementById('hatch-balance').textContent = (bal - selectedCreature.upgradeCost).toLocaleString();
-    syncBalanceDisplays();
-    sendBatchToBackend(-selectedCreature.upgradeCost);
-    
-    selectedCreature.currentLevel++;
-    const config = CREATURES_CONFIG[selectedCreature.id];
-    const currentLevelIndex = selectedCreature.currentLevel - 1;
-    const nextLevelIndex = selectedCreature.currentLevel;
-    
-    selectedCreature.currentIncome = config.levels[currentLevelIndex].income;
-    selectedCreature.upgradeCost = config.levels[currentLevelIndex].upgradeCost;
-    
-    if (selectedCreature.currentLevel < selectedCreature.maxLevel) {
-        selectedCreature.nextLevelIncome = config.levels[nextLevelIndex].income;
-    } else {
-        selectedCreature.nextLevelIncome = selectedCreature.currentIncome;
-    }
-    
-    saveGameState();
-    updatePassiveIncome();
-    showFloatingText('🎉 Upgraded!', window.innerWidth / 2, window.innerHeight / 2);
-    setTimeout(() => openCreatureDetail(selectedCreature.id), 500);
-}
-
-loadGameState();
-loadBalanceFromBackend();
-updateProgress();
-updatePassiveIncome();
-setupEggImage();
-        
-// Track when the interval started
-let intervalStartTime = Date.now();
-let intervalStartAmount = parseInt(document.getElementById('collected-amount').textContent) || 0;
-        
-setInterval(updateCollectionTimer, 60000);
-updateCollectionTimer();
-        
     </script>
 </body>
 </html>
-
